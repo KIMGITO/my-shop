@@ -108,6 +108,9 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/security', [ProfileController::class, 'security'])->name('security');
     });
 
+    // were managing profiles 
+    
+
     // Billing
     Route::prefix('billing')->name('billing.')->group(function () {
         Route::get('/', fn() => Inertia::render('Billing/Index'))->name('index');
