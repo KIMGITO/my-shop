@@ -108,7 +108,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/security', [ProfileController::class, 'security'])->name('security');
     });
 
-    // were managing profiles 
+    
     
 
     // Billing
