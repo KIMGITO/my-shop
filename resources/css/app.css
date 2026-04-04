@@ -1,0 +1,131 @@
+@import "tailwindcss";
+
+@theme {
+    /* --- Typography --- */
+    --font-headline: "Lexend", "Plus Jakarta Sans", sans-serif;
+    --font-body: "Manrope", sans-serif;
+    --font-label: "Lexend", sans-serif;
+
+    /* --- Brand & Surfaces (Dark Default) --- */
+    --color-primary: #fdb300; /* Golden Butter */
+    --color-primary-dark: #eeb200;
+    --color-on-primary: #3d2b00;
+    --color-secondary: #4a352f; /* Roasted Bean */
+    --color-on-secondary: #ffd8cc;
+    --color-tertiary: #c26a2e; /* caramel */
+    --color-on-tertiary: #fff3e8;
+
+    --color-background: #130e00; /* Espresso Black */
+    --color-surface: #1e1a0b; /* Dark Cocoa */
+    --color-on-surface: #fffbf2; /* Warm Milk */
+    --color-on-surface-variant: #d4c7a1; /* Malt */
+
+    --color-surface-container-lowest: #0a0800;
+    --color-surface-container-low: #2a2410;
+    --color-surface-container-high: #3d3415;
+
+    /* Status Colors */
+    --color-success: #00c853;
+    --color-on-success: #003900;
+    --color-warning: #ffab00;
+    --color-on-warning: #332200;
+    --color-error: #ff5449;
+    --color-on-error: #440000;
+
+    /* Decoration */
+    --color-outline: #4a422d;
+    --color-outline-variant: #352f20;
+
+    /* Radius */
+    --radius-xl: 1rem;
+    --radius-2xl: 1.5rem;
+}
+
+/* --- Light Mode Overrides --- */
+.light {
+    --color-primary: #7e5200;
+    --color-on-primary: #ffffff;
+    --color-background: #fff8eb; /* Creamy Milk White */
+    --color-surface: #fff0d6; /* Soft Butter */
+    --color-on-surface: #3e2c00; /* Chocolate Text */
+    --color-tertiary: #6a6f2b; /* olive honey */
+    --color-on-tertiary: #ffffff;
+    --color-on-surface-variant: #715822;
+    --color-surface-container-lowest: #ffffff;
+    --color-surface-container-low: #fff3e0;
+    --color-surface-container-high: #ffe0b2;
+    --color-outline: #e9d8b4;
+    --color-outline-variant: #f3e5c5;
+}
+
+/* --- Global Base Styles --- */
+@layer base {
+    * {
+        @apply border-outline-variant;
+    }
+    body {
+        @apply bg-background text-on-surface font-body antialiased transition-colors duration-300;
+    }
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        @apply font-headline font-extrabold tracking-tight;
+    }
+
+    .editorial-gradient {
+        background: linear-gradient(135deg, #feaa00 0%, #ec9e00 100%);
+    }
+    /* Hide Number Input Arrows globally */
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+    input[type="number"] {
+        -moz-appearance: textfield;
+        appearance: textfield;
+    }
+}
+
+/* --- Custom Interactive Utilities --- */
+@utility glass-nav {
+    @apply bg-background/85 backdrop-blur-lg border-b border-outline-variant/30 sticky top-0 z-50;
+}
+
+@utility scrollbar-hidden {
+    &::-webkit-scrollbar {
+        display: none;
+    }
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+@utility btn-press {
+    @apply active:scale-95 transition-transform duration-100 cursor-pointer;
+}
+
+@utility hover-lift {
+    @apply hover:-translate-y-1 hover:shadow-lg transition-all duration-300 ease-out;
+}
+
+@utility animate-page-in {
+    @apply duration-700 ease-out;
+}
+
+/* Skeleton Shimmer Effect */
+@utility skeleton {
+    @apply bg-surface-container-low relative overflow-hidden;
+    &::after {
+        content: "";
+        @apply absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-linear-to-r from-transparent via-on-surface/5 to-transparent;
+    }
+}
+
+@keyframes shimmer {
+    100% {
+        transform: translateX(100%);
+    }
+}
