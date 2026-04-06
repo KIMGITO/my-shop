@@ -1,17 +1,18 @@
 import React from "react";
 import { cn } from "@/Utils/helpers";
+import { IconType } from "react-icons";
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
     label?: string;
     error?: string;
-    icon?: string;
+    Icon?: IconType;
     height?: "sm" | "md" | "lg" | "xl"; // Added sm and md
 }
 
 export const Input: React.FC<InputProps> = ({
     label,
     error,
-    icon,
+    Icon,
     height = "sm",
     className,
     id,
@@ -38,10 +39,10 @@ export const Input: React.FC<InputProps> = ({
                 </label>
             )}
             <div className="relative flex items-center">
-                {icon && (
+                {Icon && (
                     <span className="absolute left-4 flex items-center justify-center text-on-surface-variant pointer-events-none">
                         <span className="material-symbols-outlined text-xl">
-                            {icon}
+                            <Icon className="text-xl"/>
                         </span>
                     </span>
                 )}
@@ -51,7 +52,7 @@ export const Input: React.FC<InputProps> = ({
                         "w-full px-4 rounded-xl bg-surface-container-high border-none transition-all text-on-surface font-medium",
                         "focus:bg-surface-container-highest focus:ring-2 focus:ring-primary/20 focus:outline-none",
                         heightClasses[height],
-                        icon ? "pl-12" : "pl-4",
+                        Icon ? "pl-12" : "pl-4",
                         error ? "ring-2 ring-error" : "",
                         className
                     )}

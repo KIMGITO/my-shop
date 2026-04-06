@@ -1,11 +1,14 @@
 // resources/js/Components/UI/Button.tsx
 import React from "react";
 import { cn } from "@/Utils/helpers";
+import { BiLoaderCircle } from "react-icons/bi";
+import { TbLoader3 } from "react-icons/tb";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     variant?: "primary" | "secondary" | "outline" | "ghost" | "danger";
     size?: "sm" | "md" | "lg";
     fullWidth?: boolean;
+    loading?: boolean;
 }
 
 export const Button: React.FC<ButtonProps> = ({
@@ -14,6 +17,7 @@ export const Button: React.FC<ButtonProps> = ({
     size = "md",
     fullWidth = false,
     className,
+    loading = false,
     ...props
 }) => {
     const variants = {
@@ -22,7 +26,7 @@ export const Button: React.FC<ButtonProps> = ({
             "bg-surface-container-high text-on-surface hover:bg-surface-container-low",
         outline: "border border-primary text-primary hover:bg-primary/10",
         ghost: "text-on-surface-variant hover:text-primary",
-        danger: " hover:text-red-200 border border-red-200 text-red-500/40  hover:bg-red-500/20"
+        danger: " hover:text-red-200 border border-red-200 text-red-500/40  hover:bg-red-500/20",
     };
 
     const sizes = {
@@ -42,9 +46,10 @@ export const Button: React.FC<ButtonProps> = ({
             )}
             {...props}
         >
-            {children}
+            {!loading && children}
+            {loading && <TbLoader3 className="animate-spin mx-2 font-extrabold" />}
         </button>
     );
 };
 
-export default  Button;
+export default Button;

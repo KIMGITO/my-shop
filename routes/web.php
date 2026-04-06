@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AddressController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
 use Illuminate\Foundation\Application;
@@ -95,8 +96,17 @@ Route::middleware(['auth'])->group(function () {
 
     // Customer Settings
     Route::prefix('settings')->name('settings.')->group(function () {
+        Route::prefix('address')->name('address.')->group(function () {
+            Route::get('/', [AddressController::class, 'index'])->name('index');
+            Route::get('/create', [AddressController::class, 'create'])->name('create');
+            Route::post('/', [AddressController::class, 'store'])->name('store');
+            Route::put('/{address}', [AddressController::class, 'update'])->name('update');
+            Route::patch('/{address}/default', [AddressController::class, 'toggleDefault'])->name('set-default');
+            Route::delete('/{address}', [AddressController::class, 'delete'])->name('destroy');
+        });
         Route::get('/', fn() => Inertia::render('Settings/Customer/AccountSetting'))->name('account');
-        Route::get('/address', fn() => Inertia::render('Settings/Address/Index'))->name('address');
+
+
         Route::get('/notifications', fn() => Inertia::render('Settings/Notifications/Index'))->name('notifications');
     });
 
@@ -108,8 +118,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/security', [ProfileController::class, 'security'])->name('security');
     });
 
-    
-    
+
+
 
     // Billing
     Route::prefix('billing')->name('billing.')->group(function () {

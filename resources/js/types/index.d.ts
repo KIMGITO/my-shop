@@ -64,11 +64,11 @@ export interface Address {
     county: string;
     estate: string;
     street: string;
-    houseNumber: string;
-    landmark?: string;
-    phone: string;
-    instructions?: string;
-    isDefault: boolean;
+    house_number: string;
+    land_mark?: string;
+    phone_number: string;
+    delivery_instructions?: string;
+    is_default: boolean;
 }
 
 export interface Order {

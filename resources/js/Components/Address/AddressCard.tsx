@@ -50,11 +50,11 @@ export const AddressCard: React.FC<AddressCardProps> = ({
         <div
             className={cn(
                 "group relative bg-surface-container-lowest rounded-2xl md:rounded-3xl p-5 md:p-6 shadow-sm hover:shadow-xl transition-all duration-500",
-                address.isDefault && "border-2 border-primary/30"
+                address.is_default && "border-2 border-primary/30"
             )}
         >
             {/* Default Badge */}
-            {address.isDefault && (
+            {address.is_default  && (
                 <div className="absolute top-3 right-3 md:top-4 md:right-4">
                     <Badge
                         variant="primary"
@@ -88,7 +88,7 @@ export const AddressCard: React.FC<AddressCardProps> = ({
                         size={14}
                     />
                     <span className="text-xs md:text-sm">
-                        {address.houseNumber}, {address.street}
+                        {address.house_number}, {address.street}
                     </span>
                 </div>
                 <div className="flex items-start gap-2 text-sm text-on-surface-variant">
@@ -100,14 +100,14 @@ export const AddressCard: React.FC<AddressCardProps> = ({
                         {address.estate}, {address.county}
                     </span>
                 </div>
-                {address.landmark && (
+                {address.land_mark && (
                     <div className="flex items-start gap-2 text-sm text-on-surface-variant">
                         <HiOutlineLocationMarker
                             className="text-primary mt-0.5 flex-shrink-0"
                             size={14}
                         />
                         <span className="text-xs md:text-sm">
-                            📍 {address.landmark}
+                            📍 {address.land_mark}
                         </span>
                     </div>
                 )}
@@ -116,7 +116,9 @@ export const AddressCard: React.FC<AddressCardProps> = ({
                         className="text-primary mt-0.5 flex-shrink-0"
                         size={14}
                     />
-                    <span className="text-xs md:text-sm">{address.phone}</span>
+                    <span className="text-xs md:text-sm">
+                        {address.phone_number}
+                    </span>
                 </div>
             </div>
 
@@ -130,9 +132,9 @@ export const AddressCard: React.FC<AddressCardProps> = ({
                         KSH {deliveryFee}
                     </span>
                 </div>
-                {address.instructions && (
+                {address.delivery_instructions && (
                     <p className="text-[10px] text-on-surface-variant mt-2 italic">
-                        📝 {address.instructions}
+                        📝 {address.delivery_instructions}
                     </p>
                 )}
             </div>
@@ -155,7 +157,7 @@ export const AddressCard: React.FC<AddressCardProps> = ({
                         Remove
                     </button>
                 </div>
-                {!address.isDefault && onSetDefault && (
+                {!address.is_default && onSetDefault && (
                     <button
                         onClick={() => onSetDefault(address.id)}
                         className="text-[10px] font-bold text-on-surface-variant uppercase tracking-tighter opacity-40 hover:opacity-100 transition-opacity"
