@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AddressController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
 use Illuminate\Foundation\Application;
@@ -181,8 +182,15 @@ Route::middleware(['auth'])->group(function () {
 
         // Inventory Management
         Route::prefix('inventory')->name('inventory.')->group(function () {
+            // products
+            Route::prefix('products')->name('products.')->group(function () {
+                Route::get('/', [ProductController::class,  'index'])->name('index');
+                Route::get('/create', [ProductController::class, 'method'])->name('create');
+                Route::post('/', [ProductController::class, 'store'])->name('store');
+                Route::put('/{product}', [ProductController::class, 'method'])->name('update');
+                Route::delete('/{product}', [ProductController::class, 'method'])->name('destroy');
+            });
             Route::get('/analytics', fn() => Inertia::render('Admin/InventoryAnalytics'))->name('analytics');
-            Route::get('/products', fn() => Inertia::render('Admin/Products'))->name('products');
             Route::get('/intake', fn() => Inertia::render('Admin/StockIntake'))->name('intake');
             Route::get('/adjustment', fn() => Inertia::render('Admin/StockAdjustment'))->name('adjustment');
             Route::get('/history', fn() => Inertia::render('Admin/StockHistory'))->name('history');
