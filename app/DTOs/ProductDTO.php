@@ -2,19 +2,40 @@
 
 namespace App\DTOs;
 
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Collection;
+
 class ProductDTO
 {
+    protected array $product;
+    protected array $productImages;
+    protected ?UploadedFile $mainImage;
 
-    protected $images;
-    protected $product;
-
-
-    /**
-     * Create a new class instance.
-     */
-    public function __construct(array  $data)
+    public function __construct(array $data)
     {
-        $this->product = collect($data)->except('product_images')->toArray();
-        $this->images = $data['product_images'];
+        $collection = collect($data);
+
+        $this->product = $collection
+            ->except(['productImages'])
+            ->toArray();
+
+        $this->productImages = $collection->get('productImages', []);
+
+        $this->mainImage = $collection->get('main_product_image');
+    }
+
+    public function product(): array
+    {
+        return $this->product;
+    }
+
+    public function productImages(): array
+    {
+        return $this->productImages;
+    }
+
+    public function mainImage(): UploadedFile
+    {
+        return $this->mainImage;
     }
 }

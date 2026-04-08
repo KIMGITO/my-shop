@@ -11,36 +11,55 @@ use Throwable;
 
 class ProductRepository extends BaseRepository
 {
+    protected CloudinaryService $cloudinary;
 
-    protected $cloudinary;
-    /**
-     * Create a new class instance.
-     */
-    public function __construct(Product $model, CloudinaryService $cloudinary,)
+    public function __construct(Product $model, CloudinaryService $cloudinary)
     {
-        $this->cloudinary = $cloudinary;
         parent::__construct($model);
+        $this->cloudinary = $cloudinary;
     }
 
-
-    public function storeProductImages(array  $files,  UploadedFile $main, int  $product_id)
+    public function storeProductImages(array $files, UploadedFile $main, int $product_id)
     {
+        $uploads = [];
+
         try {
             DB::beginTransaction();
-            $uploads =  $this->uploadImages($files, $main);
-            Product::images()->createMany($uploads);
+
+            $product = $this->model->findOrFail($product_id);
+
+            $uploads = $this->uploadImages($files, $main);
+
+            $productImages = $product
+                ->images()
+                ->createMany(toSnake($uploads));
+
+            DB::commit();
+
+            return $productImages;
         } catch (Throwable $e) {
+
             DB::rollBack();
 
+            // remove uploaded files if DB fails
             foreach ($uploads as $upload) {
-                $this->cloudinary->delete($upload['public_id']);
+                if (isset($upload['public_id'])) {
+                    $this->cloudinary->delete($upload['public_id']);
+                }
             }
+
+            throw $e;
         }
     }
 
-    public function uploadImages(array $files, UploadedFile $main)
+    public function uploadImages(array $files, UploadedFile $main): array
     {
-        $uploads = $this->cloudinary->upload($files, 'inventory/products', $main);
-        return $uploads;
+        return $this->cloudinary->upload(
+            $files,
+            'inventory/products',
+            $main
+        );
     }
+
+    
 }

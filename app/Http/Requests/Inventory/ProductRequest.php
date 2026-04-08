@@ -25,18 +25,18 @@ class ProductRequest extends FormRequest
             'isPopular' => ['required', 'boolean'],
             'isFeatured' => ['required', 'boolean'],
             'badge' => ['nullable', 'string', 'max:50'],
-            'product_images' => ['required', 'array', 'max:3', 'min:1'],
-            'product_images.*.file' => ['image', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
+            'productImages' => ['required', 'array', 'max:3', 'min:1'],
+            'productImages.*.file' => ['image', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
             'main_product_image' => ['image', 'required', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
         ];
     }
 
     public function prepareForValidation()
     {
-        if ($this->product_images) {
-            $images = extractImages($this->product_images);
+        if ($this->productImages) {
+            $images = extractImages($this->productImages);
             $this->merge([
-                'product_images' => $images['files'],
+                'productImages' => $images['files'],
                 'main_product_image' => $images['main']
             ]);
         }

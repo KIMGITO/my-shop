@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('addresses', function (Blueprint $table) {
-            if(!Schema::hasColumn('addresses','is_default')){
-                $table->boolean('is_default')->nullable();
-            }
-        });
+        if (!Schema::hasColumn('product_images', 'public_id')) {
+            Schema::table('product_images', function (Blueprint $table) {
+                $table->string('public_id');
+            });
+        }
     }
 
     /**
@@ -23,7 +23,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('addresses', function (Blueprint $table) {
+        Schema::table('product_images', function (Blueprint $table) {
             //
         });
     }

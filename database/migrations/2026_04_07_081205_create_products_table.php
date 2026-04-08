@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->decimal('price', 10, 2);
             $table->string('unit');
-            $table->text('image');
+            $table->text('main_product_image');
             $table->text('description')->nullable();
             $table->decimal('rating', 3, 2)->default(0);
             $table->integer('reviews')->default(0);

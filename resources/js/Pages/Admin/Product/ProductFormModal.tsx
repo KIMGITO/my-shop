@@ -64,10 +64,8 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
     const handleSubmit = (e?: React.FormEvent) => {
         if (e) e.preventDefault();
 
-        // Create FormData for proper file upload
         const formData = new FormData();
 
-        // Add basic fields
         formData.append("name", data.name);
         formData.append("price", String(data.price));
         formData.append("unit", data.unit);
@@ -94,9 +92,9 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
             formData.append("existing_images", JSON.stringify(existingImages));
         }
 
-        // Add new files as product_images[] (flattened array)
+        // Add new files as productImages[] (flattened array)
         newFiles.forEach((file) => {
-            formData.append("product_images[]", file);
+            formData.append("productImages[]", file);
         });
 
         // Add main image index

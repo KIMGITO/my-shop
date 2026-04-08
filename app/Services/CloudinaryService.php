@@ -50,7 +50,7 @@ class CloudinaryService
 
             $uploaded[] = [
                 'url' => $result['secure_url'] ?? '',
-                'public_id'=>$result['public_id'] ?? '',
+                'publicId'=>$result['public_id'] ?? '',
                 'isMain' => ($mainFile && $file === $mainFile) ? 1 : ($fileItem['isMain'] ?? 0),
             ];
         }

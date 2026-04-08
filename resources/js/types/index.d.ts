@@ -21,6 +21,7 @@ export interface Product {
     reviews?: number;
     category?: string;
     inStock?: boolean;
+    sku?: string;
     isPopular?: boolean;
     isFeatured?: boolean;
     description?: string;
@@ -166,14 +167,15 @@ export interface NotificationPreference {
     category: "order" | "billing" | "marketing";
 }
 
-// resources/js/types/cashier.ts
+
 export interface Product {
     id: string;
     name: string;
     category: string;
     price: number;
     stock: number;
-    image: string;
+    sku: string;
+    mainProductImage: string;
     status: "In Stock" | "Low Stock" | "Out of Stock";
 }
 

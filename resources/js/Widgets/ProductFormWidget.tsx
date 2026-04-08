@@ -37,9 +37,11 @@ export const ProductFormWidget: React.FC<ProductFormWidgetProps> = ({
     onSave,
     onClose,
 }) => {
+
+    console.log('data', data);
+
     return (
         <form onSubmit={onSave} className="space-y-6">
-            {/* Basic Information Section */}
             <div className="space-y-4">
                 <h4 className="text-sm font-semibold uppercase tracking-wider text-primary">
                     Basic Information
@@ -100,10 +102,10 @@ export const ProductFormWidget: React.FC<ProductFormWidgetProps> = ({
             </div>
 
             <ImageUpload
-                value={data.product_images} 
-                onChange={(imgs) => setData("product_images", imgs)}
+                value={data.images || data.productImages} 
+                onChange={(images) => setData("productImages", images)}
                 label="Product Images"
-                error={errors.product_images} 
+                error={errors.productImages} 
                 disabled={processing}
                 required
                 maxFiles={3}
