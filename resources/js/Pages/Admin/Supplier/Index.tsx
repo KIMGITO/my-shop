@@ -3,15 +3,15 @@ import React, { useState } from "react";
 import { Head } from "@inertiajs/react";
 import { SearchBar } from "@/Components/UI/SearchBar";
 import { ActionButton } from "@/Components/UI/ActionButton";
-import {
-    HiOutlinePlusCircle,
-    HiOutlinePhone,
-} from "react-icons/hi2";
+import { HiOutlinePlusCircle, HiOutlinePhone } from "react-icons/hi2";
 import AuthenticatedLayout from "@/Components/Layout/AuthenticatedLayout";
 import { GoMail } from "react-icons/go";
+import SupplierCard, { Supplier } from "@/Components/Admin/SupplierCard";
+import { SupplierFormModal } from "./SupplierFormModal";
+import FloatingActionButton from "@/Components/Common/FloatingActionButton";
 
 // Mock data
-const mockSuppliers = [
+const suppliers = [
     {
         id: "1",
         name: "Golden Valley Organics",
@@ -32,19 +32,39 @@ const mockSuppliers = [
     },
 ];
 
-export default function SuppliersPage() {
+interface SupplierPageProp {
+    suppliers: Supplier[];
+    modalOpen: boolean;
+}
+
+export default function SuppliersPage({
+    suppliers,
+    modalOpen,
+}: SupplierPageProp) {
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedSupplier, setSelectedSupplier] = useState(null);
     const [searchQuery, setSearchQuery] = useState("");
 
-    const filteredSuppliers = mockSuppliers.filter(
+    const filteredSuppliers = suppliers.filter(
         (supplier) =>
             supplier.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
             supplier.contact.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
+    const handleAddSupplier = () => {
+        setSelectedSupplier(null);
+        setIsModalOpen(true);
+    };
+
+    const handleEditSupplier = (supplier) => {
+        setSelectedSupplier(supplier);
+        setIsModalOpen(true);
+    };
+
     return (
         <>
             <Head title="Suppliers - Admin" />
-            <AuthenticatedLayout >
+            <AuthenticatedLayout>
                 <div className="p-6 md:p-8 max-w-7xl mx-auto">
                     {/* Header */}
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-8">
@@ -53,14 +73,10 @@ export default function SuppliersPage() {
                                 Supplier Partners
                             </h2>
                             <p className="text-on-surface-variant">
-                                Manage your artisanal supply chain partners.
+                                Manage your artisanal supply chain.
                             </p>
                         </div>
-                        <ActionButton
-                            icon={HiOutlinePlusCircle}
-                            label="Add Partner"
-                            variant="primary"
-                        />
+                       
                     </div>
 
                     {/* Search */}
@@ -75,34 +91,15 @@ export default function SuppliersPage() {
                     {/* Suppliers Grid */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
                         {filteredSuppliers.map((supplier) => (
-                            <div
-                                key={supplier.id}
-                                className="bg-surface-container-lowest rounded-xl overflow-hidden border border-outline-variant/10 shadow-sm group hover:shadow-md transition-all"
-                            >
-                                <img
-                                    src={supplier.image}
-                                    className="h-32 w-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
-                                    alt={supplier.name}
-                                />
-                                <div className="p-5 md:p-6">
-                                    <h4 className="text-lg md:text-xl font-headline font-bold mb-2 md:mb-4">
-                                        {supplier.name}
-                                    </h4>
-                                    <p className="text-sm text-on-surface-variant flex items-center gap-2 mb-2">
-                                        <GoMail className="text-primary text-sm" />
-                                        {supplier.email}
-                                    </p>
-                                    <p className="text-sm text-on-surface-variant flex items-center gap-2 mb-4">
-                                        <HiOutlinePhone className="text-primary text-sm" />
-                                        {supplier.phone}
-                                    </p>
-                                    <span className="bg-primary-container/10 text-primary px-3 py-1 rounded-full text-xs font-bold uppercase">
-                                        {supplier.type}
-                                    </span>
-                                </div>
-                            </div>
+                            <SupplierCard supplier={supplier} />
                         ))}
                     </div>
+
+                    <SupplierFormModal
+                        isOpen={isModalOpen}
+                        onClose={() => setIsModalOpen(false)}
+                        initialData={selectedSupplier}
+                    />
 
                     {filteredSuppliers.length === 0 && (
                         <div className="text-center py-12">
@@ -115,6 +112,10 @@ export default function SuppliersPage() {
                         </div>
                     )}
                 </div>
+                <FloatingActionButton
+                    action={handleAddSupplier}
+                    disabled={isModalOpen}
+                />
             </AuthenticatedLayout>
         </>
     );

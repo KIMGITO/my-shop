@@ -214,6 +214,7 @@ export const ImageUpload: React.FC<MultiImageUploadProps> = ({
                     <div className="flex-1">
                         <Input
                             value={urlInput}
+                            height="sm"
                             onChange={(e) => setUrlInput(e.target.value)}
                             placeholder="Add via URL..."
                             Icon={HiOutlinePhotograph}
@@ -222,6 +223,7 @@ export const ImageUpload: React.FC<MultiImageUploadProps> = ({
                     </div>
                     <Button
                         type="button"
+                        size="sm"
                         onClick={handleAddUrl}
                         disabled={!urlInput.trim() || disabled || isUploading}
                     >

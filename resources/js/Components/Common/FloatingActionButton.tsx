@@ -1,16 +1,17 @@
 import React, { ReactNode } from "react";
 import { Button } from "../UI/Button";
 import { cn } from "@/lib/utils"; // If you have a cn utility, otherwise use a template literal
+import { HiPlus } from "react-icons/hi2";
 
 interface FloatingActionButtonProps {
-    icon: ReactNode;
+    icon?: ReactNode;
     action: () => void;
     disabled?: boolean;
     className?: string;
 }
 
 export const FloatingActionButton = ({
-    icon,
+    icon = <HiPlus/>,
     action,
     disabled = false,
     className = "",

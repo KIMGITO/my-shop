@@ -33,8 +33,6 @@ class CloudinaryService
      */
     public function upload(UploadedFile|array $files, ?string $folder = null, ?UploadedFile $mainFile = null): string|array
     {
-        // 1. Remove the dd() to let the code run!
-
         if ($files instanceof UploadedFile) {
             $options = $folder ? ['folder' => $folder] : [];
             $result = $this->cloudinary->uploadApi()->upload($files->getRealPath(), $options);
@@ -56,11 +54,7 @@ class CloudinaryService
 
             $isMain = 0;
 
-            /**
-             * IMPROVED COMPARISON:
-             * We check the original filename and the file size.
-             * Using trim() just in case of weird whitespace from the request.
-             */
+            // comparison to get main image
             if ($mainFile) {
                 $currentName = trim($file->getClientOriginalName());
                 $mainName = trim($mainFile->getClientOriginalName());
@@ -81,7 +75,7 @@ class CloudinaryService
 
             $uploaded[] = [
                 'url' => $result['secure_url'] ?? '',
-                'public_id' => $result['public_id'] ?? '', // Singular
+                'public_id' => $result['public_id'] ?? '', 
                 'is_main' => $isMain,
             ];
         }

@@ -3,6 +3,7 @@
 use App\Http\Controllers\AddressController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UserController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -218,13 +219,14 @@ Route::middleware(['auth'])->group(function () {
 
         // Supplier Management
         Route::prefix('suppliers')->name('suppliers.')->group(function () {
-            Route::get('/', fn() => Inertia::render('Admin/Suppliers'))->name('index');
-            Route::get('/orders', fn() => Inertia::render('Admin/SupplierOrders'))->name('orders');
-            Route::get('/create', fn() => Inertia::render('Admin/SupplierCreate'))->name('create');
-            Route::get('/{id}', fn($id) => Inertia::render('Admin/SupplierShow', ['id' => $id]))->name('show');
-            Route::get('/{id}/edit', fn($id) => Inertia::render('Admin/SupplierEdit', ['id' => $id]))->name('edit');
-            Route::get('/orders/create', fn() => Inertia::render('Admin/POCreate'))->name('po.create');
-            Route::get('/orders/{id}', fn($id) => Inertia::render('Admin/POShow', ['id' => $id]))->name('po.show');
+            Route::get('/', [SupplierController::class, 'index'])->name('index');
+            Route::post('/',[SupplierController::class, 'store'])->name('store');
+            // Route::get('/orders', fn() => Inertia::render('Admin/SupplierOrders'))->name('orders');
+            // Route::get('/create', fn() => Inertia::render('Admin/SupplierCreate'))->name('create');
+            // Route::get('/{id}', fn($id) => Inertia::render('Admin/SupplierShow', ['id' => $id]))->name('show');
+            // Route::get('/{id}/edit', fn($id) => Inertia::render('Admin/SupplierEdit', ['id' => $id]))->name('edit');
+            // Route::get('/orders/create', fn() => Inertia::render('Admin/POCreate'))->name('po.create');
+            // Route::get('/orders/{id}', fn($id) => Inertia::render('Admin/POShow', ['id' => $id]))->name('po.show');
         });
 
         // Feedbacks
