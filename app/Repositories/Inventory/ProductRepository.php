@@ -20,7 +20,10 @@ class ProductRepository extends BaseRepository
         $this->cloudinary = $cloudinary;
     }
 
-    public function storeProductImages(array $files, UploadedFile $main, int $product_id)
+    /**
+     * Store product images with a nullable main file
+     */
+    public function storeProductImages(array $files, ?UploadedFile $main, int $product_id)
     {
         $uploads = [];
 
@@ -39,10 +42,9 @@ class ProductRepository extends BaseRepository
 
             return $productImages;
         } catch (Throwable $e) {
-
             DB::rollBack();
 
-            // remove uploaded files if DB fails
+            // Cleanup Cloudinary if DB fails
             foreach ($uploads as $upload) {
                 if (isset($upload['public_id'])) {
                     $this->cloudinary->delete($upload['public_id']);
@@ -52,7 +54,6 @@ class ProductRepository extends BaseRepository
             throw $e;
         }
     }
-
     public function deleteProductImages(array $imageIds): void
     {
         if (empty($imageIds)) return;
@@ -67,7 +68,7 @@ class ProductRepository extends BaseRepository
         }
     }
 
-    public function uploadImages(array $files, UploadedFile $main): array
+    public function uploadImages(array $files, ?UploadedFile $main): array
     {
         return $this->cloudinary->upload(
             $files,
