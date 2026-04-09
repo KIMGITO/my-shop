@@ -25,24 +25,10 @@ class ProductController extends Controller
     public function index()
     {
         $products = $this->productRepo->all();
-
-        $formattedProducts = $products->map(function ($product) {
-            $stockStatus = $this->productService->stockStatus($product);
-
-            return [
-                ...$product->toArray(),
-                'status' => $stockStatus['status'],
-                'inStockCount' => $stockStatus['quantity'],
-                'images' => $product->images->map(fn($img) => [
-                    'id' => $img->id,
-                    'isMain' => $img->is_main,
-                    'url' => $img->url
-                ])
-            ];
-        });
+        $formattedProducts =  $this->productService->formatProductForUI($products);
 
         return Inertia::render('Admin/Product/Index', [
-            'products' => toCamel($formattedProducts->toArray()),
+            'products' => toCamel($formattedProducts),
             'modalOpen' => false
         ]);
     }
@@ -52,11 +38,8 @@ class ProductController extends Controller
         try {
             DB::beginTransaction();
             $data = new ProductDTO($request->validated());
-
-            // 1. Create Product (Model Trait handles SKU)
             $product = $this->productRepo->create($data->product());
 
-            // 2. Upload & Store Images
             $this->productRepo->storeProductImages(
                 $data->productImages(),
                 $data->mainImage(),
@@ -73,14 +56,12 @@ class ProductController extends Controller
 
     public function update(ProductRequest $request, $id)
     {
-        // dd($request->all());
         try {
             DB::beginTransaction();
 
             $product = $this->productRepo->find($id);
             $payload = $request->validated();
 
-            // 1. Update basic product details
             $product->update($payload);
 
             if ($request->delete_images) {
@@ -91,12 +72,10 @@ class ProductController extends Controller
                 $product->images()->update(['is_main' => false]);
             }
 
-            // 4. Handle Existing image promoted to Main
             if ($request->main_image_id) {
                 $product->images()->where('id', $request->main_image_id)->update(['is_main' => true]);
             }
 
-            // 5. Upload New Images (Handles setting is_main if it's a new file)
             if ($request->hasFile('productImages')) {
                 $this->productRepo->storeProductImages(
                     $request->file('productImages'),
