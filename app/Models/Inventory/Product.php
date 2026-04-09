@@ -14,8 +14,7 @@ use Illuminate\Database\Eloquent\Model;
         'unit',
         'description',
         'rating',
-        'reviews',
-        'main_product_image',
+        'reviews',  
         'category',
         'in_stock',
         'is_popular',
@@ -25,12 +24,21 @@ use Illuminate\Database\Eloquent\Model;
     ]
 )]
 
+
+
 class Product extends Model
 {
-use HasSkuByCategoryName;
+    use HasSkuByCategoryName;
+
+    protected $appends = ['main_product_image'];
 
     public function images()
     {
         return $this->hasMany(ProductImage::class);
+    }
+
+    public function getMainProductImageAttribute()
+    {
+        return $this->images->where('is_main', true)->first()?->url ?? $this->images->first()->url;
     }
 }

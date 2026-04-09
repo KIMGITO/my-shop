@@ -187,8 +187,8 @@ Route::middleware(['auth'])->group(function () {
                 Route::get('/', [ProductController::class,  'index'])->name('index');
                 Route::get('/create', [ProductController::class, 'method'])->name('create');
                 Route::post('/', [ProductController::class, 'store'])->name('store');
-                Route::put('/{product}', [ProductController::class, 'method'])->name('update');
-                Route::delete('/{product}', [ProductController::class, 'method'])->name('destroy');
+                Route::put('/{product}', [ProductController::class, 'update'])->name('update');
+                Route::delete('/{product}', [ProductController::class, 'destroy'])->name('destroy');
             });
             Route::get('/analytics', fn() => Inertia::render('Admin/InventoryAnalytics'))->name('analytics');
             Route::get('/intake', fn() => Inertia::render('Admin/StockIntake'))->name('intake');

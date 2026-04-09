@@ -24,6 +24,11 @@ class BaseRepository
         return $this->model->paginate($per_page);
     }
 
+    public function find(int $id): Model
+    {
+        return $this->model->findOrFail($id);
+    }
+
     public function create(array $data)
     {
         return $this->model->create(toSnake($data));

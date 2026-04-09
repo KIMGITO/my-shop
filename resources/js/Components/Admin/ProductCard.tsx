@@ -18,6 +18,7 @@ interface ProductCardProps {
         category: string;
         badge?: string;
         unit?: string;
+        description?: string;
         status: "in_stock" | "low_stock" | "out_of_stock";
     };
     onEdit?: (id: string) => void;
@@ -72,7 +73,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
                 "group relative rounded-xl md:rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300",
                 "flex flex-row md:flex-col",
                 variant === "featured" && "md:col-span-2 lg:col-span-1",
-                getStockBg() 
+                getStockBg()
             )}
         >
             {/* Image Section */}
@@ -103,7 +104,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 
             <div className="p-3 md:p-6 flex-1 flex flex-col justify-between overflow-hidden">
                 <div className="flex flex-col gap-1">
-                    <div className="flex justify-between items-start">
+                    <div className="flex justify-between items-center">
                         <h3 className="text-sm md:text-xl capitalize font-bold text-on-surface truncate md:line-clamp-2">
                             {product.name}
                         </h3>
@@ -111,11 +112,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({
                             Ksh {product.price}
                         </span>
                     </div>
-                    <p className="text-on-surface-variant text-[10px] md:text-sm font-bold truncate">
+                    <p className="text-on-surface-variant text-[10px] text-end font-semibold truncate">
                         {product.sku}
                     </p>
-                    <p className="text-on-surface-variant text-[10px] md:text-sm truncate uppercase">
-                        {product.category}
+                    <p className="text-on-surface-variant text-[10px] border p-2  rounded border-dashed md:text-sm truncate">
+                        <span className="uppercase font-semibold">{product.category}</span>: <span className="text-xs leading-loose italic capitalize ">{product.description}</span>
                     </p>
                 </div>
 

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Head } from "@inertiajs/react";
+import { Head, router } from "@inertiajs/react";
 import { ProductCard } from "@/Components/Admin/ProductCard";
 import { FilterChip } from "@/Components/UI/FilterChip";
 import { SearchBar } from "@/Components/UI/SearchBar";
@@ -8,7 +8,8 @@ import AuthenticatedLayout from "@/Components/Layout/AuthenticatedLayout";
 import { HiOutlineFilter, HiOutlinePlus } from "react-icons/hi";
 import { Product } from "@/types";
 import ProductFormModal from "./ProductFormModal";
-import { ImageItem } from "@/Components/UI/ImageUplaod";
+import { ImageItem } from "@/Components/UI/ImageUpload";
+import FloatingActionButton from "@/Components/Common/FloatingActionButton";
 
 const categories = [
     { id: "all", label: "All Products", count: 24 },
@@ -25,6 +26,7 @@ export default function ProductsPage({
     modalOpen: boolean;
     products: Product[];
 }) {
+    console.log("products", products);
     const [searchQuery, setSearchQuery] = useState("");
     const [activeCategory, setActiveCategory] = useState("all");
     const [isModalOpen, setIsModalOpen] = useState(modalOpen);
@@ -50,9 +52,32 @@ export default function ProductsPage({
     };
 
     const handleEdit = (product: any) => {
-        console.log('Product editing data',product);
         setDataForEdit(product);
         setIsModalOpen(true);
+    };
+
+    const handleDelete = (id: number | string) => {
+        if (
+            confirm(
+                "Are you sure you want to delete this product? All associated images will be removed."
+            )
+        ) {
+            router.delete(route("admin.inventory.products.destroy", id), {
+                onStart: () => {
+                    // Optional: Start a global loading bar or local state
+                },
+                onSuccess: () => {
+                    console.log("Product deleted successfully");
+                },
+                onError: (errors) => {
+                    // Handle any server-side errors
+                    alert(
+                        "Failed to delete product: " + Object.values(errors)[0]
+                    );
+                },
+                preserveScroll: true, // Keeps the user at the same scroll position
+            });
+        }
     };
 
     return (
@@ -66,16 +91,7 @@ export default function ProductsPage({
                                 Product Catalog
                             </h2>
                         </div>
-                        <div className="flex gap-3">
-                            <ActionButton
-                                icon={HiOutlinePlus}
-                                onClick={handleAddProduct}
-                                label="Add Product"
-                                variant="primary"
-                            />
-                        </div>
                     </div>
-
 
                     <div className="flex flex-wrap gap-3 mb-8">
                         {categories.map((cat) => (
@@ -103,7 +119,7 @@ export default function ProductsPage({
                                 key={product.id}
                                 product={product}
                                 onEdit={() => handleEdit(product)}
-                                onArchive={(id) => console.log("Archive", id)}
+                                onArchive={(id) => handleDelete(id)}
                             />
                         ))}
                     </div>
@@ -114,6 +130,12 @@ export default function ProductsPage({
                         onClose={() => setIsModalOpen(false)}
                     />
                 </div>
+
+                <FloatingActionButton
+                    disabled={isModalOpen}
+                    icon={<HiOutlinePlus />}
+                    action={handleAddProduct}
+                />
             </AuthenticatedLayout>
         </>
     );

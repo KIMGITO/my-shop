@@ -3,6 +3,7 @@
 namespace App\Repositories\Inventory;
 
 use App\Models\Inventory\Product;
+use App\Models\ProductImage;
 use App\Repositories\BaseRepository;
 use App\Services\CloudinaryService;
 use Illuminate\Http\UploadedFile;
@@ -52,6 +53,20 @@ class ProductRepository extends BaseRepository
         }
     }
 
+    public function deleteProductImages(array $imageIds): void
+    {
+        if (empty($imageIds)) return;
+
+        $images = ProductImage::whereIn('id', $imageIds)->get();
+
+        foreach ($images as $image) {
+            if ($image->public_id) {
+                $this->cloudinary->delete($image->public_id);
+            }
+            $image->delete();
+        }
+    }
+
     public function uploadImages(array $files, UploadedFile $main): array
     {
         return $this->cloudinary->upload(
@@ -60,6 +75,4 @@ class ProductRepository extends BaseRepository
             $main
         );
     }
-
-    
 }

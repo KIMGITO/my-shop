@@ -2,33 +2,35 @@
 
 namespace App\Models\Traits;
 
-use Illuminate\Support\Str;
-use App\Models\Inventory\Product;
+use Illuminate\Support\Facades\DB;
 
 trait HasSkuByCategoryName
 {
     public static function bootHasSkuByCategoryName()
     {
         static::creating(function ($model) {
-            if (!$model->sku && isset($model->category)) {
-                $categoryCode = strtoupper(substr($model->category, 0, 3));
-                $datePart = now()->format('Ymd');
+            if (!$model->sku && !empty($model->category)) {
+                // 1. Generate the prefix (e.g., "ELE" for Electronics)
+                $prefix = strtoupper(substr($model->category, 0, 3));
 
-                // Get the last SKU for this category and date
-                $lastProduct = Product::where('category', $model->category)
-                    ->where('sku', 'like', $categoryCode . $datePart . '%')
-                    ->orderByDesc('id')
-                    ->first();
+                // 2. Find the highest existing SKU for this specific category prefix
+                // We sort by SKU string length and then SKU value to get the literal maximum
+                $lastSku = DB::table('products')
+                    ->where('sku', 'like', $prefix . '%')
+                    ->orderByRaw('LENGTH(sku) DESC')
+                    ->orderBy('sku', 'desc')
+                    ->value('sku');
 
-                if ($lastProduct && $lastProduct->sku) {
-                    // Extract the numeric suffix and increment
-                    $lastNumber = intval(substr($lastProduct->sku, -4));
-                    $nextNumber = str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT);
+                if ($lastSku) {
+                    // 3. Strip the prefix and convert the remainder to an integer
+                    // Example: "ELE0042" -> "0042" -> 42
+                    $numericPart = preg_replace('/[^0-9]/', '', $lastSku);
+                    $nextNumber = intval($numericPart) + 1;
                 } else {
-                    $nextNumber = '0001';
+                    $nextNumber = 1;
                 }
 
-                $model->sku = $categoryCode . $nextNumber;
+                $model->sku = $prefix . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
             }
         });
     }

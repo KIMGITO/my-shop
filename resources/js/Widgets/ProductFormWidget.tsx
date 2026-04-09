@@ -1,24 +1,14 @@
 import { Button } from "@/Components/UI/Button";
-import ImageUpload from "@/Components/UI/ImageUplaod";
+import ImageUpload from "@/Components/UI/ImageUpload";
 import { Input } from "@/Components/UI/Input";
-import PreferenceToggle from "@/Components/UI/PreferenceToggle";
 import { Select } from "@/Components/UI/Select";
 import ToggleSwitch from "@/Components/UI/ToggleSwitch";
 import { categories } from "@/Data/ProductData";
-import { cn } from "@/lib/utils";
 import { GiPriceTag } from "react-icons/gi";
-import {
-    HiOutlineShoppingBag,
-    HiOutlineTag,
-    HiOutlinePhotograph,
-    HiOutlineStar,
-    HiOutlineCheckCircle,
-    HiTag,
-} from "react-icons/hi";
-import { MdCategory, MdPriceCheck } from "react-icons/md";
-import { RiUpload2Line } from "react-icons/ri";
+import { HiOutlineShoppingBag, HiTag } from "react-icons/hi";
+import { MdCategory } from "react-icons/md";
 import { TbChartBarPopular, TbRulerMeasure2 } from "react-icons/tb";
-import { data } from "react-router-dom";
+import { useEffect } from "react";
 
 interface ProductFormWidgetProps {
     data: any;
@@ -37,8 +27,40 @@ export const ProductFormWidget: React.FC<ProductFormWidgetProps> = ({
     onSave,
     onClose,
 }) => {
+    
+    console.log('data for por', data);
+    useEffect(() => {
+        // When in edit mode and images exist, make sure they have the right structure
+        if (data.id && data.images && data.images.length > 0) {
+            // Transform server images to include originalId if not already set
+            const transformedImages = data.images.map((img: any) => ({
+                id: img.id?.toString() || crypto.randomUUID(),
+                url: img.url,
+                originalId: img.id, // Important for ImageUpload to know it's an existing image
+                isMain: img.is_main === 1 || img.is_main === true,
+                isDeleted: false,
+            }));
 
-    console.log('data', data);
+            // Only update if the structure is different
+            if (!data.images[0]?.originalId) {
+                setData("images", transformedImages);
+            }
+        }
+    }, [data.id]);
+
+    const handleCancel = () => {
+        // Clean up any blob URLs before closing
+        if (data.images) {
+            data.images.forEach((image: any) => {
+                if (image.url?.startsWith("blob:")) {
+                    URL.revokeObjectURL(image.url);
+                }
+            });
+        }
+
+        // Call parent's onClose
+        onClose();
+    };
 
     return (
         <form onSubmit={onSave} className="space-y-6">
@@ -56,11 +78,13 @@ export const ProductFormWidget: React.FC<ProductFormWidgetProps> = ({
                         Icon={HiOutlineShoppingBag}
                         error={errors.name}
                         disabled={processing}
+                        required
                     />
 
                     <Input
                         label="Price (KES)"
                         type="number"
+                        step="0.01"
                         value={data.price}
                         onChange={(e) =>
                             setData("price", parseFloat(e.target.value))
@@ -69,6 +93,7 @@ export const ProductFormWidget: React.FC<ProductFormWidgetProps> = ({
                         Icon={GiPriceTag}
                         error={errors.price}
                         disabled={processing}
+                        required
                     />
                 </div>
 
@@ -81,6 +106,7 @@ export const ProductFormWidget: React.FC<ProductFormWidgetProps> = ({
                         error={errors.unit}
                         disabled={processing}
                         Icon={TbRulerMeasure2}
+                        required
                     />
 
                     <Select
@@ -97,18 +123,20 @@ export const ProductFormWidget: React.FC<ProductFormWidgetProps> = ({
                         Icon={MdCategory}
                         error={errors.category}
                         disabled={processing}
+                        required
                     />
                 </div>
             </div>
 
             <ImageUpload
-                value={data.images || data.productImages} 
-                onChange={(images) => setData("productImages", images)}
+                value={data.images || []}
+                onChange={(images) => setData("images", images)}
                 label="Product Images"
-                error={errors.productImages} 
+                error={errors.images}
                 disabled={processing}
                 required
-                maxFiles={3}
+                maxFiles={5}
+                showMainImageControl={true}
             />
 
             {/* Description */}
@@ -148,6 +176,7 @@ export const ProductFormWidget: React.FC<ProductFormWidgetProps> = ({
                         value={data.isPopular}
                         size="sm"
                         icon={TbChartBarPopular}
+                        disabled={processing}
                     />
 
                     <ToggleSwitch
@@ -156,6 +185,7 @@ export const ProductFormWidget: React.FC<ProductFormWidgetProps> = ({
                         value={data.isFeatured}
                         size="sm"
                         icon={HiTag}
+                        disabled={processing}
                     />
 
                     {/* Badge input */}
@@ -176,7 +206,7 @@ export const ProductFormWidget: React.FC<ProductFormWidgetProps> = ({
             <div className="flex gap-4 pt-4 sticky -bottom-6 bg-surface-container-lowest py-4 -mx-6 px-6 border-t border-outline-variant/10 mt-6">
                 <Button
                     type="button"
-                    onClick={onClose}
+                    onClick={handleCancel}
                     variant="outline"
                     className="flex-1"
                     disabled={processing}

@@ -22,7 +22,7 @@ class ProductService
         // read stock status 
         return [
             'status' => 'low_stock',
-            'quantity' => 0 //from stock levels
+            'quantity' => 0 
         ];
     }
 }

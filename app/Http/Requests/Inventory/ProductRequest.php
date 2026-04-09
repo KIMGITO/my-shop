@@ -9,38 +9,52 @@ class ProductRequest extends FormRequest
 {
     public function authorize(): bool
     {
-
-
         return Gate::allows('manage inventory');
+    }
+
+    protected function prepareForValidation()
+    {
+
+        $this->merge([
+            'inStock' => filter_var($this->inStock, FILTER_VALIDATE_BOOLEAN),
+            'isPopular' => filter_var($this->isPopular, FILTER_VALIDATE_BOOLEAN),
+            'isFeatured' => filter_var($this->isFeatured, FILTER_VALIDATE_BOOLEAN),
+        ]);
+
+        // Decode JSON strings into PHP arrays
+        if (is_string($this->existing_images)) {
+            $this->merge(['existing_images' => json_decode($this->existing_images, true) ?? []]);
+        }
+
+        if (is_string($this->delete_images)) {
+            $this->merge(['delete_images' => json_decode($this->delete_images, true) ?? []]);
+        }
     }
 
     public function rules(): array
     {
+        $isUpdate = $this->has('_method') && $this->_method === 'PUT';
+
         return [
             'name' => ['required', 'string', 'max:255'],
-            'price' => ['required', 'numeric', 'min:1'],
-            'unit' => ['required', 'string', 'max:50'],
+            'price' => ['required', 'numeric', 'min:0'],
+            'unit' => ['required', 'string'],
+            'category' => ['required', 'string'],
             'description' => ['nullable', 'string'],
-            'category' => ['required', 'string', 'max:100'],
-            'isPopular' => ['required', 'boolean'],
-            'isFeatured' => ['required', 'boolean'],
-            'badge' => ['nullable', 'string', 'max:50'],
-            'productImages' => ['required', 'array', 'max:3', 'min:1'],
-            'productImages.*.file' => ['image', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
-            'main_product_image' => ['image', 'required', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
+            'isPopular' => ['boolean'],
+            'isFeatured' => ['boolean'],
+            'badge' => ['nullable','string'],
+
+            // Image Validation
+            'productImages' => [$isUpdate ? 'nullable' : 'required', 'array'],
+            'productImages.*' => ['image', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
+            'main_product_image' => [$isUpdate ? 'nullable' : 'required', 'image', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
+
+            // Metadata for updates
+            'existing_images' => ['nullable', 'array'],
+            'delete_images' => ['nullable', 'array'],
+            'main_image_id' => ['nullable', 'integer'],
+
         ];
-    }
-
-    public function prepareForValidation()
-    {
-        if ($this->productImages) {
-            $images = extractImages($this->productImages);
-            $this->merge([
-                'productImages' => $images['files'],
-                'main_product_image' => $images['main']
-            ]);
-        }
-
-        // dd($this->all());
     }
 }
