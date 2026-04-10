@@ -8,7 +8,7 @@ import AuthenticatedLayout from "@/Components/Layout/AuthenticatedLayout";
 import { HiOutlineFilter, HiOutlinePlus } from "react-icons/hi";
 import { Product } from "@/types";
 import ProductFormModal from "./ProductFormModal";
-import { ImageItem } from "@/Components/UI/ImageUpload";
+import { ImageItem } from "@/Components/UI/MultipleImagesUpload";
 import FloatingActionButton from "@/Components/Common/FloatingActionButton";
 
 const categories = [

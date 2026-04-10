@@ -4,7 +4,7 @@ import Button from "@/Components/UI/Button";
 import { RiCloseLargeLine } from "react-icons/ri";
 import { Product } from "@/types";
 import { ProductFormWidget } from "@/Widgets/ProductFormWidget";
-import { ImageItem } from "@/Components/UI/ImageUpload";
+import { ImageItem } from "@/Components/UI/MultipleImagesUpload";
 interface ProductFormModalProps {
     isOpen: boolean;
     onClose: () => void;
@@ -16,8 +16,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
     onClose,
     initialData,
 }) => {
-
-            const { data, setData, processing, errors, reset, clearErrors, setError } =
+    const { data, setData, processing, errors, reset, clearErrors, setError } =
         useForm({
             name: "",
             price: 0,

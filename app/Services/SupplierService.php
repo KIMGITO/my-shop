@@ -2,16 +2,17 @@
 
 namespace App\Services;
 
+use App\Models\Supplier;
 use App\Repositories\Inventory\SupplierRepository;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Throwable;
 
 class SupplierService
 {
-
-
     protected $supplierRepository;
     protected $cloudinaryService;
-
 
     public function __construct(SupplierRepository $supplierRepository, CloudinaryService $cloudinaryService)
     {
@@ -19,24 +20,70 @@ class SupplierService
         $this->cloudinaryService = $cloudinaryService;
     }
 
+    /**
+     * transform suppliers data for display.
+     */
 
-    public function storeData(array $payload)
+    public function transformSuppliers(Collection $suppliers)
     {
-        try { // store image
-            $logo = $payload['logo'];
-            $uploaded = $this->cloudinaryService->upload($logo, 'upload/suppliers');
-            $url = $uploaded['url'];
-            $publicId = $uploaded['public_id'];
+        $transformedSuppliers = $suppliers->map(function ($supplier) {
+            $supplierData = $supplier->except(['logo_url', 'logo_public_id']);
 
-            // store data with updated logo url
+            return [
+                ...$supplierData,
+                'logo' => $supplier->toArray()['logo_url']
+            ];
+        })->toArray();
 
-            $payload['logo'] = $url;
-            $payload['logo_id'] = $publicId;
+        return toCamel($transformedSuppliers);
+    }
 
-            dd($payload);
-            $supplier = $this->supplierRepository->create($payload);
+    /**
+     * Store or Update Supplier Data
+     */
+    public function processSupplier(array $payload, $id = null)
+    {
+
+        try {
+            return DB::transaction(function () use ($payload, $id) {
+                $supplier = $id ? $this->supplierRepository->find($id) : null;
+                $logoUrl = $supplier ? $supplier->image : null;
+                $publicId = $supplier ? $supplier->public_id : null;
+
+                if (($payload['remove_existing_logo'] ?? false) || isset($payload['logo'])) {
+                    if ($publicId) {
+                        $this->cloudinaryService->delete($publicId);
+                        $logoUrl = null;
+                        $publicId = null;
+                    }
+                }
+
+                if (isset($payload['logo']) && $payload['logo'] instanceof \Illuminate\Http\UploadedFile) {
+                    $uploaded = $this->cloudinaryService->upload($payload['logo'], 'suppliers');
+                    $logoUrl = $uploaded['url'];
+                    $publicId = $uploaded['public_id'];
+                }
+
+                $data = [
+                    'name'      => $payload['name'],
+                    'email'     => $payload['email'],
+                    'phone'     => $payload['phone'],
+                    'type'      => $payload['type'] ?? 'General',
+                    'contact'   => $payload['contact'] ?? null,
+                    'logo_url'     => $logoUrl,
+                    'logo_public_id' => $publicId,
+                ];
+
+                if ($id) {
+                    $supplier->update($data);
+                    return $supplier;
+                }
+
+                return $this->supplierRepository->create($data);
+            });
         } catch (Throwable $e) {
-            dd($e);
+            Log::error("Supplier Service Error: " . $e->getMessage());
+            throw $e;
         }
     }
 }

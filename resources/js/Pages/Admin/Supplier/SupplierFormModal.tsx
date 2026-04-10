@@ -2,7 +2,6 @@ import React, { useEffect } from "react";
 import { useForm, router } from "@inertiajs/react";
 import Button from "@/Components/UI/Button";
 import { RiCloseLargeLine } from "react-icons/ri";
-import { ImageItem } from "@/Components/UI/ImageUpload";
 import { SupplierFormWidget } from "@/Widgets/SupplierFormWidget";
 
 interface Supplier {
@@ -10,7 +9,8 @@ interface Supplier {
     name: string;
     email: string;
     phone: string;
-    image: string;
+    contact: string;
+    logo: string;
     type: string;
 }
 
@@ -29,10 +29,11 @@ export const SupplierFormModal: React.FC<SupplierFormModalProps> = ({
         useForm({
             name: "",
             email: "",
-            contact:"",
+            contact: "",
             phone: "",
             type: "",
-            images: [] as ImageItem[],
+            logo: null as File | null,
+            removeExistingLogo: false,
         });
 
     useEffect(() => {
@@ -42,17 +43,10 @@ export const SupplierFormModal: React.FC<SupplierFormModalProps> = ({
                     name: initialData.name || "",
                     email: initialData.email || "",
                     phone: initialData.phone || "",
+                    contact: initialData.contact || "",
                     type: initialData.type || "",
-                    images: initialData.image
-                        ? [
-                              {
-                                  id: "existing-logo",
-                                  url: initialData.image,
-                                  isMain: true,
-                                  isDeleted: false,
-                              },
-                          ]
-                        : [],
+                    logo: null, // Keep this null; we use initialData.logo for the preview
+                    removeExistingLogo: false,
                 });
             } else {
                 reset();
@@ -64,22 +58,13 @@ export const SupplierFormModal: React.FC<SupplierFormModalProps> = ({
     const handleSubmit = (e?: React.FormEvent) => {
         if (e) e.preventDefault();
 
-        const logoFile =
-            data.images.find((img) => img.file && !img.isDeleted)?.file || null;
-        const isLogoDeleted = data.images.some(
-            (img) => img.isDeleted && !img.file
-        );
-
         const payload: any = {
-            name: data.name,
-            email: data.email,
-            contact: data.contact,
-            phone: data.phone,
-            type: data.type,
-            logo: logoFile,
-            removeExistingLogo: isLogoDeleted ? 1 : 0,
+            ...data,
+            // PHP/Laravel expects 1 or 0 for booleans in multipart/form-data
+            removeExistingLogo: data.removeExistingLogo ? 1 : 0,
         };
 
+        // Method spoofing for PUT requests with files
         if (initialData?.id) {
             payload["_method"] = "PUT";
         }
@@ -95,7 +80,9 @@ export const SupplierFormModal: React.FC<SupplierFormModalProps> = ({
                 onClose();
             },
             onError: (err) => {
-                Object.keys(err).forEach((key: any) => setError(key, err[key]));
+                Object.keys(err).forEach((key: any) =>
+                    setError(key as any, err[key])
+                );
             },
         });
     };
@@ -117,9 +104,10 @@ export const SupplierFormModal: React.FC<SupplierFormModalProps> = ({
                         <RiCloseLargeLine className="w-5 h-5" />
                     </Button>
                 </div>
-                <div className="overflow-y-auto flex-1 px-6 py-12">
+                <div className="overflow-y-auto flex-1 px-6 py-8">
                     <SupplierFormWidget
                         data={data}
+                        existingImageUrl={initialData?.logo}
                         setData={setData}
                         errors={errors}
                         processing={processing}

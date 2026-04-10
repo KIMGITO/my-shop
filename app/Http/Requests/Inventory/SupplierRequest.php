@@ -21,7 +21,6 @@ class SupplierRequest extends FormRequest
      */
     public function rules(): array
     {
-        // Get the supplier ID from the route (e.g., /suppliers/{supplier})
         $supplierId = $this->route('supplier');
 
         return [
@@ -37,8 +36,8 @@ class SupplierRequest extends FormRequest
                 Rule::unique('suppliers', 'phone')->ignore($supplierId)
             ],
             "type" => ['required', 'string', 'max:100'],
-            "logo" => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
-            "removeExistingLogo" => ['boolean', 'sometimes'],
+            "logo" => ['required', 'image', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
+            "removeExistingLogo" => ['boolean', 'required'],
             "contact" => ['nullable', 'string', 'max:255'],
         ];
     }
@@ -48,6 +47,7 @@ class SupplierRequest extends FormRequest
      */
     protected function prepareForValidation()
     {
+
         $this->merge([
             'removeExistingLogo' => filter_var($this->removeExistingLogo, FILTER_VALIDATE_BOOLEAN),
         ]);

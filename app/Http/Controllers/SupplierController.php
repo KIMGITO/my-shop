@@ -4,16 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Inventory\SupplierRequest;
 use App\Repositories\Inventory\SupplierRepository;
-use App\Services\CloudinaryService;
 use App\Services\SupplierService;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Throwable;
 
 class SupplierController extends Controller
 {
     protected $supplierRepository;
     protected $supplierService;
-
 
     public function __construct(SupplierRepository $supplierRepository, SupplierService $supplierService)
     {
@@ -24,12 +22,37 @@ class SupplierController extends Controller
     public function index()
     {
         $suppliers = $this->supplierRepository->all();
-        return Inertia::render('Admin/Supplier/Index', ['suppliers' => $suppliers->toArray(), 'modalOpen' => false]);
+        $transformedData = $this->supplierService->transformSuppliers($suppliers);
+
+        return Inertia::render('Admin/Supplier/Index', [
+            'suppliers' => $transformedData,
+            'modalOpen' => false
+        ]);
     }
 
-    public function store(SupplierRequest  $request)
+    public function store(SupplierRequest $request)
     {
-        $payload = $request->validated();
-        $this->supplierService->storeData($payload);
+        try {
+            $this->supplierService->processSupplier($request->validated());
+
+            return redirect()->back()->with('success', 'Supplier created successfully');
+        } catch (Throwable $e) {
+            return redirect()->back()->withErrors([
+                'error' => 'Failed to create supplier: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    public function update(SupplierRequest $request, $id)
+    {
+        try {
+            $this->supplierService->processSupplier($request->validated(), $id);
+
+            return redirect()->back()->with('success', 'Supplier updated successfully');
+        } catch (Throwable $e) {
+            return redirect()->back()->withErrors([
+                'error' => 'Failed to update supplier: ' . $e->getMessage()
+            ]);
+        }
     }
 }

@@ -76,7 +76,6 @@ export default function SuppliersPage({
                                 Manage your artisanal supply chain.
                             </p>
                         </div>
-                       
                     </div>
 
                     {/* Search */}
@@ -91,7 +90,10 @@ export default function SuppliersPage({
                     {/* Suppliers Grid */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
                         {filteredSuppliers.map((supplier) => (
-                            <SupplierCard supplier={supplier} />
+                            <SupplierCard
+                                supplier={supplier}
+                                onEdit={(supplier) => handleEditSupplier(supplier)}
+                            />
                         ))}
                     </div>
 

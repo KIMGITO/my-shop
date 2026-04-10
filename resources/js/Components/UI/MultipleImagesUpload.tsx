@@ -1,4 +1,4 @@
-// ImageUpload.tsx (updated)
+// MultipleImagesUpload.tsx (updated)
 import React, { useState, useRef, ChangeEvent, useEffect } from "react";
 import { cn } from "@/Utils/helpers";
 import { HiOutlinePhotograph, HiOutlineX } from "react-icons/hi";
@@ -31,7 +31,7 @@ interface MultiImageUploadProps {
     showMainImageControl?: boolean;
 }
 
-export const ImageUpload: React.FC<MultiImageUploadProps> = ({
+export const MultipleImagesUpload: React.FC<MultiImageUploadProps> = ({
     value = [],
     onChange,
     label = "Images",
@@ -45,8 +45,7 @@ export const ImageUpload: React.FC<MultiImageUploadProps> = ({
     showUrlInput = true,
     showMainImageControl = true,
 }) => {
-
-    console.log('images', value);
+    console.log("images", value);
     const [isUploading, setIsUploading] = useState(false);
     const [uploadError, setUploadError] = useState<string | null>(null);
     const [urlInput, setUrlInput] = useState("");
@@ -352,4 +351,4 @@ export const ImageUpload: React.FC<MultiImageUploadProps> = ({
     );
 };
 
-export default ImageUpload;
+export default MultipleImagesUpload;

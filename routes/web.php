@@ -221,6 +221,7 @@ Route::middleware(['auth'])->group(function () {
         Route::prefix('suppliers')->name('suppliers.')->group(function () {
             Route::get('/', [SupplierController::class, 'index'])->name('index');
             Route::post('/',[SupplierController::class, 'store'])->name('store');
+            Route::put('/{supplier}',[SupplierController::class, 'update'])->name('update');
             // Route::get('/orders', fn() => Inertia::render('Admin/SupplierOrders'))->name('orders');
             // Route::get('/create', fn() => Inertia::render('Admin/SupplierCreate'))->name('create');
             // Route::get('/{id}', fn($id) => Inertia::render('Admin/SupplierShow', ['id' => $id]))->name('show');

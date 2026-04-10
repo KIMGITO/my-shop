@@ -1,5 +1,5 @@
 import { Button } from "@/Components/UI/Button";
-import ImageUpload from "@/Components/UI/ImageUpload";
+import ImageUpload from "@/Components/UI/MultipleImagesUpload";
 import { Input } from "@/Components/UI/Input";
 import { Select } from "@/Components/UI/Select";
 import ToggleSwitch from "@/Components/UI/ToggleSwitch";
@@ -27,8 +27,7 @@ export const ProductFormWidget: React.FC<ProductFormWidgetProps> = ({
     onSave,
     onClose,
 }) => {
-    
-    console.log('data for por', data);
+    console.log("data for por", data);
     useEffect(() => {
         // When in edit mode and images exist, make sure they have the right structure
         if (data.id && data.images && data.images.length > 0) {

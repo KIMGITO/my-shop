@@ -1,15 +1,15 @@
 import React from "react";
-import { Button } from "@/Components/UI/Button";
-import ImageUpload from "@/Components/UI/ImageUpload";
+import Button from "@/Components/UI/Button";
+import { SingleImageUpload } from "@/Components/UI/SingleImageUpload";
 import { Input } from "@/Components/UI/Input";
-import { HiOutlineUser, HiOutlinePhone, HiUser } from "react-icons/hi2";
-import { GoMail } from "react-icons/go";
+import { HiOutlinePhone, HiUser } from "react-icons/hi2";
 import { MdOutlineCategory } from "react-icons/md";
 import { FcFactoryBreakdown } from "react-icons/fc";
 import { AiTwotoneMail } from "react-icons/ai";
 
 interface SupplierFormWidgetProps {
     data: any;
+    existingImageUrl?: string | null;
     setData: (key: string, value: any) => void;
     errors: any;
     processing: boolean;
@@ -19,6 +19,7 @@ interface SupplierFormWidgetProps {
 
 export const SupplierFormWidget: React.FC<SupplierFormWidgetProps> = ({
     data,
+    existingImageUrl,
     setData,
     errors,
     processing,
@@ -28,11 +29,14 @@ export const SupplierFormWidget: React.FC<SupplierFormWidgetProps> = ({
     return (
         <form onSubmit={onSave} className="space-y-6">
             <div className="space-y-4">
-                <ImageUpload
-                    value={data.images || []}
-                    onChange={(imgs) => setData("images", imgs)}
-                    label="Supplier Logo/Image"
-                    maxFiles={1}
+                <SingleImageUpload
+                    // Pass the DB URL for display, or the new blob if a file is picked
+                    value={existingImageUrl}
+                    onFileChange={(file) => setData("logo", file)}
+                    onRemoveExisting={(bool) =>
+                        setData("removeExistingLogo", bool)
+                    }
+                    label="Supplier Logo"
                     error={errors.logo}
                     disabled={processing}
                 />
@@ -76,17 +80,17 @@ export const SupplierFormWidget: React.FC<SupplierFormWidgetProps> = ({
                         error={errors.contact}
                     />
                     <Input
-                        label="Supplier Type (e.g. Dairy, Bakery)"
+                        label="Supplier Type"
                         value={data.type}
                         onChange={(e) => setData("type", e.target.value)}
                         Icon={MdOutlineCategory}
-                        placeholder="e.g. Dairy, Grain, Poultryral"
+                        placeholder="e.g. Dairy, Grain, Poultry"
                         error={errors.type}
                     />
                 </div>
             </div>
 
-            <div className="flex gap-4 pt-4 border-t border-outline-variant/10">
+            <div className="flex gap-4 pt-6 border-t border-outline-variant/10">
                 <Button
                     type="button"
                     onClick={onClose}
