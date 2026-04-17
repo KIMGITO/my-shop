@@ -23,8 +23,8 @@ export interface Supplier {
 
 interface SupplierCardProps {
     supplier: Supplier;
-    onEdit?: (supplier: Supplier) => void;
-    onDelete?: (id: number | string) => void;
+    onEdit: (supplier: Supplier) => void;
+    onDelete: (id: number | string) => void;
     onInfo?: (supplier: Supplier) => void;
 }
 
@@ -106,7 +106,7 @@ const SupplierCard: React.FC<SupplierCardProps> = ({
                         </Button>
                         <Button
                             variant="ghost"
-                            onClick={() => onDelete?.(supplier.id)}
+                            onClick={() => onDelete(supplier.id)}
                             className="px-2 hover:bg-primary/30 rounded py-2 text-error"
                         >
                             <HiOutlineTrash className="text-xs md:text-sm" />

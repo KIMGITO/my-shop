@@ -20,7 +20,8 @@ use Illuminate\Database\Eloquent\Model;
         'is_popular',
         'is_featured',
         'badge',
-        'sku'
+        'sku',
+        'code'
     ]
 )]
 

@@ -1,6 +1,6 @@
 // resources/js/Pages/Admin/Suppliers.tsx
 import React, { useState } from "react";
-import { Head } from "@inertiajs/react";
+import { Head, router } from "@inertiajs/react";
 import { SearchBar } from "@/Components/UI/SearchBar";
 import { ActionButton } from "@/Components/UI/ActionButton";
 import { HiOutlinePlusCircle, HiOutlinePhone } from "react-icons/hi2";
@@ -9,29 +9,9 @@ import { GoMail } from "react-icons/go";
 import SupplierCard, { Supplier } from "@/Components/Admin/SupplierCard";
 import { SupplierFormModal } from "./SupplierFormModal";
 import FloatingActionButton from "@/Components/Common/FloatingActionButton";
+import axios from  'axios';
 
 // Mock data
-const suppliers = [
-    {
-        id: "1",
-        name: "Golden Valley Organics",
-        contact: "Sarah Jenkins",
-        type: "Dairy",
-        image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBg1D1zFS-3jZFhHLV8L-Yx-UJNe2f8uofPXAxGlbu19gCBL4AMxb0KAhL5LL2kixXMy2j3IkA4v4VVsMyPp2GW4TgSFCeKaYHvXF8xMK5Ivwomag8GZNT1mtlBXdf9QSNwwXCfldnluVc_vMpghKxBN_i_cLHvpbPoK63KFKM6lWcq7elkbjVTmF-4ivbtxFPrW1TyQuHj6w72UX235IVkFiwllzcKyriFd4pf9rPXGScnaBu4FkZKXWhhKimGY210PWU2_qjndzf0",
-        email: "sarah@goldenvalley.com",
-        phone: "+1 (555) 123-4567",
-    },
-    {
-        id: "2",
-        name: "Heritage Flour Co.",
-        contact: "Marko Vujic",
-        type: "Bakery",
-        image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBY2fob6J90-I5s-Xj8lBWMcXOZ_jGFS-iof5diw4NdLArg8CvHJXtWaYCvM__c2KQH582XypRnHbe6xqAgfsxtuaCWFlclckVa4_LZPWesEGmrUe7UWDM7jN2l_QHmdUkY0t5uoCZoj0XyRAgqXFXTYhK_lgIWrVSVYXy0AT-2Nv3hJYLw4BFmY-TkMso5crLSc9H8JDtgEW3cm_0rHV7GkVFEQ7VviRIA9S4w-LqkCLDZO1Ms_uhoZhf7iv5cKPURXJXyGULw0dbp",
-        email: "marko@heritageflour.com",
-        phone: "+1 (555) 234-5678",
-    },
-];
-
 interface SupplierPageProp {
     suppliers: Supplier[];
     modalOpen: boolean;
@@ -60,6 +40,24 @@ export default function SuppliersPage({
         setSelectedSupplier(supplier);
         setIsModalOpen(true);
     };
+
+    const handleDeleteSupplier = (id: string | number) => {
+        router.delete(route('admin.suppliers.destroy',id),{
+            onStart: () => {
+                // loading state
+            },
+            onSuccess: () => {
+                console.log("Supplier deleted successfully");
+            },
+            onError: (errors) => {
+                // Handle any server-side errors
+                alert(
+                    "Failed to delete supplier: " + Object.values(errors)[0]
+                );
+            },
+            preserveScroll: true,
+        });
+    }
 
     return (
         <>
@@ -93,6 +91,7 @@ export default function SuppliersPage({
                             <SupplierCard
                                 supplier={supplier}
                                 onEdit={(supplier) => handleEditSupplier(supplier)}
+                                onDelete = {(id) => handleDeleteSupplier(id)}
                             />
                         ))}
                     </div>

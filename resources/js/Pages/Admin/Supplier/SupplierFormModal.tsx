@@ -32,7 +32,7 @@ export const SupplierFormModal: React.FC<SupplierFormModalProps> = ({
             contact: "",
             phone: "",
             type: "",
-            logo: null as File | null,
+            logo: null as File | null | '',
             removeExistingLogo: false,
         });
 
@@ -45,7 +45,7 @@ export const SupplierFormModal: React.FC<SupplierFormModalProps> = ({
                     phone: initialData.phone || "",
                     contact: initialData.contact || "",
                     type: initialData.type || "",
-                    logo: null, // Keep this null; we use initialData.logo for the preview
+                    logo: initialData.logo || null,
                     removeExistingLogo: false,
                 });
             } else {
@@ -60,11 +60,9 @@ export const SupplierFormModal: React.FC<SupplierFormModalProps> = ({
 
         const payload: any = {
             ...data,
-            // PHP/Laravel expects 1 or 0 for booleans in multipart/form-data
             removeExistingLogo: data.removeExistingLogo ? 1 : 0,
         };
 
-        // Method spoofing for PUT requests with files
         if (initialData?.id) {
             payload["_method"] = "PUT";
         }

@@ -30,7 +30,6 @@ export const SupplierFormWidget: React.FC<SupplierFormWidgetProps> = ({
         <form onSubmit={onSave} className="space-y-6">
             <div className="space-y-4">
                 <SingleImageUpload
-                    // Pass the DB URL for display, or the new blob if a file is picked
                     value={existingImageUrl}
                     onFileChange={(file) => setData("logo", file)}
                     onRemoveExisting={(bool) =>

@@ -36,7 +36,18 @@ class SupplierRequest extends FormRequest
                 Rule::unique('suppliers', 'phone')->ignore($supplierId)
             ],
             "type" => ['required', 'string', 'max:100'],
-            "logo" => ['required', 'image', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
+            "logo" => [
+                'nullable',
+                function ($attribute, $value, $fail) {
+                    if ($value instanceof \Illuminate\Http\UploadedFile) {
+                        if (!in_array($value->getClientOriginalExtension(), ['jpeg', 'jpg', 'png', 'webp'])) {
+                            $fail('Invalid image format.');
+                        }
+                    } elseif (!is_string($value) && !is_null($value)) {
+                        $fail('Logo must be .');
+                    }
+                }
+            ],
             "removeExistingLogo" => ['boolean', 'required'],
             "contact" => ['nullable', 'string', 'max:255'],
         ];

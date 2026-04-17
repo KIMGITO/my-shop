@@ -1,12 +1,10 @@
 import React, { useState } from "react";
-import { Head, router } from "@inertiajs/react";
+import { Head } from "@inertiajs/react";
 import { StatCard } from "@/Components/Admin/StatCard";
 import { StatusBadge } from "@/Components/UI/StatusBadge";
-import { SearchBar } from "@/Components/UI/SearchBar";
 import { Pagination } from "@/Components/UI/Pagination";
 import { ActionButton } from "@/Components/UI/ActionButton";
 import {
-    HiOutlinePlusCircle,
     HiOutlineQrCode,
     HiOutlineDocumentText,
     HiOutlineCube,
@@ -17,6 +15,7 @@ import { cn } from "@/lib/utils";
 import { FaFilter } from "react-icons/fa6";
 import { IoMdDownload } from "react-icons/io";
 import FloatingActionButton from "@/Components/Common/FloatingActionButton";
+import { StockIntakeModal } from "./StockIntakeModal";
 
 // Mock data
 const mockBatches = [
@@ -117,6 +116,7 @@ const stats = [
 export default function BatchesPage() {
     const [searchQuery, setSearchQuery] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
+    const [isIntakeModalOpen, setIsIntakeModalOpen] = useState(false);
     const itemsPerPage = 5;
 
     const filteredBatches = mockBatches.filter(
@@ -148,7 +148,7 @@ export default function BatchesPage() {
                     <div className="bg-surface-container-lowest rounded-3xl shadow-sm overflow-hidden border border-outline-variant/10">
                         <div className="px-6 md:px-8 py-6 border-b border-outline-variant/5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                             <div>
-                                <h3 className="text-xl font-bold">
+                                <h3 className="text-xl font-bold text-on-surface">
                                     Milk Ledger
                                 </h3>
                                 <p className="text-on-surface-variant text-sm">
@@ -328,10 +328,15 @@ export default function BatchesPage() {
                         </div>
                     </div>
                 </div>
+
+                {/* Modal for Stock Intake */}
+                <StockIntakeModal
+                    isOpen={isIntakeModalOpen}
+                    onClose={() => setIsIntakeModalOpen(false)}
+                />
+
                 <FloatingActionButton
-                    action={() => {
-                        router.get("/admin/inventory/intake");
-                    }}
+                    action={() => setIsIntakeModalOpen(true)}
                     icon={<HiPlus />}
                 />
             </AuthenticatedLayout>

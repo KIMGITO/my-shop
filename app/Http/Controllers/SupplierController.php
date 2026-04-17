@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Inventory\SupplierRequest;
+use App\Models\Supplier;
 use App\Repositories\Inventory\SupplierRepository;
 use App\Services\SupplierService;
 use Inertia\Inertia;
@@ -52,6 +53,19 @@ class SupplierController extends Controller
         } catch (Throwable $e) {
             return redirect()->back()->withErrors([
                 'error' => 'Failed to update supplier: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    public function destroy( Supplier $supplier){
+        try{
+
+            $this->supplierService->deleteSupplier($supplier->id);
+            return redirect()->back()->with('success', 'Supplier deleted successfully');
+
+        } catch(Throwable $e){
+            return redirect()->back()->withErrors([
+                'error' => 'Failed to delete supplier '. $e->getMessage(),
             ]);
         }
     }

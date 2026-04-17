@@ -5,6 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 
-#[Fillable(['name', 'email', 'contact',  'phone', 'type', 'logo_url', 'logo_public_id'])]
+#[Fillable(['name', 'email', 'contact',  'phone', 'type', 'logo_url', 'logo_public_id','code'])]
 
 class Supplier extends Model {}

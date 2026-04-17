@@ -5,7 +5,7 @@ import { RiUpload2Line } from "react-icons/ri";
 import Button from "@/Components/UI/Button";
 
 interface SingleImageUploadProps {
-    value: string | null; // The existing URL from DB
+    value: string | null;
     onFileChange: (file: File | null) => void;
     onRemoveExisting: (shouldRemove: boolean) => void;
     error?: string;

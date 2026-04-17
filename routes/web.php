@@ -191,6 +191,11 @@ Route::middleware(['auth'])->group(function () {
                 Route::put('/{product}', [ProductController::class, 'update'])->name('update');
                 Route::delete('/{product}', [ProductController::class, 'destroy'])->name('destroy');
             });
+            Route::prefix('batches')->name('batches.')->group(function () {
+                Route::get('/', fn() => Inertia::render('Admin/Stock/Index'))->name('index');
+                Route::get('/{id}', fn($id) => Inertia::render('Admin/BatchShow', ['id' => $id]))->name('show');
+                Route::get('/{id}/edit', fn($id) => Inertia::render('Admin/BatchEdit', ['id' => $id]))->name('edit');
+            });
             Route::get('/analytics', fn() => Inertia::render('Admin/InventoryAnalytics'))->name('analytics');
             Route::get('/intake', fn() => Inertia::render('Admin/StockIntake'))->name('intake');
             Route::get('/adjustment', fn() => Inertia::render('Admin/StockAdjustment'))->name('adjustment');
@@ -210,18 +215,14 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/audit-logs', fn() => Inertia::render('Admin/AuditLogs'))->name('audit-logs');
 
         // Batch Management
-        Route::prefix('batches')->name('batches.')->group(function () {
-            Route::get('/', fn() => Inertia::render('Admin/Batches'))->name('index');
-            Route::get('/create', fn() => Inertia::render('Admin/BatchCreate'))->name('create');
-            Route::get('/{id}', fn($id) => Inertia::render('Admin/BatchShow', ['id' => $id]))->name('show');
-            Route::get('/{id}/edit', fn($id) => Inertia::render('Admin/BatchEdit', ['id' => $id]))->name('edit');
-        });
+       
 
         // Supplier Management
         Route::prefix('suppliers')->name('suppliers.')->group(function () {
             Route::get('/', [SupplierController::class, 'index'])->name('index');
             Route::post('/',[SupplierController::class, 'store'])->name('store');
             Route::put('/{supplier}',[SupplierController::class, 'update'])->name('update');
+            Route::delete('/{supplier}',  [SupplierController::class, 'destroy']) -> name('destroy');
             // Route::get('/orders', fn() => Inertia::render('Admin/SupplierOrders'))->name('orders');
             // Route::get('/create', fn() => Inertia::render('Admin/SupplierCreate'))->name('create');
             // Route::get('/{id}', fn($id) => Inertia::render('Admin/SupplierShow', ['id' => $id]))->name('show');

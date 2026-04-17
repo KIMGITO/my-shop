@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Supplier;
 use App\Repositories\Inventory\SupplierRepository;
+use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -64,6 +65,8 @@ class SupplierService
                     $publicId = $uploaded['public_id'];
                 }
 
+
+
                 $data = [
                     'name'      => $payload['name'],
                     'email'     => $payload['email'],
@@ -75,6 +78,11 @@ class SupplierService
                 ];
 
                 if ($id) {
+                    if(!isset($data['logo_url'])){
+                        unset($data['logo_url']);
+                        unset($data['logo_public_id']);
+
+                    }
                     $supplier->update($data);
                     return $supplier;
                 }
@@ -84,6 +92,21 @@ class SupplierService
         } catch (Throwable $e) {
             Log::error("Supplier Service Error: " . $e->getMessage());
             throw $e;
+        }
+    }
+
+    public function deleteSupplier($id){
+        try{
+            DB::beginTransaction();
+            $supplier = Supplier::findOrFail($id);
+            $logo_id = $supplier->logo_public_id;
+
+            $this->cloudinaryService->delete($logo_id); //delete from cloudinary.
+            $this->supplierRepository->delete($id); // supplier from database.
+            DB::commit();
+        }catch(Exception $e){
+            DB::rollBack();
+            throw new Exception($e->getMessage()) ;
         }
     }
 }
