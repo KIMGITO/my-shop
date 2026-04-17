@@ -92,11 +92,7 @@ export const adminNav: NavItem[] = [
         path: "/admin/inventory/products",
         icon: AiFillProduct,
     },
-    {
-        label: "Stock Intake",
-        path: "/admin/inventory/intake",
-        icon: HiOutlineShoppingBag,
-    },
+  
     {
         label: "Stock Adjustment",
         path: "/admin/inventory/adjustment",
@@ -109,7 +105,7 @@ export const adminNav: NavItem[] = [
     },
     { label: "Sales Reports", path: "/admin/sales", icon: BiSolidReport },
     { label: "Staff", path: "/admin/staff", icon: HiOutlineUsers },
-    { label: "Batches", path: "/admin/batches", icon: FaSitemap },
+    { label: "Batches", path: "/admin/inventory/batches", icon: FaSitemap },
     { label: "Suppliers", path: "/admin/suppliers", icon: HiOutlineTruck },
     {
         label: "Supplier Orders",

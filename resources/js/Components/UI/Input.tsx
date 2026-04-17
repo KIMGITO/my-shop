@@ -6,6 +6,7 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
     label?: string;
     error?: string;
     Icon?: IconType;
+    disabled?: boolean;
     height?: "sm" | "md" | "lg" | "xl"; // Added sm and md
 }
 
@@ -15,6 +16,7 @@ export const Input: React.FC<InputProps> = ({
     Icon,
     height = "sm",
     className,
+    disabled,
     id,
     ...props
 }) => {
@@ -48,13 +50,15 @@ export const Input: React.FC<InputProps> = ({
                 )}
                 <input
                     id={inputId}
+                    disabled={disabled}
                     className={cn(
                         "w-full px-4 rounded-xl bg-surface-container-high border-none transition-all text-on-surface font-medium",
                         "focus:bg-surface-container-highest focus:ring-2 focus:ring-primary/20 focus:outline-none",
                         heightClasses[height],
                         Icon ? "pl-12" : "pl-4",
                         error ? "ring-2 ring-error" : "",
-                        className
+                        className,
+                        disabled ? 'bg-gray-400/50':''
                     )}
                     {...props}
                 />

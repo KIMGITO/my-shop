@@ -46,7 +46,6 @@ Route::prefix('auth')->name('auth.')->group(function () {
     Route::get('/register', fn() => Inertia::render('Auth/Register'))->name('register');
 });
 
-require __DIR__ . '/auth.php';
 
 Route::get('/product/{id}', fn($id) => Inertia::render('Product/Show', ['id' => $id]))->name('product.show');
 
@@ -120,9 +119,6 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/security', [ProfileController::class, 'security'])->name('security');
     });
 
-
-
-
     // Billing
     Route::prefix('billing')->name('billing.')->group(function () {
         Route::get('/', fn() => Inertia::render('Billing/Index'))->name('index');
@@ -170,71 +166,6 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/', fn() => Inertia::render('Pos/Index'))->name('index');
         Route::get('/history', fn() => Inertia::render('Pos/History'))->name('history');
         Route::get('/dashboard', fn() => Inertia::render('Pos/Dashboard'))->name('dashboard');
-    });
-
-    // ============================================================================
-    // Admin Routes (Backend Management)
-    // ============================================================================
-
-    Route::prefix('admin')->name('admin.')->group(function () {
-
-        // Admin Dashboard
-        Route::get('/dashboard', fn() => Inertia::render('Admin/Dashboard'))->name('dashboard');
-
-        // Inventory Management
-        Route::prefix('inventory')->name('inventory.')->group(function () {
-            // products
-            Route::prefix('products')->name('products.')->group(function () {
-                Route::get('/', [ProductController::class,  'index'])->name('index');
-                Route::get('/create', [ProductController::class, 'method'])->name('create');
-                Route::post('/', [ProductController::class, 'store'])->name('store');
-                Route::put('/{product}', [ProductController::class, 'update'])->name('update');
-                Route::delete('/{product}', [ProductController::class, 'destroy'])->name('destroy');
-            });
-            Route::prefix('batches')->name('batches.')->group(function () {
-                Route::get('/', fn() => Inertia::render('Admin/Stock/Index'))->name('index');
-                Route::get('/{id}', fn($id) => Inertia::render('Admin/BatchShow', ['id' => $id]))->name('show');
-                Route::get('/{id}/edit', fn($id) => Inertia::render('Admin/BatchEdit', ['id' => $id]))->name('edit');
-            });
-            Route::get('/analytics', fn() => Inertia::render('Admin/InventoryAnalytics'))->name('analytics');
-            Route::get('/intake', fn() => Inertia::render('Admin/StockIntake'))->name('intake');
-            Route::get('/adjustment', fn() => Inertia::render('Admin/StockAdjustment'))->name('adjustment');
-            Route::get('/history', fn() => Inertia::render('Admin/StockHistory'))->name('history');
-        });
-
-        // Sales Reports
-        Route::get('/sales', fn() => Inertia::render('Admin/SalesReports'))->name('sales');
-
-        // Staff Management
-        Route::get('/staff', [UserController::class, 'staffIndex'])->name('staff');
-
-        // System Settings
-        Route::get('/settings', fn() => Inertia::render('Admin/SystemSettings'))->name('settings');
-
-        // Audit Logs
-        Route::get('/audit-logs', fn() => Inertia::render('Admin/AuditLogs'))->name('audit-logs');
-
-        // Batch Management
-       
-
-        // Supplier Management
-        Route::prefix('suppliers')->name('suppliers.')->group(function () {
-            Route::get('/', [SupplierController::class, 'index'])->name('index');
-            Route::post('/',[SupplierController::class, 'store'])->name('store');
-            Route::put('/{supplier}',[SupplierController::class, 'update'])->name('update');
-            Route::delete('/{supplier}',  [SupplierController::class, 'destroy']) -> name('destroy');
-            // Route::get('/orders', fn() => Inertia::render('Admin/SupplierOrders'))->name('orders');
-            // Route::get('/create', fn() => Inertia::render('Admin/SupplierCreate'))->name('create');
-            // Route::get('/{id}', fn($id) => Inertia::render('Admin/SupplierShow', ['id' => $id]))->name('show');
-            // Route::get('/{id}/edit', fn($id) => Inertia::render('Admin/SupplierEdit', ['id' => $id]))->name('edit');
-            // Route::get('/orders/create', fn() => Inertia::render('Admin/POCreate'))->name('po.create');
-            // Route::get('/orders/{id}', fn($id) => Inertia::render('Admin/POShow', ['id' => $id]))->name('po.show');
-        });
-
-        // Feedbacks
-        Route::get('/feedback', function () {
-            return Inertia::render('Admin/FeedbackManagement');
-        })->name('feedback');
     });
 
     // ============================================================================
@@ -307,3 +238,7 @@ Route::prefix('api')->name('api.')->group(function () {
         Route::post('/process', fn() => response()->json(['success' => true]))->name('process');
     });
 });
+
+
+require __DIR__ . '/auth.php';
+require __DIR__ . '/admin.php';

@@ -112,13 +112,13 @@ export const StockIntakeFormWidget: React.FC<StockIntakeFormWidgetProps> = ({
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-outline-variant/10">
                         <Input
                             label="Batch Number"
+                            disabled
                             value={data.batch_number}
                             onChange={(e) =>
                                 setData("batch_number", e.target.value)
                             }
-                            Icon={HiOutlineHashtag}
                             error={errors.batch_number}
-                            placeholder="e.g., BTH-2024-001"
+                            placeholder=""
                             className="uppercase"
                         />
                         <Input
@@ -162,9 +162,8 @@ export const StockIntakeFormWidget: React.FC<StockIntakeFormWidgetProps> = ({
                             </div>
                         </div>
                         <div className="mt-8 p-4 bg-primary/5 rounded-2xl text-[11px] text-on-surface-variant italic leading-relaxed border border-primary/10">
-                            Warning: Submitting this will create a new ledger
-                            entry. Ensure batch numbers match physical labels
-                            for traceability.
+                            Note: Submitting this will create a new ledger
+                            entry and batch number will be generated automatically.
                         </div>
                     </div>
                 </div>
@@ -184,7 +183,6 @@ export const StockIntakeFormWidget: React.FC<StockIntakeFormWidgetProps> = ({
                     type="submit"
                     variant="primary"
                     loading={processing}
-                    icon={<HiOutlineCheck className="w-5 h-5" />}
                     className="px-8"
                 >
                     Confirm Intake

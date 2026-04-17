@@ -336,6 +336,7 @@ export default function BatchesPage() {
                 />
 
                 <FloatingActionButton
+                    disabled={isIntakeModalOpen}
                     action={() => setIsIntakeModalOpen(true)}
                     icon={<HiPlus />}
                 />
