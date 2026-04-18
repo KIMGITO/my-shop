@@ -75,7 +75,7 @@ export default function ProductsPage({
                         "Failed to delete product: " + Object.values(errors)[0]
                     );
                 },
-                preserveScroll: true, // Keeps the user at the same scroll position
+                preserveScroll: true, 
             });
         }
     };

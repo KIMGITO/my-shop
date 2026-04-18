@@ -13,7 +13,7 @@ class BatchRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return Gate::allows('manage stock');
+        return Gate::allows('manage inventory');
     }
 
     /**
@@ -30,8 +30,19 @@ class BatchRequest extends FormRequest
             'productId' => ['required', 'exists:products,id', 'numeric'],
             'supplierId' => ['required', 'exists:suppliers,id', 'numeric'],
             'expiryDate' => ['required', 'date', 'after_or_equal:today'],
-            'intakeQuantity' => ['required', 'decimal:1'],
+            'intakeQuantity' => ['required', 'decimal:0,2'],
             'currentPrice' => ['nullable', 'decimal:0,2'],
+        ];
+    }
+
+    public function attributes(): array
+    {
+        return [
+            'productId' => 'product',
+            'supplierId' => 'supplier',
+            'expiryDate' => 'expiry date',
+            'intakeQuantity' => 'intake quantity',
+            'currentPrice' => 'current price',
         ];
     }
 }

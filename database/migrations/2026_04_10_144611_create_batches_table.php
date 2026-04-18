@@ -16,10 +16,12 @@ return new class extends Migration
             $table->foreignId('product_id')->constrained();
             $table->foreignId('supplier_id')->constrained();
             $table->string('batch_number')->unique;
-            $table->date('expiry_date');
-            $table->decimal('intake_quantity', 3, 2)->default(0);
-            $table->decimal('balance', 3, 2);
-            $table->decimal('current_price');
+            $table->string('expiry_date');
+            $table->integer('intake_quantity');
+            $table->integer('balance');
+            $table->integer('current_price');
+            $table->boolean('is_active')->default(true);
+
             $table->timestamps();
         });
     }

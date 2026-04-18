@@ -37,17 +37,17 @@ export const StockIntakeModal: React.FC<StockIntakeModalProps> = ({
     }, [isOpen]);
     const { data, setData, post, processing, errors, reset, clearErrors } =
         useForm({
-            product_id: "",
-            supplier_id: "",
-            quantity: "" as string | number,
-            unit_price: "" as string | number,
-            batch_number: "",
-            expiry_date: "",
+            productId: "",
+            supplierId: "",
+            intakeQuantity: "" as string | number,
+            currentPrice: "" as string | number,
+            batchNumber: "",
+            expiryDate: "",
         });
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post(route("admin.inventory.store"), {
+        post(route("admin.inventory.batches.store"), {
             onSuccess: () => {
                 reset();
                 onClose();

@@ -9,6 +9,7 @@ import { HiOutlineShoppingBag, HiTag } from "react-icons/hi";
 import { MdCategory } from "react-icons/md";
 import { TbChartBarPopular, TbRulerMeasure2 } from "react-icons/tb";
 import { useEffect } from "react";
+import { FaHeartbeat } from "react-icons/fa";
 
 interface ProductFormWidgetProps {
     data: any;
@@ -81,7 +82,7 @@ export const ProductFormWidget: React.FC<ProductFormWidgetProps> = ({
                     />
 
                     <Input
-                        label="Price (KES)"
+                        label="Unit Price (KES)"
                         type="number"
                         step="0.01"
                         value={data.price}
@@ -125,6 +126,17 @@ export const ProductFormWidget: React.FC<ProductFormWidgetProps> = ({
                         required
                     />
                 </div>
+                 <Input
+                        label="Shelf Life"
+                        value={data.shelfLife}
+                        type="number"
+                        onChange={(e) => setData("shelfLife", e.target.value)}
+                        placeholder="e.g., 4"
+                        error={errors.shelfLife}
+                        disabled={processing}
+                        Icon={FaHeartbeat}
+                        required
+                    />
             </div>
 
             <ImageUpload

@@ -4,6 +4,8 @@ namespace App\Services;
 
 use App\Models\Batch;
 use App\Repositories\Inventory\BatchRepository;
+use Carbon\Carbon;
+use Exception;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
@@ -17,8 +19,22 @@ class BatchService
         $this->batchRepository = $batchRepository;
     }
 
-    // transform batches data (camelCase)
 
+    public function  getFormattedBatches(){
+        try {
+            $batches = $this->batchRepository->all();
+
+            $formatted = $batches->map(function ($batch){
+
+            });
+
+        } catch (\Throwable $th) {
+            //throw $th;
+        }
+
+    }
+
+   
     // process batches 
     public function processBatch(array $payload, $id = null){
         
@@ -31,6 +47,8 @@ class BatchService
                 $this->batchRepository->update($id, $data);
             }else{
                 // crate
+                $data['balance'] = $data['intake_quantity'];
+                $data['is_active'] = true;
                 $this->batchRepository->create($data);
             }
         }catch(Throwable $e){
@@ -40,12 +58,15 @@ class BatchService
 
     }
 
+
+    public function getStatus($receiveDate, $expiryDate){
+        $receiveDate = Carbon::parse($receiveDate);
+        $expiryDate = Carbon::parse($expiryDate);
+        
+    }
     
 
-    // generate batch number
-    public function generateBatchNumber(Batch $batch){
-        $rand = random_int(1000,9000);
-    }
+   
 
 
 }

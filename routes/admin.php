@@ -15,7 +15,7 @@ use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-    Route::prefix('admin')->name('admin.')->group(function () {
+    Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
 
         // Admin Dashboard
         Route::get('/dashboard', fn() => Inertia::render('Admin/Dashboard'))->name('dashboard');
@@ -33,8 +33,7 @@ use Inertia\Inertia;
             // bathes
             Route::prefix('batches')->name('batches.')->group(function () {
                 Route::get('/', [BatchController::class, 'index'])->name('index');
-                Route::get('/{id}', fn($id) => Inertia::render('Admin/BatchShow', ['id' => $id]))->name('show');
-                Route::get('/{id}/edit', fn($id) => Inertia::render('Admin/BatchEdit', ['id' => $id]))->name('edit');
+                Route::post('/', [BatchController::class,'store'])->name('store');
             });
 
             Route::get('/analytics', fn() => Inertia::render('Admin/InventoryAnalytics'))->name('analytics');

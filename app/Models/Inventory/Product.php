@@ -21,7 +21,8 @@ use Illuminate\Database\Eloquent\Model;
         'is_featured',
         'badge',
         'sku',
-        'code'
+        'code',
+        'shelf_life',
     ]
 )]
 

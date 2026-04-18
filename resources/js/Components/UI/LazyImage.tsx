@@ -19,7 +19,7 @@ interface LazyImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
 
 const shapeClasses: Record<ImageShape, string> = {
     circle: "rounded-full",
-    none: "rounded-none",
+    none: "rounded-[4px]",
 };
 
 const aspectClasses: Record<AspectRatio, string> = {

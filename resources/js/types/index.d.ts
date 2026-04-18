@@ -9,25 +9,183 @@ export type PageProps<
     ziggy: Config & { location: string };
 };
 
-// types/index.ts
-export interface Product {
+// ========== BASE PRODUCT ==========
+export interface BaseProduct {
     id: string | number;
     name: string;
     price: number;
-    unit?: string;
     image: string;
-    description: string;
+    description?: string;
+    category?: string;
+    sku?: string;
+}
+
+// ========== STORE / CUSTOMER FACING PRODUCT ==========
+export interface Product extends BaseProduct {
+    unit?: string;
     rating?: number;
     reviews?: number;
-    category?: string;
     inStock?: boolean;
-    sku?: string;
     isPopular?: boolean;
     isFeatured?: boolean;
-    description?: string;
     badge?: string;
 }
 
+// ========== INVENTORY / ADMIN FACING PRODUCT ==========
+export interface InventoryProduct extends BaseProduct {
+    stock: number;
+    shelfLife: number;
+    images: ProductImage[];
+    mainProductImage: string;
+    status: "In Stock" | "Low Stock" | "Out of Stock";
+}
+
+export interface ProductImage {
+    url: string;
+    alt?: string;
+    isPrimary?: boolean;
+}
+
+// ========== SUBSCRIPTION PRODUCT ==========
+export interface SubscriptionProduct extends BaseProduct {
+    volumeOptions: string[];
+    defaultVolume: string;
+    frequencyOptions: Frequency[];
+}
+
+// ========== CART ITEMS ==========
+export interface CartItem extends Product {
+    quantity: number;
+}
+
+export interface CashierCartItem {
+    id: string;
+    name: string;
+    price: number;
+    quantity: number;
+    image?: string;
+}
+
+// ========== BATCH ==========
+export interface Batch {
+    batchNumber: string;
+    expiryDate: string;
+    receiveDate: string;
+    intakeQuantity: number;
+    balance: number;
+    isActive: boolean;
+    product: {
+        name?: string;
+        image?: string;
+    };
+}
+
+// types/index.ts
+import { Config } from "ziggy-js";
+
+export type PageProps<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = T & {
+    auth: {
+        user: User;
+    };
+    ziggy: Config & { location: string };
+};
+
+// ========== BASE PRODUCT ==========
+export interface BaseProduct {
+    id: string | number;
+    name: string;
+    price: number;
+    description: string;
+    category: string;
+    sku?: string;
+}
+
+// ========== STORE / CUSTOMER FACING PRODUCT ==========
+export interface Product extends BaseProduct {
+    unit?: string;
+    rating?: number;
+    reviews?: number;
+    inStock: boolean;
+    isPopular?: boolean;
+    isFeatured?: boolean;
+    badge?: string;
+    images: ProductImage[];
+    shelfLife?: number;
+}
+
+// ========== INVENTORY / ADMIN FACING PRODUCT ==========
+export interface InventoryProduct extends BaseProduct {
+    unit?: string;
+    stock: number;  // This replaces inStock
+    shelfLife: number;
+    images: ProductImage[];
+    mainProductImage: string;
+    status: "In Stock" | "Low Stock" | "Out of Stock";
+    inStock?: never; // Prevent confusion
+    isPopular?: boolean;
+    isFeatured?: boolean;
+    badge?: string;
+}
+
+export interface ProductImage {
+    id?: string | number;
+    url: string;
+    alt?: string;
+    isMain?: boolean;
+    file?: File; // For uploads
+}
+
+// ========== TYPE CONVERTERS ==========
+export function productToInventoryProduct(product: Product): InventoryProduct {
+    const stock = product.inStock ? (product.unit === 'kg' ? 100 : 50) : 0;
+    const status: InventoryProduct['status'] = 
+        !product.inStock ? "Out of Stock" :
+        stock < 10 ? "Low Stock" : "In Stock";
+    
+    const mainImage = product.images.find(img => img.isMain) || product.images[0];
+    
+    return {
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        description: product.description,
+        category: product.category,
+        sku: product.sku,
+        unit: product.unit,
+        stock: stock,
+        shelfLife: product.shelfLife || 6,
+        images: product.images,
+        mainProductImage: mainImage?.url || '',
+        status: status,
+        isPopular: product.isPopular,
+        isFeatured: product.isFeatured,
+        badge: product.badge,
+    };
+}
+
+export function inventoryToProduct(inventoryProduct: InventoryProduct): Product {
+    return {
+        id: inventoryProduct.id,
+        name: inventoryProduct.name,
+        price: inventoryProduct.price,
+        description: inventoryProduct.description,
+        category: inventoryProduct.category,
+        sku: inventoryProduct.sku,
+        unit: inventoryProduct.unit,
+        inStock: inventoryProduct.status !== 'Out of Stock',
+        isPopular: inventoryProduct.isPopular,
+        isFeatured: inventoryProduct.isFeatured,
+        badge: inventoryProduct.badge,
+        images: inventoryProduct.images,
+        shelfLife: inventoryProduct.shelfLife,
+        rating: 0,
+        reviews: 0,
+    };
+}
+
+// Rest of your types remain the same...
 export interface CartItem extends Product {
     quantity: number;
 }
@@ -45,12 +203,8 @@ export interface User {
     email_verified_at?: string;
 }
 
-export interface SubscriptionProduct extends Product {
-    volumeOptions: string[];
-    defaultVolume: string;
-    frequencyOptions: Frequency[];
-}
 
+// ========== SUBSCRIPTION ==========
 export interface Frequency {
     id: string;
     label: string;
@@ -58,6 +212,7 @@ export interface Frequency {
     description?: string;
 }
 
+// ========== ADDRESS ==========
 export interface Address {
     id: string;
     name: string;
@@ -72,6 +227,7 @@ export interface Address {
     is_default: boolean;
 }
 
+// ========== ORDERS ==========
 export interface Order {
     id: string;
     orderNumber: string;
@@ -98,6 +254,18 @@ export interface OrderStatus {
     icon: string;
 }
 
+// ========== CASHIER ==========
+export interface CashierTransaction {
+    id: string;
+    orderNumber: string;
+    time: string;
+    items: number;
+    amount: number;
+    status: "Success" | "Refunded" | "Pending";
+    paymentMethod?: "cash" | "mpesa";
+}
+
+// ========== REWARDS & COINS ==========
 export interface Reward {
     id: string;
     name: string;
@@ -125,6 +293,7 @@ export interface Transaction {
     description: string;
 }
 
+// ========== BILLING & INVOICES ==========
 export interface Invoice {
     id: string;
     orderNumber: string;
@@ -147,6 +316,7 @@ export interface BillingSummary {
     rewardsEarned: number;
 }
 
+// ========== NOTIFICATIONS ==========
 export interface Notification {
     id: string;
     title: string;
@@ -167,32 +337,11 @@ export interface NotificationPreference {
     category: "order" | "billing" | "marketing";
 }
 
-
-export interface Product {
-    id: string;
-    name: string;
-    category: string;
-    price: number;
-    stock: number;
-    sku: string;
-    mainProductImage: string;
-    status: "In Stock" | "Low Stock" | "Out of Stock";
+// ========== TYPE GUARDS ==========
+export function isInventoryProduct(product: BaseProduct | InventoryProduct): product is InventoryProduct {
+    return 'stock' in product && 'status' in product;
 }
 
-export interface CashierTransaction {
-    id: string;
-    orderNumber: string;
-    time: string;
-    items: number;
-    amount: number;
-    status: "Success" | "Refunded" | "Pending";
-    paymentMethod?: "cash" | "mpesa";
-}
-
-export interface CashierCartItem {
-    id: string;
-    name: string;
-    price: number;
-    quantity: number;
-    image?: string;
+export function isStoreProduct(product: BaseProduct | Product): product is Product {
+    return 'rating' in product || 'inStock' in product;
 }

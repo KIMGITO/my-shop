@@ -44,6 +44,7 @@ class ProductRequest extends FormRequest
             'isPopular' => ['boolean'],
             'isFeatured' => ['boolean'],
             'badge' => ['nullable','string'],
+            'shelfLife' => ['required','numeric','min:1'],
 
             // Image Validation
             'productImages' => [$isUpdate ? 'nullable' : 'required', 'array'],

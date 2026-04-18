@@ -16,9 +16,10 @@ import { FaFilter } from "react-icons/fa6";
 import { IoMdDownload } from "react-icons/io";
 import FloatingActionButton from "@/Components/Common/FloatingActionButton";
 import { StockIntakeModal } from "./StockIntakeModal";
+import { Batch } from "@/types";
 
 // Mock data
-const mockBatches = [
+const batches = [
     {
         id: "1",
         batchNumber: "#BCH-90210",
@@ -113,18 +114,19 @@ const stats = [
     },
 ];
 
-export default function BatchesPage() {
+export default function BatchesPage({batches,isModalOpen = false} : {batches: Batch[], isModalOpen:boolean} ) {
+    console.log(batches)
     const [searchQuery, setSearchQuery] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
-    const [isIntakeModalOpen, setIsIntakeModalOpen] = useState(false);
+    const [isIntakeModalOpen, setIsIntakeModalOpen] = useState(isModalOpen);
     const itemsPerPage = 5;
 
-    const filteredBatches = mockBatches.filter(
+    const filteredBatches = batches.filter(
         (batch) =>
             batch.batchNumber
                 .toLowerCase()
                 .includes(searchQuery.toLowerCase()) ||
-            batch.product.name.toLowerCase().includes(searchQuery.toLowerCase())
+            batch.product?.name?.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
     const paginatedBatches = filteredBatches.slice(
@@ -214,6 +216,7 @@ export default function BatchesPage() {
                                                         <img
                                                             src={
                                                                 batch.product
+                                                                    .image && batch.product
                                                                     .image
                                                             }
                                                             alt={

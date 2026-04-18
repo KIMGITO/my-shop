@@ -3,13 +3,16 @@
 namespace App\Models;
 
 use App\Models\Inventory\Product;
+use App\Models\Traits\HasBatchNumber;
+use App\Services\BatchService;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 
-#[Fillable(['product_id', 'batch_number', 'expiry_date', 'supplier_id', 'intake_quantity', 'balance', 'current_price'])]
+#[Fillable(['product_id', 'batch_number', 'expiry_date', 'supplier_id', 'intake_quantity', 'balance', 'current_price','is_active'])]
 
 class Batch extends Model
 {
+    use HasBatchNumber;
 
     public function product()
     {
@@ -20,4 +23,5 @@ class Batch extends Model
     {
         return $this->belongsTo(Supplier::class);
     }
+
 }
