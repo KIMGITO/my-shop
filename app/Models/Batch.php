@@ -13,6 +13,12 @@ use Illuminate\Database\Eloquent\Model;
 class Batch extends Model
 {
     use HasBatchNumber;
+    protected  $appends = ['product_unit'];
+
+    public function getProductUnitAttribute(){
+
+       return $this->product->unit ?? '';
+    }
 
     public function product()
     {

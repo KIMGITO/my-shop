@@ -121,6 +121,13 @@ export default function BatchesPage({batches,isModalOpen = false} : {batches: Ba
     const [isIntakeModalOpen, setIsIntakeModalOpen] = useState(isModalOpen);
     const itemsPerPage = 5;
 
+
+    const statusStyles = {
+        fresh: "text-green-600",
+        expiring_soon: "text-yellow-200 font-bold",
+        expiring_today: "text-orange-600 font-bold",
+        expired: "text-error font-bold",
+    };
     const filteredBatches = batches.filter(
         (batch) =>
             batch.batchNumber
@@ -235,38 +242,26 @@ export default function BatchesPage({batches,isModalOpen = false} : {batches: Ba
                                                 {batch.receiveDate}
                                             </td>
                                             <td
-                                                className={cn(
-                                                    "px-4 md:px-6 py-5",
-                                                    batch.status ===
-                                                        "expiring_soon" &&
-                                                        "text-error-dim font-bold",
-                                                    batch.status ===
-                                                        "expired" &&
-                                                        "text-error font-bold"
-                                                )}
+                                            className={cn(
+                                                "px-4 md:px-6 py-5",
+                                                statusStyles[batch.status]
+                                            )}
                                             >
                                                 {batch.expiryDate}
-                                            </td>
+                                             </td>
                                             <td className="px-4 md:px-6 py-5 text-right tabular-nums">
-                                                {batch.initialQty}
+                                                {batch.intakeQuantity}
                                             </td>
                                             <td
                                                 className={cn(
                                                     "px-4 md:px-6 py-5 text-right tabular-nums font-bold",
-                                                    batch.status ===
-                                                        "expiring_soon" &&
-                                                        "text-error",
-                                                    batch.status ===
-                                                        "expired" &&
-                                                        "text-error"
+                                                    statusStyles[batch.status]
                                                 )}
                                             >
-                                                {batch.remainingQty}
+                                                {batch.balance}
                                             </td>
-                                            <td className="px-4 md:px-8 py-5">
-                                                <StatusBadge
-                                                    status={batch.status}
-                                                />
+                                            <td>
+                                                <StatusBadge status={batch.status}  />
                                             </td>
                                         </tr>
                                     ))}
@@ -288,7 +283,7 @@ export default function BatchesPage({batches,isModalOpen = false} : {batches: Ba
                     </div>
 
                     {/* Bottom Info Cards */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pb-8">
+                    {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pb-8">
                         <div className="bg-surface-variant/30 p-6 md:p-8 rounded-3xl flex items-center gap-6 border border-outline-variant/10">
                             <div className="w-14 h-14 md:w-16 md:h-16 rounded-2xl premium-gradient flex items-center justify-center shadow-lg">
                                 <HiOutlineQrCode className="text-white text-2xl md:text-3xl" />
@@ -329,7 +324,7 @@ export default function BatchesPage({batches,isModalOpen = false} : {batches: Ba
                                 </button>
                             </div>
                         </div>
-                    </div>
+                    </div> */}
                 </div>
 
                 {/* Modal for Stock Intake */}

@@ -135,7 +135,6 @@ export const ProductFormWidget: React.FC<ProductFormWidgetProps> = ({
                         error={errors.shelfLife}
                         disabled={processing}
                         Icon={FaHeartbeat}
-                        required
                     />
             </div>
 

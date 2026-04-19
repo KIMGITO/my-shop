@@ -71,8 +71,8 @@ export interface Batch {
     batchNumber: string;
     expiryDate: string;
     receiveDate: string;
-    intakeQuantity: number;
-    balance: number;
+    intakeQuantity: string;
+    balance: string;
     isActive: boolean;
     product: {
         name?: string;

@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('product_id')->constrained();
             $table->foreignId('supplier_id')->constrained();
             $table->string('batch_number')->unique;
-            $table->string('expiry_date');
+            $table->string('expiry_date') -> nullable();
             $table->integer('intake_quantity');
             $table->integer('balance');
             $table->integer('current_price');
