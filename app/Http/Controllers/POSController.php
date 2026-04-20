@@ -14,11 +14,9 @@ class POSController extends Controller
     }
 
     public function index(){
-        // get products
        $products =  $this->POSService->getPOSProducts();
-       dd($products);
 
-    //    return Inertia::render('Pos/Index');
+       return Inertia::render('Pos/Index', ['POSProducts' => $products]);
 
     }
 }
