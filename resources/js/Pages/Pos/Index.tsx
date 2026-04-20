@@ -12,7 +12,7 @@ const mockProducts: Product[] = [
     {
         id: "1",
         name: "Artisan Whole Milk",
-        price: 4.50,
+        price: 4.5,
         unit: "1 Liter",
         category: "milk",
         image: "https://lh3.googleusercontent.com/aida-public/AB6AXuDbrUrsKylM_X5SDNDHk3RUYOzWadg3e0CyCNA87jIIv_ocl3We12TNZZZALH3PUEUJFkoKU0WokFa8c1Cni4je3ypvORB2xNs3SW6_9PBq1ryBU-KhXgYzziAA7JdhqIdhQtqJC5xHddPMp55hquOnQmL9BFxdlrhGG3jR3FtBf9avkQz8D4hl7SelZwIHDFLmpaqwFrKAzdhjdRbAwiAozuM70f9qeUMQeYeDX3ccZ8AMtyABUNNMaaTt4LaQquYYAd0FG8d_iE41",
@@ -33,7 +33,7 @@ const mockProducts: Product[] = [
     {
         id: "3",
         name: "Honey Greek Yogurt",
-        price: 6.80,
+        price: 6.8,
         unit: "500g",
         category: "yoghurt",
         image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBCGZVjioCZTMbC8axa6pJM2OFp5G8xNblXurWmyAD85P2JRVvll5DTKGCywER46CrkD15R9EM9O40K67SsqX3qz77ZWW2Aiup5A7qLBX--AmDAoskwaNLh4Jq8KYsxhLligmTvHYRsdGy2w1195Qxsh4WFBEb1-1ZWhGNPbiQWpoA68fESP9ULymQugqYaCHB2rdsOxxoxdasb_pu6R1winECecBvC9-1adAKGC2V-95aApcAaOeiu4KTMttB58EZAEcYQGqapgPlq",
@@ -44,7 +44,7 @@ const mockProducts: Product[] = [
     {
         id: "4",
         name: "Double Cocoa Milk",
-        price: 5.20,
+        price: 5.2,
         unit: "500ml",
         category: "milk",
         image: "https://lh3.googleusercontent.com/aida-public/AB6AXuD2yxpTFL1PWD463dBXXsN-4j2A18WqMLoksO3RzAJuwKy-TJTILVm-RTV58Dpt2svTAqKKUGSrhqA9fWzS5pZMrsOlulvnbCzMcIiTWH4hgGmZNAG9fG3JFO2vaUyn5BP09EYHjhSVy1T5LkkwVK4Em8bhA1RrvzQmoqBePj3sQTULCG-J21nOjDW0uvDsjoICFVW7tOEB0kPXf1FcI5lAEp6MbacygOU-Gb7eC_aaKu4h0EXD52M1X1df-FPRqFtXjvSf4TcE1-cW",
@@ -53,7 +53,37 @@ const mockProducts: Product[] = [
     {
         id: "5",
         name: "Sourdough Loaf",
-        price: 7.50,
+        price: 7.5,
+        unit: "Each",
+        category: "bakery",
+        image: "https://lh3.googleusercontent.com/aida-public/AB6AXuDUq3r_lJcpUxr1v1vzIcqqYtmFx9j5zAT7UXUCEMcnartl4feXayyNTaphLY6W4i-Kk3jb1W7xDXLGL8gzP6PEupioPZbJi_vrfeHjM6jhGjwpliTPxX8N7h-vTsK5lmk5m7RmAuk4oZdcNg-ORYz9l8pdGdW_fe4l5MwVtGCDxk-6fiUz_eHxDHFnmXUCoA7vAjcwuW8J5O6HeRpkRIB3ej87_JF2V2nGaTGF_Fj0ovmdbrjv7aR16f8xNkjXIllzGFl78tbcfnUx",
+        isPopular: true,
+        frequency: 22,
+    },
+    {
+        id: "6",
+        name: "Honey Greek Yogurt",
+        price: 6.8,
+        unit: "500g",
+        category: "yoghurt",
+        image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBCGZVjioCZTMbC8axa6pJM2OFp5G8xNblXurWmyAD85P2JRVvll5DTKGCywER46CrkD15R9EM9O40K67SsqX3qz77ZWW2Aiup5A7qLBX--AmDAoskwaNLh4Jq8KYsxhLligmTvHYRsdGy2w1195Qxsh4WFBEb1-1ZWhGNPbiQWpoA68fESP9ULymQugqYaCHB2rdsOxxoxdasb_pu6R1winECecBvC9-1adAKGC2V-95aApcAaOeiu4KTMttB58EZAEcYQGqapgPlq",
+        isOrganic: true,
+        isPopular: true,
+        frequency: 30,
+    },
+    {
+        id: "7",
+        name: "Double Cocoa Milk",
+        price: 5.2,
+        unit: "500ml",
+        category: "milk",
+        image: "https://lh3.googleusercontent.com/aida-public/AB6AXuD2yxpTFL1PWD463dBXXsN-4j2A18WqMLoksO3RzAJuwKy-TJTILVm-RTV58Dpt2svTAqKKUGSrhqA9fWzS5pZMrsOlulvnbCzMcIiTWH4hgGmZNAG9fG3JFO2vaUyn5BP09EYHjhSVy1T5LkkwVK4Em8bhA1RrvzQmoqBePj3sQTULCG-J21nOjDW0uvDsjoICFVW7tOEB0kPXf1FcI5lAEp6MbacygOU-Gb7eC_aaKu4h0EXD52M1X1df-FPRqFtXjvSf4TcE1-cW",
+        frequency: 12,
+    },
+    {
+        id: "8",
+        name: "Sourdough Loaf",
+        price: 7.5,
         unit: "Each",
         category: "bakery",
         image: "https://lh3.googleusercontent.com/aida-public/AB6AXuDUq3r_lJcpUxr1v1vzIcqqYtmFx9j5zAT7UXUCEMcnartl4feXayyNTaphLY6W4i-Kk3jb1W7xDXLGL8gzP6PEupioPZbJi_vrfeHjM6jhGjwpliTPxX8N7h-vTsK5lmk5m7RmAuk4oZdcNg-ORYz9l8pdGdW_fe4l5MwVtGCDxk-6fiUz_eHxDHFnmXUCoA7vAjcwuW8J5O6HeRpkRIB3ej87_JF2V2nGaTGF_Fj0ovmdbrjv7aR16f8xNkjXIllzGFl78tbcfnUx",
@@ -73,14 +103,18 @@ export default function PosIndex() {
     const [cart, setCart] = useState<CartItem[]>([]);
     const [searchQuery, setSearchQuery] = useState("");
     const [activeCategory, setActiveCategory] = useState("all");
-    const [sortBy, setSortBy] = useState<"name" | "price" | "popular">("popular");
-    const [orderNumber] = useState(() => `POS-${Math.floor(Math.random() * 10000)}`);
+    const [sortBy, setSortBy] = useState<"name" | "price" | "popular">(
+        "popular"
+    );
+    const [orderNumber] = useState(
+        () => `POS-${Math.floor(Math.random() * 10000)}`
+    );
 
     const addToCart = (product: Product) => {
-        setCart(prev => {
-            const existing = prev.find(item => item.id === product.id);
+        setCart((prev) => {
+            const existing = prev.find((item) => item.id === product.id);
             if (existing) {
-                return prev.map(item =>
+                return prev.map((item) =>
                     item.id === product.id
                         ? { ...item, quantity: item.quantity + 1 }
                         : item
@@ -91,15 +125,13 @@ export default function PosIndex() {
     };
 
     const updateQuantity = (id: string, quantity: number) => {
-        setCart(prev =>
-            prev.map(item =>
-                item.id === id ? { ...item, quantity } : item
-            )
+        setCart((prev) =>
+            prev.map((item) => (item.id === id ? { ...item, quantity } : item))
         );
     };
 
     const removeItem = (id: string) => {
-        setCart(prev => prev.filter(item => item.id !== id));
+        setCart((prev) => prev.filter((item) => item.id !== id));
     };
 
     const filteredProducts = useMemo(() => {
@@ -107,12 +139,12 @@ export default function PosIndex() {
 
         // Filter by category
         if (activeCategory !== "all") {
-            products = products.filter(p => p.category === activeCategory);
+            products = products.filter((p) => p.category === activeCategory);
         }
 
         // Filter by search
         if (searchQuery) {
-            products = products.filter(p =>
+            products = products.filter((p) =>
                 p.name.toLowerCase().includes(searchQuery.toLowerCase())
             );
         }
@@ -126,14 +158,19 @@ export default function PosIndex() {
                 products.sort((a, b) => a.price - b.price);
                 break;
             case "popular":
-                products.sort((a, b) => (b.frequency || 0) - (a.frequency || 0));
+                products.sort(
+                    (a, b) => (b.frequency || 0) - (a.frequency || 0)
+                );
                 break;
         }
 
         return products;
     }, [activeCategory, searchQuery, sortBy]);
 
-    const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    const subtotal = cart.reduce(
+        (sum, item) => sum + item.price * item.quantity,
+        0
+    );
     const tax = subtotal * 0.08;
     const total = subtotal + tax;
 
@@ -159,8 +196,7 @@ export default function PosIndex() {
             <Head title="POS - Kaykay's Milk Bar" />
             <AuthenticatedLayout>
                 <div className="h-full flex flex-col lg:flex-row gap-6 p-4 lg:p-6">
-                    {/* Products Section */}
-                    <div className="flex-1 flex flex-col overflow-hidden">
+                    <div className="flex-1 flex flex-col overflow-hidden ">
                         {/* Search Bar */}
                         <div className="relative mb-4">
                             <HiOutlineSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-lg" />
@@ -210,7 +246,9 @@ export default function PosIndex() {
 
                             {filteredProducts.length === 0 && (
                                 <div className="text-center py-12 text-on-surface-variant">
-                                    <span className="material-symbols-outlined text-5xl mb-2">search_off</span>
+                                    <span className="material-symbols-outlined text-5xl mb-2">
+                                        search_off
+                                    </span>
                                     <p>No products found</p>
                                 </div>
                             )}

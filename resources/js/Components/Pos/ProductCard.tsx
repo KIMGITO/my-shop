@@ -1,7 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import { cn } from "@/Utils/helpers";
 import { Product } from "@/types/pos";
 import { HiOutlineShoppingCart, HiOutlineStar } from "react-icons/hi2";
+import { MdAddShoppingCart, MdOutlinePlusOne } from "react-icons/md";
+import Button from "../UI/Button";
+import { AnimatePresence, motion } from "framer-motion";
+import AnimatedAddButton from "../UI/AnimatedAddButton";
 
 interface ProductCardProps {
     product: Product;
@@ -14,6 +18,16 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     onAddToCart,
     variant = "grid",
 }) => {
+
+    const [added, setAdded] = useState(false);
+    const handleClick = () => {
+        onAddToCart(product);
+        setAdded(true);
+
+        setTimeout(() => {
+            setAdded(false);
+        }, 300);
+    };
     if (variant === "list") {
         return (
             <div className="flex items-center gap-3 p-3 bg-surface-container-lowest rounded-xl hover:shadow-md transition-all">
@@ -30,16 +44,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({
                     <p className="text-xs text-on-surface-variant">{product.unit}</p>
                     <p className="text-sm font-bold text-primary">${product.price.toFixed(2)}</p>
                 </div>
-                <button
-                    onClick={() => onAddToCart(product)}
-                    className="p-2 bg-primary-container text-on-primary-container rounded-lg hover:scale-105 transition-transform"
-                >
-                    <HiOutlineShoppingCart className="text-lg" />
-                </button>
+                    <AnimatedAddButton flyX={-120} flyY={500} added={added} onClick={() => handleClick()} />
+
             </div>
         );
     }
-
+    
     return (
         <div className="bg-surface-container-lowest p-4 rounded-xl flex flex-col gap-3 shadow-sm hover:shadow-md transition-all group">
             <div className="relative h-32 rounded-lg overflow-hidden bg-surface-container">
@@ -65,12 +75,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             </div>
             <div className="flex items-center justify-between mt-auto">
                 <span className="text-lg font-black text-primary">${product.price.toFixed(2)}</span>
-                <button
-                    onClick={() => onAddToCart(product)}
-                    className="bg-primary-container text-on-primary-container p-2 rounded-lg hover:scale-105 transition-transform"
-                >
-                    <HiOutlineShoppingCart className="text-lg" />
-                </button>
+                <AnimatedAddButton added={added} onClick={() => handleClick()} />
             </div>
         </div>
     );
