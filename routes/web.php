@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AddressController;
+use App\Http\Controllers\POSController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SupplierController;
@@ -163,7 +164,7 @@ Route::middleware(['auth'])->group(function () {
     });
 
     Route::prefix('pos')->name('pos.')->group(function () {
-        Route::get('/', fn() => Inertia::render('Pos/Index'))->name('index');
+        Route::get('/', [POSController::class, 'index'])->name('index');
         Route::get('/history', fn() => Inertia::render('Pos/History'))->name('history');
         Route::get('/dashboard', fn() => Inertia::render('Pos/Dashboard'))->name('dashboard');
     });

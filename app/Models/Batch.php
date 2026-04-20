@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Inventory\Product;
+use App\Models\Scopes\ActiveScope;
 use App\Models\Traits\HasBatchNumber;
 use App\Services\BatchService;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -20,6 +21,9 @@ class Batch extends Model
        return $this->product->unit ?? '';
     }
 
+    protected $with = ['product:id,name,unit,price','product.images'];
+
+
     public function product()
     {
         return $this->belongsTo(Product::class);
@@ -28,6 +32,11 @@ class Batch extends Model
     public function supplier()
     {
         return $this->belongsTo(Supplier::class);
+    }
+
+    protected static function booted()
+    {
+        static::addGlobalScope(new ActiveScope);
     }
 
 }
