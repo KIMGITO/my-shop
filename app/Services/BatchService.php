@@ -20,19 +20,41 @@ class BatchService
     }
 
 
-    public function  getFormattedBatches(){
-        try {
-            $batches = $this->batchRepository->all();
-
-            $formatted = $batches->map(function ($batch){
-
-            });
-
-        } catch (\Throwable $th) {
-            //throw $th;
-        }
-
+   public function getFormattedBatches()
+{
+    try {
+        $batches = Batch::with('product')->get();
+        
+        $formatted = $batches->map(function ($batch) {
+            $product = $batch->product;
+            
+            return array_merge( $batch->toArray(), [
+                
+                'product' => $product ? [
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'image' => $product->main_product_image,
+                ] : null,
+                
+                'status' => $this->getBatchStatus($batch),
+                
+                'receiveDate' => Carbon::parse($batch->created_at)->format('d M Y'),
+                
+                'expiryDate' => Carbon::parse($batch->created_at)
+                    ->addDays($product?->shelf_life ?? 0)
+                    ->format('d M Y'),
+                
+                'intakeQuantity' => $batch->intake_quantity . ' ' . ($product->unit ?? ''),
+                'balance' => $batch->balance . ' ' .($product->unit?? ''),
+            ]);
+        });
+        
+        return $formatted;
+        
+    } catch (\Throwable $th) {
+        throw $th;
     }
+}
 
    
     // process batches 
@@ -59,10 +81,28 @@ class BatchService
     }
 
 
-    public function getStatus($receiveDate, $expiryDate){
-        $receiveDate = Carbon::parse($receiveDate);
-        $expiryDate = Carbon::parse($expiryDate);
-        
+    public function getBatchStatus(Batch $batch){
+        try {
+            $batch = $batch->load('product:id,shelf_life');
+
+            $receiveDate = Carbon::parse($batch->created_at);
+            $shelfLife = $batch->product->shelf_life;
+            $expiryDate = $receiveDate->addDays($shelfLife);
+
+            $expireDays = (int) Carbon::today()->diffInDays($expiryDate);
+
+            if($expireDays >= floor($shelfLife/2)){
+                return 'expiring_soon';
+            }else if($expireDays < floor($shelfLife/2) && $expireDays > 0){
+                return 'expiring_soon';
+            }else if($expireDays == 0){
+                return 'expiring_today';
+            } else{
+                return 'expired';
+            }
+        } catch (\Throwable $th) {
+            throw $th;
+        }
     }
     
 

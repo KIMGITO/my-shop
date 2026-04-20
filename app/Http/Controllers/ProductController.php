@@ -62,7 +62,8 @@ class ProductController extends Controller
             $product = $this->productRepo->find($id);
             $payload = $request->validated();
 
-            $product->update($payload);
+        
+            $product->update(toSnake($payload));
 
             if ($request->delete_images) {
                 $this->productRepo->deleteProductImages($request->delete_images);
@@ -83,7 +84,7 @@ class ProductController extends Controller
                     $product->id
                 );
             }
-
+// 0797571738
             DB::commit();
             return redirect()->back()->with('success', 'Product updated successfully');
         } catch (Throwable $e) {

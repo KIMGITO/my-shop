@@ -21,13 +21,13 @@ class BatchController extends Controller
 
 
     public function index(){
+        
         try{
             
-            $batches = $this->batchRepository->all();
-
+            $batches = $this->batchService->getFormattedBatches();
             return Inertia::render('Admin/Stock/Index', ['batches' => toCamel($batches->toArray())]);
         } catch(Throwable $e){
-
+            throw $e;
         }
     }
 
