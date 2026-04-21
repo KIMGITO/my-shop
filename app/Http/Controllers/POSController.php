@@ -19,4 +19,8 @@ class POSController extends Controller
        return Inertia::render('Pos/Index', ['POSProducts' => $products]);
 
     }
+
+    public function checkout(){
+        return Inertia::render('Cashier/Checkout');
+    }
 }

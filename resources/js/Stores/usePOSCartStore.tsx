@@ -10,7 +10,7 @@ export interface ParkedCart {
     subtotal: number;
     tax: number;
     total: number;
-    parkedAt: Date;
+    parkedAt: Date | string;
     customerName?: string;
     notes?: string;
     orderNumber?: string;
@@ -258,7 +258,7 @@ export const usePOSCartStore = create<POSCartStore>()(
                 cart: state.cart,
                 parkedCarts: state.parkedCarts.map((cart) => ({
                     ...cart,
-                    parkedAt: cart.parkedAt.toISOString(),
+                    parkedAt: cart.parkedAt.toString(),
                 })),
                 customerName: state.customerName,
                 notes: state.notes,

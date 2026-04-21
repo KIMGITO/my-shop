@@ -1,6 +1,6 @@
 // pages/pos/index.tsx
 import React, { useState, useMemo, useEffect } from "react";
-import { Head } from "@inertiajs/react";
+import { Head, router } from "@inertiajs/react";
 import { Product } from "@/types/pos";
 import { HiOutlineSearch } from "react-icons/hi";
 import AuthenticatedLayout from "@/Components/Layout/AuthenticatedLayout";
@@ -102,11 +102,10 @@ export default function PosIndex({POSProducts}:{POSProducts:Product[]}) {
             total,
         });
 
-        // Here you would process the payment and create order
         if (confirm(`Process order ${orderNumber} for $${total.toFixed(2)}?`)) {
             // Process order
-            alert("Order processed successfully!");
-            clearCart();
+            router.get(route('cashier.checkout'));
+            // clearCart();
         }
     };
 

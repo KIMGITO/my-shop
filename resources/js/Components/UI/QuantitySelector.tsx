@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { cn } from "@/Utils/helpers";
-import { HiOutlineMinus, HiOutlinePlus } from "react-icons/hi";
+import { HiOutlineMinus } from "react-icons/hi";
 import Input from "./Input";
+import AnimatedAddButton from "./AnimatedAddButton";
 
 interface QuantitySelectorProps {
-    quantity: number; // The "truth" from your Cart state
+    quantity: number;
     onUpdate: (newQuantity: string) => void;
     min?: number;
     max?: number;
@@ -20,10 +21,10 @@ export const QuantitySelector: React.FC<QuantitySelectorProps> = ({
     size = "md",
     disabled = false,
 }) => {
-    // 1. Local state handles the string typing (allowing "")
     const [localValue, setLocalValue] = useState<string>(String(quantity));
+    // Internal state to trigger the "plus one" fly-away animation
+    const [isAnimating, setIsAnimating] = useState(false);
 
-    // 2. Keep local state in sync if global quantity changes (e.g., from another component)
     useEffect(() => {
         setLocalValue(String(quantity));
     }, [quantity]);
@@ -41,20 +42,29 @@ export const QuantitySelector: React.FC<QuantitySelectorProps> = ({
     };
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const val = e.target.value;
-        // Just update local state while typing; don't call onUpdate yet
-        setLocalValue(val);
+        setLocalValue(e.target.value);
     };
 
     const handleBlur = () => {
-        // 3. When the user clicks away, commit the value to global state
-        // If empty, we treat as "0" (which your parent updateQuantity handles)
         onUpdate(localValue === "" ? "0" : localValue);
     };
 
-    const handleButtonClick = (delta: number) => {
+    const handleIncrease = () => {
+        // Trigger the fly-away animation
+        setIsAnimating(true);
+
         const current = parseInt(localValue, 10) || 0;
-        const next = Math.min(max, Math.max(min, current + delta));
+        const next = Math.min(max, Math.max(min, current + 1));
+        setLocalValue(String(next));
+        onUpdate(String(next));
+
+        // Reset animation state after it completes (~700ms based on your transition)
+        setTimeout(() => setIsAnimating(false), 750);
+    };
+
+    const handleDecrease = () => {
+        const current = parseInt(localValue, 10) || 0;
+        const next = Math.min(max, Math.max(min, current - 1));
         setLocalValue(String(next));
         onUpdate(String(next));
     };
@@ -66,9 +76,10 @@ export const QuantitySelector: React.FC<QuantitySelectorProps> = ({
                 disabled && "opacity-50 pointer-events-none"
             )}
         >
+            {/* Decrease Button */}
             <button
                 type="button"
-                onClick={() => handleButtonClick(-1)}
+                onClick={handleDecrease}
                 disabled={disabled || quantity <= min}
                 className={cn(
                     sizeClasses[size],
@@ -78,10 +89,11 @@ export const QuantitySelector: React.FC<QuantitySelectorProps> = ({
                 <HiOutlineMinus className="text-xs" />
             </button>
 
+            {/* Manual Input */}
             <Input
                 type="number"
                 height="sm"
-                value={localValue === "0" && document.activeElement !== undefined ? localValue : localValue}
+                value={localValue}
                 onChange={handleInputChange}
                 onBlur={handleBlur}
                 className={cn(
@@ -92,17 +104,19 @@ export const QuantitySelector: React.FC<QuantitySelectorProps> = ({
                 max={max}
             />
 
-            <button
-                type="button"
-                onClick={() => handleButtonClick(1)}
-                disabled={disabled || quantity >= max}
+            {/* Animated Plus Button */}
+            <div
                 className={cn(
                     sizeClasses[size],
-                    "flex items-center justify-center hover:bg-surface-container-highest rounded-md transition-colors"
+                    "flex items-center justify-center"
                 )}
             >
-                <HiOutlinePlus className="text-xs" />
-            </button>
+                <AnimatedAddButton
+                    onClick={handleIncrease}
+                    added={isAnimating}
+                        flyY={size === "sm" ? -100 : -150}
+                />
+            </div>
         </div>
     );
 };

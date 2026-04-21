@@ -165,6 +165,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::prefix('pos')->name('pos.')->group(function () {
         Route::get('/', [POSController::class, 'index'])->name('index');
+        Route::get('/checkout', [POSController::class, 'checkout'])->name('checkout');
         Route::get('/history', fn() => Inertia::render('Pos/History'))->name('history');
         Route::get('/dashboard', fn() => Inertia::render('Pos/Dashboard'))->name('dashboard');
     });
