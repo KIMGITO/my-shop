@@ -12,8 +12,8 @@ interface AnimatedAddButtonProps {
 const AnimatedAddButton: React.FC<AnimatedAddButtonProps> = ({ 
   added, 
   onClick, 
-  flyX = 40,  
-  flyY = -60, 
+  flyX = 5,  
+  flyY = -150, 
   glowColor = "rgb(34 197 94)" 
 }) => {
   return (

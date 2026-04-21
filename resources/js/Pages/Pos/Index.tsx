@@ -1,96 +1,19 @@
-import React, { useState, useMemo } from "react";
-import { Head } from "@inertiajs/react";
-import { CartItem, Product } from "@/types/pos";
+// pages/pos/index.tsx
+import React, { useState, useMemo, useEffect } from "react";
+import { Head, router } from "@inertiajs/react";
+import { Product } from "@/types/pos";
 import { HiOutlineSearch } from "react-icons/hi";
 import AuthenticatedLayout from "@/Components/Layout/AuthenticatedLayout";
 import ProductCard from "@/Components/Pos/ProductCard";
 import { OrderSummary } from "@/Components/Pos/OrderSummary";
 import ProductFilters from "@/Components/Pos/ProductFiler";
+import { usePOSCartStore } from "@/Stores/usePOSCartStore";
+import { ParkedCartsModal } from "./ParkedCartsModal";
+import Button from "@/Components/UI/Button";
+import Input from "@/Components/UI/Input";
 
-// Mock Products
-const mockProducts: Product[] = [
-    {
-        id: "1",
-        name: "Artisan Whole Milk",
-        price: 4.5,
-        unit: "1 Liter",
-        category: "milk",
-        image: "https://lh3.googleusercontent.com/aida-public/AB6AXuDbrUrsKylM_X5SDNDHk3RUYOzWadg3e0CyCNA87jIIv_ocl3We12TNZZZALH3PUEUJFkoKU0WokFa8c1Cni4je3ypvORB2xNs3SW6_9PBq1ryBU-KhXgYzziAA7JdhqIdhQtqJC5xHddPMp55hquOnQmL9BFxdlrhGG3jR3FtBf9avkQz8D4hl7SelZwIHDFLmpaqwFrKAzdhjdRbAwiAozuM70f9qeUMQeYeDX3ccZ8AMtyABUNNMaaTt4LaQquYYAd0FG8d_iE41",
-        isOrganic: true,
-        isPopular: true,
-        frequency: 25,
-    },
-    {
-        id: "2",
-        name: "Butter Croissant",
-        price: 3.25,
-        unit: "Each",
-        category: "bakery",
-        image: "https://lh3.googleusercontent.com/aida-public/AB6AXuDZPqxHrGDlQxB6zXGieyEGUTyXnNVRCd8U5KfrNk0E40nhTMMTgZerTWj2RlSLJf_K0SfR1qhgZ3gqUFRfJzLDO0jRZzzDXr0CXU3nQi3VNYX11cf0RGVBn06immGY5rkq_raEb-VW9wABqil5zL7lvoQ7n-FO8s7iJmPfBt1bW6c3cOqAD97OK-YFiJG0QuT7-EnbBRIVal2HxbC7sF1rtFYGQvASPjqP8E1aMd6wm5_nUS_Q3vVu_vvJEIQ5eZGodlExpfo8i8FB",
-        isPopular: true,
-        frequency: 18,
-    },
-    {
-        id: "3",
-        name: "Honey Greek Yogurt",
-        price: 6.8,
-        unit: "500g",
-        category: "yoghurt",
-        image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBCGZVjioCZTMbC8axa6pJM2OFp5G8xNblXurWmyAD85P2JRVvll5DTKGCywER46CrkD15R9EM9O40K67SsqX3qz77ZWW2Aiup5A7qLBX--AmDAoskwaNLh4Jq8KYsxhLligmTvHYRsdGy2w1195Qxsh4WFBEb1-1ZWhGNPbiQWpoA68fESP9ULymQugqYaCHB2rdsOxxoxdasb_pu6R1winECecBvC9-1adAKGC2V-95aApcAaOeiu4KTMttB58EZAEcYQGqapgPlq",
-        isOrganic: true,
-        isPopular: true,
-        frequency: 30,
-    },
-    {
-        id: "4",
-        name: "Double Cocoa Milk",
-        price: 5.2,
-        unit: "500ml",
-        category: "milk",
-        image: "https://lh3.googleusercontent.com/aida-public/AB6AXuD2yxpTFL1PWD463dBXXsN-4j2A18WqMLoksO3RzAJuwKy-TJTILVm-RTV58Dpt2svTAqKKUGSrhqA9fWzS5pZMrsOlulvnbCzMcIiTWH4hgGmZNAG9fG3JFO2vaUyn5BP09EYHjhSVy1T5LkkwVK4Em8bhA1RrvzQmoqBePj3sQTULCG-J21nOjDW0uvDsjoICFVW7tOEB0kPXf1FcI5lAEp6MbacygOU-Gb7eC_aaKu4h0EXD52M1X1df-FPRqFtXjvSf4TcE1-cW",
-        frequency: 12,
-    },
-    {
-        id: "5",
-        name: "Sourdough Loaf",
-        price: 7.5,
-        unit: "Each",
-        category: "bakery",
-        image: "https://lh3.googleusercontent.com/aida-public/AB6AXuDUq3r_lJcpUxr1v1vzIcqqYtmFx9j5zAT7UXUCEMcnartl4feXayyNTaphLY6W4i-Kk3jb1W7xDXLGL8gzP6PEupioPZbJi_vrfeHjM6jhGjwpliTPxX8N7h-vTsK5lmk5m7RmAuk4oZdcNg-ORYz9l8pdGdW_fe4l5MwVtGCDxk-6fiUz_eHxDHFnmXUCoA7vAjcwuW8J5O6HeRpkRIB3ej87_JF2V2nGaTGF_Fj0ovmdbrjv7aR16f8xNkjXIllzGFl78tbcfnUx",
-        isPopular: true,
-        frequency: 22,
-    },
-    {
-        id: "6",
-        name: "Honey Greek Yogurt",
-        price: 6.8,
-        unit: "500g",
-        category: "yoghurt",
-        image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBCGZVjioCZTMbC8axa6pJM2OFp5G8xNblXurWmyAD85P2JRVvll5DTKGCywER46CrkD15R9EM9O40K67SsqX3qz77ZWW2Aiup5A7qLBX--AmDAoskwaNLh4Jq8KYsxhLligmTvHYRsdGy2w1195Qxsh4WFBEb1-1ZWhGNPbiQWpoA68fESP9ULymQugqYaCHB2rdsOxxoxdasb_pu6R1winECecBvC9-1adAKGC2V-95aApcAaOeiu4KTMttB58EZAEcYQGqapgPlq",
-        isOrganic: true,
-        isPopular: true,
-        frequency: 30,
-    },
-    {
-        id: "7",
-        name: "Double Cocoa Milk",
-        price: 5.2,
-        unit: "500ml",
-        category: "milk",
-        image: "https://lh3.googleusercontent.com/aida-public/AB6AXuD2yxpTFL1PWD463dBXXsN-4j2A18WqMLoksO3RzAJuwKy-TJTILVm-RTV58Dpt2svTAqKKUGSrhqA9fWzS5pZMrsOlulvnbCzMcIiTWH4hgGmZNAG9fG3JFO2vaUyn5BP09EYHjhSVy1T5LkkwVK4Em8bhA1RrvzQmoqBePj3sQTULCG-J21nOjDW0uvDsjoICFVW7tOEB0kPXf1FcI5lAEp6MbacygOU-Gb7eC_aaKu4h0EXD52M1X1df-FPRqFtXjvSf4TcE1-cW",
-        frequency: 12,
-    },
-    {
-        id: "8",
-        name: "Sourdough Loaf",
-        price: 7.5,
-        unit: "Each",
-        category: "bakery",
-        image: "https://lh3.googleusercontent.com/aida-public/AB6AXuDUq3r_lJcpUxr1v1vzIcqqYtmFx9j5zAT7UXUCEMcnartl4feXayyNTaphLY6W4i-Kk3jb1W7xDXLGL8gzP6PEupioPZbJi_vrfeHjM6jhGjwpliTPxX8N7h-vTsK5lmk5m7RmAuk4oZdcNg-ORYz9l8pdGdW_fe4l5MwVtGCDxk-6fiUz_eHxDHFnmXUCoA7vAjcwuW8J5O6HeRpkRIB3ej87_JF2V2nGaTGF_Fj0ovmdbrjv7aR16f8xNkjXIllzGFl78tbcfnUx",
-        isPopular: true,
-        frequency: 22,
-    },
-];
+// Mock Products (same as yours)
+
 
 const categories = [
     { id: "all", name: "All Items" },
@@ -99,57 +22,57 @@ const categories = [
     { id: "yoghurt", name: "Yoghurt" },
 ];
 
-export default function PosIndex() {
-    const [cart, setCart] = useState<CartItem[]>([]);
+export default function PosIndex({POSProducts}:{POSProducts:Product[]}) {
+    const { //Zustand 
+        cart,
+        orderNumber,
+        customerName,
+        notes,
+        parkedCarts,
+        addToCart,
+        updateQuantity,
+        removeItem,
+        clearCart,
+        setCustomerName,
+        setNotes,
+        parkCurrentCart,
+        loadParkedCart,
+        deleteParkedCart,
+        getSubtotal,
+        getTax,
+        getTotal,
+        getItemCount,
+    } = usePOSCartStore();
+
     const [searchQuery, setSearchQuery] = useState("");
     const [activeCategory, setActiveCategory] = useState("all");
     const [sortBy, setSortBy] = useState<"name" | "price" | "popular">(
         "popular"
     );
-    const [orderNumber] = useState(
-        () => `POS-${Math.floor(Math.random() * 10000)}`
-    );
+    const [showParkedModal, setShowParkedModal] = useState(false);
+    const [parkCartName, setParkCartName] = useState("");
+    const [showParkConfirmation, setShowParkConfirmation] = useState(false);
 
-    const addToCart = (product: Product) => {
-        setCart((prev) => {
-            const existing = prev.find((item) => item.id === product.id);
-            if (existing) {
-                return prev.map((item) =>
-                    item.id === product.id
-                        ? { ...item, quantity: item.quantity + 1 }
-                        : item
-                );
-            }
-            return [...prev, { ...product, quantity: 1 }];
-        });
-    };
+    // Get computed values from store
+    const subtotal = getSubtotal();
+    const tax = getTax(0.08);
+    const total = getTotal(0.08);
+    const itemCount = getItemCount();
 
-    const updateQuantity = (id: string, quantity: number) => {
-        setCart((prev) =>
-            prev.map((item) => (item.id === id ? { ...item, quantity } : item))
-        );
-    };
-
-    const removeItem = (id: string) => {
-        setCart((prev) => prev.filter((item) => item.id !== id));
-    };
-
+    // Filter and sort products
     const filteredProducts = useMemo(() => {
-        let products = [...mockProducts];
+        let products = [...POSProducts];
 
-        // Filter by category
         if (activeCategory !== "all") {
             products = products.filter((p) => p.category === activeCategory);
         }
 
-        // Filter by search
         if (searchQuery) {
             products = products.filter((p) =>
                 p.name.toLowerCase().includes(searchQuery.toLowerCase())
             );
         }
 
-        // Sort
         switch (sortBy) {
             case "name":
                 products.sort((a, b) => a.name.localeCompare(b.name));
@@ -167,28 +90,62 @@ export default function PosIndex() {
         return products;
     }, [activeCategory, searchQuery, sortBy]);
 
-    const subtotal = cart.reduce(
-        (sum, item) => sum + item.price * item.quantity,
-        0
-    );
-    const tax = subtotal * 0.08;
-    const total = subtotal + tax;
-
     const handleCheckout = () => {
-        console.log("Checkout", { cart, subtotal, tax, total });
-        // Navigate to checkout or process order
+        console.log("Checkout", {
+            cart,
+            orderNumber,
+            customerName,
+            notes,
+            subtotal,
+            tax,
+            total,
+        });
+
+        if (confirm(`Process order ${orderNumber} for $${total.toFixed(2)}?`)) {
+            // Process order
+            router.get(route('cashier.checkout'));
+            // clearCart();
+        }
     };
 
     const handleVoid = () => {
         if (confirm("Clear entire order?")) {
-            setCart([]);
+            clearCart();
         }
     };
 
     const handlePark = () => {
-        console.log("Park order", cart);
-        // Save to parked orders
-        setCart([]);
+        if (cart.length === 0) {
+            alert("Cannot park empty cart");
+            return;
+        }
+        setShowParkConfirmation(true);
+    };
+
+    const confirmPark = () => {
+        try {
+            parkCurrentCart(
+                parkCartName || `Cart ${new Date().toLocaleTimeString()}`,
+                customerName,
+                notes
+            );
+            setShowParkConfirmation(false);
+            setParkCartName("");
+        } catch (error) {
+            alert("Failed to park cart");
+        }
+    };
+
+    const handleLoadParkedCart = (cartId: string) => {
+        if (cart.length > 0) {
+            const confirm = window.confirm(
+                "Current cart will be cleared. Continue?"
+            );
+            if (!confirm) return;
+        }
+        loadParkedCart(cartId);
+        deleteParkedCart(cartId);
+        setShowParkedModal(false);
     };
 
     return (
@@ -196,7 +153,28 @@ export default function PosIndex() {
             <Head title="POS - Kaykay's Milk Bar" />
             <AuthenticatedLayout>
                 <div className="h-full flex flex-col lg:flex-row gap-6 p-4 lg:p-6">
-                    <div className="flex-1 flex flex-col overflow-hidden ">
+                    {/* Left Side - Products */}
+                    <div className="flex-1 flex flex-col overflow-hidden">
+                        {/* Customer Info Bar */}
+                        <div className="mb-4 grid grid-cols-2 gap-2">
+                            <input
+                                type="text"
+                                placeholder="Customer Name (optional)"
+                                value={customerName}
+                                onChange={(e) =>
+                                    setCustomerName(e.target.value)
+                                }
+                                className="px-3 py-2 bg-surface-container-high border-none rounded-lg text-sm"
+                            />
+                            <input
+                                type="text"
+                                placeholder="Order Notes (optional)"
+                                value={notes}
+                                onChange={(e) => setNotes(e.target.value)}
+                                className="px-3 py-2 bg-surface-container-high border-none rounded-lg text-sm"
+                            />
+                        </div>
+
                         {/* Search Bar */}
                         <div className="relative mb-4">
                             <HiOutlineSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-lg" />
@@ -218,9 +196,21 @@ export default function PosIndex() {
                             onSortChange={setSortBy}
                         />
 
-                        {/* Products Grid/List - Responsive */}
+                        {/* Parked Carts Indicator */}
+                        {parkedCarts.length > 0 && (
+                            <Button
+                                onClick={() => setShowParkedModal(true)}
+                                className="mb-4 px-4 py-2 bg-primary/90  rounded-lg text-sm flex items-center justify-between hover:brightness-110"
+                            >
+                                <span>📦 Parked Carts</span>
+                                <span className="bg-secondary text-white px-2 py-0.5 rounded-full text-xs">
+                                    {parkedCarts.length}
+                                </span>
+                            </Button>
+                        )}
+
+                        {/* Products Grid/List */}
                         <div className="flex-1 overflow-y-auto pb-20 lg:pb-0">
-                            {/* Desktop Grid (lg and up) */}
                             <div className="hidden lg:grid grid-cols-2 xl:grid-cols-3 gap-4">
                                 {filteredProducts.map((product) => (
                                     <ProductCard
@@ -232,7 +222,6 @@ export default function PosIndex() {
                                 ))}
                             </div>
 
-                            {/* Mobile List (below lg) */}
                             <div className="lg:hidden space-y-2">
                                 {filteredProducts.map((product) => (
                                     <ProductCard
@@ -255,7 +244,7 @@ export default function PosIndex() {
                         </div>
                     </div>
 
-                    {/* Order Summary - Sticky on desktop, fixed on mobile */}
+                    {/* Right Side - Order Summary */}
                     <div className="lg:sticky lg:top-0 lg:h-[calc(100vh-6rem)]">
                         <OrderSummary
                             items={cart}
@@ -266,9 +255,88 @@ export default function PosIndex() {
                             onVoid={handleVoid}
                             onPark={handlePark}
                             orderNumber={orderNumber}
+                            onUpdateQuantity={updateQuantity}
+                            onRemove={removeItem}
                         />
                     </div>
                 </div>
+
+                {/* Park Cart Confirmation Modal */}
+                {showParkConfirmation && (
+                    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+                        <div className="bg-surface-container-lowest rounded-3xl w-full max-w-sm shadow-2xl overflow-hidden flex flex-col border border-outline-variant/10">
+                            {/* Header */}
+                            <div className="px-6 py-4 border-b border-outline-variant/10">
+                                <h3 className="text-xl font-bold font-headline text-on-surface">
+                                    Park Current Cart
+                                </h3>
+                            </div>
+
+                            {/* Content */}
+                            <div className="p-6 space-y-4">
+                                <div className="space-y-1.5">
+                                    <Input
+                                        label="Cart Reference"
+                                        type="text"
+                                        placeholder="e.g., Table 4 or Customer Name"
+                                        value={parkCartName}
+                                        onChange={(e) =>
+                                            setParkCartName(e.target.value)
+                                        }
+                                        className="w-full px-4 py-3 bg-surface-container-high border-none rounded-xl text-on-surface placeholder:text-on-surface-variant/40 focus:ring-2 focus:ring-primary transition-all"
+                                        autoFocus
+                                    />
+                                </div>
+
+                                {/* Quick Summary Card */}
+                                <div className="bg-primary/5 rounded-2xl p-2 flex justify-between items-center border border-primary/10">
+                                    <div className="flex items-center gap-2">
+                                        <span className="material-symbols-outlined text-primary">
+                                            shopping_basket
+                                        </span>
+                                        <span className="text-sm font-medium text-on-surface-variant">
+                                            {itemCount}{" "}
+                                            {itemCount === 1 ? "Item" : "Items"}
+                                        </span>
+                                    </div>
+                                    <div className="text-lg font-bold text-primary font-headline">
+                                        ${total.toFixed(2)}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Actions */}
+                            <div className="px-6 py-4 bg-surface-container-low/50 flex gap-3">
+                                <Button
+                                    variant="ghost"
+                                    className="flex-1 py-3 border-0 text-on-surface-variant hover:bg-surface-container-highest"
+                                    onClick={() =>
+                                        setShowParkConfirmation(false)
+                                    }
+                                >
+                                    Cancel
+                                </Button>
+                                <Button
+                                    variant="primary"
+                                    className="flex-1 p-1 shadow-lg shadow-primary/20"
+                                    onClick={confirmPark}
+                                >
+                                    Park Cart
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+                {/* Parked Carts Modal */}
+                {showParkedModal && (
+                    <ParkedCartsModal
+                        isOpen
+                        parkedCarts={parkedCarts}
+                        onLoadCart={handleLoadParkedCart}
+                        onDeleteCart={deleteParkedCart}
+                        onClose={() => setShowParkedModal(false)}
+                    />
+                )}
             </AuthenticatedLayout>
         </>
     );

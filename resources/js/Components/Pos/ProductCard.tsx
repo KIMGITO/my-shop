@@ -12,12 +12,13 @@ interface ProductCardProps {
     onAddToCart: (product: Product) => void;
     variant?: "grid" | "list";
 }
-
 export const ProductCard: React.FC<ProductCardProps> = ({
     product,
     onAddToCart,
     variant = "grid",
 }) => {
+
+
 
     const [added, setAdded] = useState(false);
     const handleClick = () => {
@@ -42,7 +43,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
                         )}
                     </div>
                     <p className="text-xs text-on-surface-variant">{product.unit}</p>
-                    <p className="text-sm font-bold text-primary">${product.price.toFixed(2)}</p>
+                    <p className="text-sm font-bold text-primary">Ksh{product.price.toFixed(2)}</p>
                 </div>
                     <AnimatedAddButton flyX={-120} flyY={500} added={added} onClick={() => handleClick()} />
 
@@ -74,7 +75,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
                 <p className="text-xs text-on-surface-variant">{product.unit}</p>
             </div>
             <div className="flex items-center justify-between mt-auto">
-                <span className="text-lg font-black text-primary">${product.price.toFixed(2)}</span>
+                <span className="text-base font-black text-primary">Ksh{product.price.toFixed(2)}</span>
                 <AnimatedAddButton added={added} onClick={() => handleClick()} />
             </div>
         </div>
