@@ -21,7 +21,7 @@ class TransactionNamingService
         } while ($n >= 0);
 
         // 2. Date Components
-        $month = date('n') <= 9 ? date('n') : chr(55 + date('n'));
+        $month = chr(64 + (int)date('n'));
         $day = date('j') <= 9 ? date('j') : chr(55 + date('j'));
         
         // 3. Get Prefix from Enum

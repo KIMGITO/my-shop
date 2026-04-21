@@ -111,8 +111,8 @@ export const usePOSCartStore = create<POSCartStore>()(
             },
 
             clearCart: async () => {
-                // Pre-fetch the next number before clearing
                 const nextNumber = await get().refreshOrderNumber();
+
                 set({
                     cart: [],
                     customerName: "",
@@ -187,13 +187,12 @@ export const usePOSCartStore = create<POSCartStore>()(
                 });
             },
 
-            // Logic to fetch from API and update state
             refreshOrderNumber: async () => {
                 try {
                     const response = await axios.get('/api/v1/pos/orders/order-number');
-                    const num = response.data.orderNumber;
-                    set({ orderNumber: num });
-                    return num;
+                    const orderNumber = response.data.orderNumber;
+                    set({ orderNumber: orderNumber });
+                    return orderNumber;
                 } catch (error) {
                     console.error("Order number fetch failed", error);
                     return ""; 
