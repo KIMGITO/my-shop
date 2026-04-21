@@ -23,8 +23,7 @@ const categories = [
 ];
 
 export default function PosIndex({POSProducts}:{POSProducts:Product[]}) {
-    // Use Zustand store instead of local state
-    const {
+    const { //Zustand 
         cart,
         orderNumber,
         customerName,

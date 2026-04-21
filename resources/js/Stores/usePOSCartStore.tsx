@@ -247,7 +247,7 @@ export const usePOSCartStore = create<POSCartStore>()(
                 return { subtotal, tax, total, itemCount };
             },
 
-            // Generate new order number
+            // get new order number from database.
             generateOrderNumber: () => {
                 return `POS-${Math.floor(Math.random() * 10000)}`;
             },
