@@ -2,6 +2,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { CartItem, Product } from "@/types/pos";
+import axios from 'axios';
 
 export interface ParkedCart {
     id: string;
@@ -13,24 +14,22 @@ export interface ParkedCart {
     parkedAt: Date | string;
     customerName?: string;
     notes?: string;
-    orderNumber?: string;
+    orderNumber: string; // Must be string for persistence
 }
 
 interface POSCartStore {
-    // Active cart
+    // State
     cart: CartItem[];
-    orderNumber: string;
+    orderNumber: string; 
     customerName: string;
     notes: string;
-
-    // Parked carts
     parkedCarts: ParkedCart[];
 
     // Actions - Cart Management
     addToCart: (product: Product) => void;
     updateQuantity: (id: string, quantity: number) => void;
     removeItem: (id: string) => void;
-    clearCart: () => void;
+    clearCart: () => Promise<void>; 
     setOrderNumber: (orderNumber: string) => void;
     setCustomerName: (name: string) => void;
     setNotes: (notes: string) => void;
@@ -40,12 +39,13 @@ interface POSCartStore {
         cartName: string,
         customerName?: string,
         notes?: string
-    ) => string;
+    ) => Promise<string>;
     loadParkedCart: (cartId: string) => void;
     deleteParkedCart: (cartId: string) => void;
     updateParkedCartName: (cartId: string, newName: string) => void;
 
-    // Computed values
+    // Utility & Computed
+    refreshOrderNumber: () => Promise<string>;
     getSubtotal: () => number;
     getTax: (taxRate?: number) => number;
     getTotal: (taxRate?: number) => number;
@@ -56,9 +56,6 @@ interface POSCartStore {
         total: number;
         itemCount: number;
     };
-
-    // Utility
-    generateOrderNumber: () => string;
 }
 
 export const usePOSCartStore = create<POSCartStore>()(
@@ -66,17 +63,21 @@ export const usePOSCartStore = create<POSCartStore>()(
         (set, get) => ({
             // Initial state
             cart: [],
-            orderNumber: `POS-${Math.floor(Math.random() * 10000)}`,
+            orderNumber: '',
             customerName: "",
             notes: "",
             parkedCarts: [],
 
             // Add to cart
             addToCart: (product) => {
-                const { cart } = get();
-                const existingItem = cart.find(
-                    (item) => item.id === product.id
-                );
+                const { cart, orderNumber, refreshOrderNumber } = get();
+                
+                // Fetch number if it's missing (e.g. first item added)
+                if (!orderNumber) {
+                    refreshOrderNumber();
+                }
+
+                const existingItem = cart.find((item) => item.id === product.id);
 
                 if (existingItem) {
                     set({
@@ -93,7 +94,6 @@ export const usePOSCartStore = create<POSCartStore>()(
                 }
             },
 
-            // Update quantity
             updateQuantity: (id, quantity) => {
                 if (quantity <= 0) {
                     get().removeItem(id);
@@ -106,164 +106,122 @@ export const usePOSCartStore = create<POSCartStore>()(
                 }
             },
 
-            // Remove item
             removeItem: (id) => {
                 set({ cart: get().cart.filter((item) => item.id !== id) });
             },
 
-            // Clear cart
-            clearCart: () => {
+            clearCart: async () => {
+                // Pre-fetch the next number before clearing
+                const nextNumber = await get().refreshOrderNumber();
                 set({
                     cart: [],
                     customerName: "",
                     notes: "",
-                    orderNumber: get().generateOrderNumber(),
+                    orderNumber: nextNumber,
                 });
             },
 
-            // Set order number
             setOrderNumber: (orderNumber) => set({ orderNumber }),
-
-            // Set customer name
             setCustomerName: (name) => set({ customerName: name }),
-
-            // Set notes
             setNotes: (notes) => set({ notes }),
 
-            // Park current cart
-            parkCurrentCart: (cartName, customerName, notes) => {
-                const {
-                    cart,
-                    getSubtotal,
-                    getTax,
-                    getTotal,
-                    orderNumber,
-                    parkedCarts,
-                    customerName: currentCustomer,
-                    notes: currentNotes,
-                } = get();
+            parkCurrentCart: async (cartName, customerName, notes) => {
+                const state = get();
 
-                if (cart.length === 0) {
+                if (state.cart.length === 0) {
                     throw new Error("Cannot park empty cart");
                 }
 
-                const subtotal = getSubtotal();
-                const tax = getTax();
-                const total = getTotal();
-
                 const parkedCart: ParkedCart = {
                     id: Date.now().toString(),
-                    name: cartName || `Cart ${parkedCarts.length + 1}`,
-                    items: [...cart],
-                    subtotal,
-                    tax,
-                    total,
+                    name: cartName || `Cart ${state.parkedCarts.length + 1}`,
+                    items: [...state.cart],
+                    subtotal: state.getSubtotal(),
+                    tax: state.getTax(),
+                    total: state.getTotal(),
                     parkedAt: new Date(),
-                    customerName: customerName || currentCustomer,
-                    notes: notes || currentNotes,
-                    orderNumber: orderNumber,
+                    customerName: customerName || state.customerName,
+                    notes: notes || state.notes,
+                    orderNumber: state.orderNumber, // Use the current one
                 };
 
+                // Fetch new number for the "next" cart
+                const nextNumber = await get().refreshOrderNumber();
+
                 set({
-                    parkedCarts: [...parkedCarts, parkedCart],
+                    parkedCarts: [...state.parkedCarts, parkedCart],
                     cart: [],
                     customerName: "",
                     notes: "",
-                    orderNumber: get().generateOrderNumber(),
+                    orderNumber: nextNumber,
                 });
 
                 return parkedCart.id;
             },
 
-            // Load parked cart
             loadParkedCart: (cartId) => {
                 const { parkedCarts } = get();
-                const parkedCart = parkedCarts.find(
-                    (cart) => cart.id === cartId
-                );
+                const parkedCart = parkedCarts.find((c) => c.id === cartId);
 
                 if (parkedCart) {
                     set({
                         cart: [...parkedCart.items],
                         customerName: parkedCart.customerName || "",
                         notes: parkedCart.notes || "",
-                        orderNumber:
-                            parkedCart.orderNumber ||
-                            get().generateOrderNumber(),
+                        orderNumber: parkedCart.orderNumber,
                     });
-
-                    // Optionally remove from parked carts (uncomment if you want to remove when loaded)
-                    // get().deleteParkedCart(cartId);
                 }
             },
 
-            // Delete parked cart
             deleteParkedCart: (cartId) => {
                 set({
-                    parkedCarts: get().parkedCarts.filter(
-                        (cart) => cart.id !== cartId
-                    ),
+                    parkedCarts: get().parkedCarts.filter((c) => c.id !== cartId),
                 });
             },
 
-            // Update parked cart name
             updateParkedCartName: (cartId, newName) => {
                 set({
-                    parkedCarts: get().parkedCarts.map((cart) =>
-                        cart.id === cartId ? { ...cart, name: newName } : cart
+                    parkedCarts: get().parkedCarts.map((c) =>
+                        c.id === cartId ? { ...c, name: newName } : c
                     ),
                 });
             },
 
-            // Computed values
-            getSubtotal: () => {
-                return get().cart.reduce(
-                    (sum, item) => sum + item.price * item.quantity,
-                    0
-                );
+            // Logic to fetch from API and update state
+            refreshOrderNumber: async () => {
+                try {
+                    const response = await axios.get('/api/v1/pos/orders/order-number');
+                    const num = response.data.orderNumber;
+                    set({ orderNumber: num });
+                    return num;
+                } catch (error) {
+                    console.error("Order number fetch failed", error);
+                    return ""; 
+                }
             },
 
-            getTax: (taxRate = 0.08) => {
-                return get().getSubtotal() * taxRate;
-            },
-
-            getTotal: (taxRate = 0.08) => {
-                return get().getSubtotal() + get().getTax(taxRate);
-            },
-
-            getItemCount: () => {
-                return get().cart.reduce(
-                    (count, item) => count + item.quantity,
-                    0
-                );
-            },
+            getSubtotal: () => get().cart.reduce((sum, item) => sum + item.price * item.quantity, 0),
+            getTax: (taxRate = 0.08) => get().getSubtotal() * taxRate,
+            getTotal: (taxRate = 0.08) => get().getSubtotal() + get().getTax(taxRate),
+            getItemCount: () => get().cart.reduce((count, item) => count + item.quantity, 0),
 
             getCartSummary: () => {
                 const subtotal = get().getSubtotal();
                 const tax = get().getTax();
                 const total = get().getTotal();
                 const itemCount = get().getItemCount();
-
                 return { subtotal, tax, total, itemCount };
-            },
-
-            // get new order number from database.
-            generateOrderNumber: () => {
-                return `POS-${Math.floor(Math.random() * 10000)}`;
             },
         }),
         {
             name: "pos-cart-storage",
             partialize: (state) => ({
                 cart: state.cart,
-                parkedCarts: state.parkedCarts.map((cart) => ({
-                    ...cart,
-                    parkedAt: cart.parkedAt.toString(),
-                })),
+                parkedCarts: state.parkedCarts,
                 customerName: state.customerName,
                 notes: state.notes,
+                orderNumber: state.orderNumber, // Safe to persist string
             }),
         }
     )
 );
-
