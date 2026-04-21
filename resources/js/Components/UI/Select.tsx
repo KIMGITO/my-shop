@@ -1,6 +1,10 @@
 import React, { useState, useRef, useEffect } from "react";
-import { cn } from "@/lib/utils"; // Adjusted to your common lib path
-import { HiOutlineChevronDown, HiOutlineCheck } from "react-icons/hi2";
+import { cn } from "@/lib/utils";
+import {
+    HiOutlineChevronDown,
+    HiOutlineCheck,
+    HiOutlineXMark,
+} from "react-icons/hi2";
 import { IconType } from "react-icons";
 
 interface SelectOption {
@@ -12,8 +16,8 @@ interface SelectOption {
 
 interface SelectProps {
     label?: string;
-    value: string | number;
-    onChange: (value: string | number) => void;
+    value: string | number | null; // Allow null for clearing
+    onChange: (value: string | number | null) => void; // Update type
     options: SelectOption[];
     placeholder?: string;
     Icon?: IconType;
@@ -22,6 +26,7 @@ interface SelectProps {
     required?: boolean;
     className?: string;
     size?: "sm" | "md" | "lg" | "xl";
+    clearable?: boolean; // New prop to toggle this feature
 }
 
 const sizeClasses = {
@@ -54,7 +59,8 @@ export const Select: React.FC<SelectProps> = ({
     disabled = false,
     required = false,
     className,
-    size = "md",
+    size = "sm",
+    clearable = true,
 }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
@@ -69,12 +75,10 @@ export const Select: React.FC<SelectProps> = ({
         opt.label.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    // Reset active index when search changes
     useEffect(() => {
         setActiveIndex(0);
     }, [searchTerm]);
 
-    // Handle Clicks Outside
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (
@@ -90,13 +94,11 @@ export const Select: React.FC<SelectProps> = ({
             document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
-    // Keyboard Navigation
     const handleKeyDown = (e: React.KeyboardEvent) => {
         if (!isOpen) {
             if (e.key === "Enter" || e.key === "ArrowDown") setIsOpen(true);
             return;
         }
-
         switch (e.key) {
             case "ArrowDown":
                 e.preventDefault();
@@ -112,9 +114,8 @@ export const Select: React.FC<SelectProps> = ({
                 break;
             case "Enter":
                 e.preventDefault();
-                if (filteredOptions[activeIndex]) {
+                if (filteredOptions[activeIndex])
                     handleSelect(filteredOptions[activeIndex]);
-                }
                 break;
             case "Escape":
                 setIsOpen(false);
@@ -125,6 +126,12 @@ export const Select: React.FC<SelectProps> = ({
     const handleSelect = (option: SelectOption) => {
         onChange(option.value);
         setIsOpen(false);
+        setSearchTerm("");
+    };
+
+    const handleClear = (e: React.MouseEvent) => {
+        e.stopPropagation(); // Prevents the dropdown from opening
+        onChange(null);
         setSearchTerm("");
     };
 
@@ -145,7 +152,7 @@ export const Select: React.FC<SelectProps> = ({
                 onClick={() => !disabled && setIsOpen(!isOpen)}
                 disabled={disabled}
                 className={cn(
-                    "w-full rounded-2xl bg-surface-container-high border-none transition-all text-on-surface font-medium text-left flex items-center justify-between px-4",
+                    "w-full rounded-2xl bg-surface-container-high border-none transition-all text-on-surface font-medium text-left flex items-center justify-between px-4 group",
                     "focus:ring-2 focus:ring-primary/20 focus:outline-none",
                     sizeClasses[size],
                     error ? "ring-2 ring-error" : "",
@@ -153,11 +160,11 @@ export const Select: React.FC<SelectProps> = ({
                     disabled && "opacity-50 cursor-not-allowed"
                 )}
             >
-                <div className="flex items-center gap-3 truncate">
+                <div className="flex items-center gap-3 truncate pr-2">
                     {Icon && (
                         <Icon
                             className={cn(
-                                "text-on-surface-variant",
+                                "text-on-surface-variant absolute left-4",
                                 iconSizeClasses[size]
                             )}
                         />
@@ -171,18 +178,33 @@ export const Select: React.FC<SelectProps> = ({
                         {selectedOption ? selectedOption.label : placeholder}
                     </span>
                 </div>
-                <HiOutlineChevronDown
-                    className={cn(
-                        "text-on-surface-variant transition-transform",
-                        iconSizeClasses[size],
-                        isOpen && "rotate-180"
+
+                <div className="flex items-center gap-2 shrink-0">
+                    {/* Clear Button */}
+                    {clearable && selectedOption && !disabled && (
+                        <div
+                            role="button"
+                            onClick={handleClear}
+                            className="p-1 rounded-full hover:bg-on-surface/10 transition-colors text-on-surface-variant/70 hover:text-on-surface"
+                        >
+                            <HiOutlineXMark className={iconSizeClasses[size]} />
+                        </div>
                     )}
-                />
+
+                    <HiOutlineChevronDown
+                        className={cn(
+                            "text-on-surface-variant transition-transform",
+                            iconSizeClasses[size],
+                            isOpen && "rotate-180"
+                        )}
+                    />
+                </div>
             </button>
 
+            {/* Dropdown Menu */}
             {isOpen && (
-                <div className="absolute z-100 left-0 right-0 mt-2 bg-outline-variant rounded-none rounded-b-xl p-0 border border-outline-variant/20 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-                    <div className="px-0 pb-2 border-b border-none">
+                <div className="absolute z-[100] left-0 right-0 mt-2 bg-surface-container-high rounded-xl border border-outline-variant/20 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                    <div className="border-b border-outline-variant/20">
                         <input
                             ref={searchInputRef}
                             autoFocus
@@ -190,7 +212,7 @@ export const Select: React.FC<SelectProps> = ({
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             placeholder="Search ..."
-                            className="w-full px-3 py-2   border-b-white focus:ring-primary focus:ring-0  text-on-surface text-sm"
+                            className="w-full px-4 py-3 bg-transparent focus:outline-none text-on-surface text-sm"
                         />
                     </div>
 
@@ -210,7 +232,7 @@ export const Select: React.FC<SelectProps> = ({
                                         "w-full px-4 py-3 text-left flex items-center justify-between transition-colors",
                                         index === activeIndex
                                             ? "bg-primary/10"
-                                            : "hover:bg-surface-container-high",
+                                            : "hover:bg-on-surface/5",
                                         String(value) ===
                                             String(option.value) &&
                                             "bg-primary/5"
@@ -243,6 +265,7 @@ export const Select: React.FC<SelectProps> = ({
                     </div>
                 </div>
             )}
+
             {error && (
                 <p className="text-error text-[11px] mt-1 px-1 font-medium">
                     {error}
@@ -251,3 +274,5 @@ export const Select: React.FC<SelectProps> = ({
         </div>
     );
 };
+
+export default Select;
