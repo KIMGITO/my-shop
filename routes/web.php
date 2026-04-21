@@ -168,6 +168,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/checkout', [POSController::class, 'checkout'])->name('checkout');
         Route::get('/history', fn() => Inertia::render('Pos/History'))->name('history');
         Route::get('/dashboard', fn() => Inertia::render('Pos/Dashboard'))->name('dashboard');
+        // POS orders
     });
 
     // ============================================================================
