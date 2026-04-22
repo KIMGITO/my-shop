@@ -13,7 +13,7 @@ interface OrderSummaryProps {
     onPark: () => void;
     onRemove: (id: string) => void;
     onUpdateQuantity: (id: string, quantity: string) => void;
-    orderNumber: Promise<string>;
+    orderNumber: string;
 }
 
 export const OrderSummary: React.FC<OrderSummaryProps> = ({

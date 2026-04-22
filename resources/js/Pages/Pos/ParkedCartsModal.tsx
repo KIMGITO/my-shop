@@ -93,7 +93,7 @@ export const ParkedCartsModal: React.FC<ParkedCartsModalProps> = ({
                                                         setEditName(cart.name);
                                                     }}
                                                 >
-                                                    {cart.name ||
+                                                    {
                                                         `Order ${cart.orderNumber}`}
                                                 </h4>
                                             )}

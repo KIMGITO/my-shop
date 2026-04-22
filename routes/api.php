@@ -15,4 +15,8 @@ Route::get('/products/search', [SearchController::class,  'products']);
 Route::get('/suppliers/search', [SearchController::class,  'suppliers']);
 
 
-Route::get('/pos/orders/order-number', [OrderController::class, 'orderNumber']);
+Route::prefix('pos') -> middleware('auth:sanctum')->group(function () {
+    Route::get('/orders/order-number', [OrderController::class, 'getOrderNumber']);
+    Route::post('/orders', [OrderController::class, 'store']);
+    Route::patch('/orders/{order}/status', [OrderController::class, 'updateStatus']);
+});

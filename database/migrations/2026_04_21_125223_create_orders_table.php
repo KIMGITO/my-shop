@@ -22,7 +22,7 @@ return new class extends Migration
                 'completed',
                 'cancelled',
                 'expired',
-            ])->nullable();
+            ])->default('active');
             $table->foreignId('customer_id')->nullable()->constrained('users');
             $table->foreignId('user_id')->constrained();
             $table->decimal('total_amount', 12, 2)->default(0);

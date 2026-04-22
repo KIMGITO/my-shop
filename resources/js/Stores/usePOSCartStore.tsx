@@ -14,7 +14,7 @@ export interface ParkedCart {
     parkedAt: Date | string;
     customerName?: string;
     notes?: string;
-    orderNumber: string; // Must be string for persistence
+    orderNumber: string;
 }
 
 interface POSCartStore {
@@ -69,12 +69,11 @@ export const usePOSCartStore = create<POSCartStore>()(
             parkedCarts: [],
 
             // Add to cart
-            addToCart: (product) => {
+            addToCart:async (product) => {
                 const { cart, orderNumber, refreshOrderNumber } = get();
                 
-                // Fetch number if it's missing (e.g. first item added)
                 if (!orderNumber) {
-                    refreshOrderNumber();
+                    await refreshOrderNumber();
                 }
 
                 const existingItem = cart.find((item) => item.id === product.id);
@@ -111,13 +110,14 @@ export const usePOSCartStore = create<POSCartStore>()(
             },
 
             clearCart: async () => {
-                const nextNumber = await get().refreshOrderNumber();
-
+                // Clear the cart and get a fresh order number
+                // const nextNumber = await get().refreshOrderNumber();
+                
                 set({
                     cart: [],
                     customerName: "",
                     notes: "",
-                    orderNumber: nextNumber,
+                    orderNumber: "",
                 });
             },
 
@@ -132,6 +132,9 @@ export const usePOSCartStore = create<POSCartStore>()(
                     throw new Error("Cannot park empty cart");
                 }
 
+                // Save current order number with parked cart
+                const currentOrderNumber = state.orderNumber;
+                
                 const parkedCart: ParkedCart = {
                     id: Date.now().toString(),
                     name: cartName || `Cart ${state.parkedCarts.length + 1}`,
@@ -142,10 +145,10 @@ export const usePOSCartStore = create<POSCartStore>()(
                     parkedAt: new Date(),
                     customerName: customerName || state.customerName,
                     notes: notes || state.notes,
-                    orderNumber: state.orderNumber, // Use the current one
+                    orderNumber: currentOrderNumber, 
                 };
 
-                // Fetch new number for the "next" cart
+                // Get new order number for the next cart
                 const nextNumber = await get().refreshOrderNumber();
 
                 set({
@@ -153,7 +156,7 @@ export const usePOSCartStore = create<POSCartStore>()(
                     cart: [],
                     customerName: "",
                     notes: "",
-                    orderNumber: nextNumber,
+                    orderNumber: "",
                 });
 
                 return parkedCart.id;
@@ -168,8 +171,9 @@ export const usePOSCartStore = create<POSCartStore>()(
                         cart: [...parkedCart.items],
                         customerName: parkedCart.customerName || "",
                         notes: parkedCart.notes || "",
-                        orderNumber: parkedCart.orderNumber,
+                        orderNumber: parkedCart.orderNumber, // Restore order number
                     });
+                    get().deleteParkedCart(cartId);
                 }
             },
 
@@ -195,7 +199,10 @@ export const usePOSCartStore = create<POSCartStore>()(
                     return orderNumber;
                 } catch (error) {
                     console.error("Order number fetch failed", error);
-                    return ""; 
+                    // Generate a temporary order number if API fails
+                    const tempNumber = `TEMP-${Date.now()}`;
+                    set({ orderNumber: tempNumber });
+                    return tempNumber;
                 }
             },
 
@@ -216,10 +223,13 @@ export const usePOSCartStore = create<POSCartStore>()(
             name: "pos-cart-storage",
             partialize: (state) => ({
                 cart: state.cart,
-                parkedCarts: state.parkedCarts,
+                parkedCarts: state.parkedCarts.map(cart => ({
+                    ...cart,
+                    orderNumber: cart.orderNumber // Preserve order numbers for parked carts
+                })),
                 customerName: state.customerName,
                 notes: state.notes,
-                orderNumber: state.orderNumber, // Safe to persist string
+                orderNumber: state.orderNumber,
             }),
         }
     )
