@@ -17,7 +17,10 @@ type PaymentMethod = "mpesa" | "cash" | "credit" | "split";
 
 interface PaymentTerminalProps {
     total: number;
-    customers?: any[];
+    customer?: {
+        id:number,
+        name:string,
+    };
     selectedCustomerId?: number | string | null;
     onBack?: () => void;
     onComplete: (data: any) => void;
@@ -28,7 +31,7 @@ interface PaymentTerminalProps {
 
 export default function PaymentTerminal({
     total,
-    customers = [],
+    customer,
     onBack,
     onComplete,
     allowedPaymentMethods = ["mpesa", "cash", "credit", "split"], // Default all methods
@@ -36,9 +39,8 @@ export default function PaymentTerminal({
     // Determine the first allowed method as default
     const defaultMethod = allowedPaymentMethods[0] || "mpesa";
     const [activeTab, setActiveTab] = useState<PaymentMethod>(defaultMethod);
-    const [selectedCustomerId, setSelectedCustomerId] = useState<
-        string | number | null
-    >(null);
+
+    const selectedCustomerId = customer?.id;
 
     // Payment Amounts
     const [cashAmount, setCashAmount] = useState<number>(0);
@@ -213,9 +215,9 @@ export default function PaymentTerminal({
                     <div className="flex-1 min-w-0 space-y-6 md:space-y-8">
                         <section>
                             <h3 className="text-xs font-black uppercase tracking-widest text-on-surface-variant mb-3 md:mb-4 ml-2">
-                                1. Customer Details
+                               {customer?.name}
                             </h3>
-                            <Select
+                            {/* <Select
                                 label="Select Customer"
                                 value={selectedCustomerId || ""}
                                 onChange={setSelectedCustomerId}
@@ -223,7 +225,7 @@ export default function PaymentTerminal({
                                 placeholder="Search for customer..."
                                 Icon={HiOutlineUser}
                                 size="lg"
-                            />
+                            /> */}
                         </section>
 
                         <section>

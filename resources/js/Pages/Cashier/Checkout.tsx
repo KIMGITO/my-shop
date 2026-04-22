@@ -16,7 +16,12 @@ const MOCK_CUSTOMERS = [
     { id: 3, value: 3, label: "Daniel Simiyu" },
 ];
 
-export default function CashierCheckout() {
+interface Customer {
+    id:number,
+    name:string,
+}
+
+export default function CashierCheckout({customer}:{customer?:Customer}) {
     const {
         cart,
         orderNumber,
@@ -37,7 +42,8 @@ export default function CashierCheckout() {
 
     const handleCompleteSale = async (paymentData: any) => {
         setIsProcessing(true);
-
+    
+       
         // Find the customer name from our list for the backend
         const customer = MOCK_CUSTOMERS.find((c) => c.value === selectedId);
 
@@ -69,6 +75,16 @@ export default function CashierCheckout() {
         // });
     };
 
+    const  reviewOrder = () => {
+        setTimeout(() => {
+            router.visit(route("pos.index"), {
+                preserveScroll: true,
+                onSuccess: () => setIsProcessing(false),
+            });
+        }, 400);
+    }
+
+
     return (
         <AuthenticatedLayout>
             <Head title="Checkout" />
@@ -84,7 +100,7 @@ export default function CashierCheckout() {
                         >
                             <Button
                                 variant="ghost"
-                                onClick={() => router.visit("/pos")}
+                                onClick={() => reviewOrder()}
                                 className="rounded-full h-12 w-12 p-0 bg-surface-container-high"
                             >
                                 <HiOutlineArrowLeft className="text-xl" />
@@ -123,11 +139,21 @@ export default function CashierCheckout() {
                                                 <QuantitySelector
                                                     size="sm"
                                                     quantity={item.quantity}
+                                                    flyX={-45}
+                                                    flyY={200}
                                                     onUpdate={(v) =>
+{
                                                         updateQuantity(
                                                             item.id,
                                                             Number(v)
-                                                        )
+                                                        );
+                                                        reviewOrder();
+                                                    }
+                                                        
+                                                    
+                                                        
+
+
                                                     }
                                                 />
                                                 <Button
@@ -156,7 +182,7 @@ export default function CashierCheckout() {
                         {/* 3. Wired up props correctly */}
                         <PaymentTerminal
                             total={total}
-                            customers={MOCK_CUSTOMERS}
+                            customer={customer}
                             selectedCustomerId={selectedId}
                             onCustomerChange={(id: number | string) =>
                                 setSelectedId(id)

@@ -2,7 +2,7 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { Head, router } from "@inertiajs/react";
 import { Product } from "@/types/pos";
-import { HiOutlineSearch } from "react-icons/hi";
+import { HiOutlineSearch, HiOutlineUser } from "react-icons/hi";
 import AuthenticatedLayout from "@/Components/Layout/AuthenticatedLayout";
 import ProductCard from "@/Components/Pos/ProductCard";
 import { OrderSummary } from "@/Components/Pos/OrderSummary";
@@ -11,6 +11,8 @@ import { usePOSCartStore } from "@/Stores/usePOSCartStore";
 import { ParkedCartsModal } from "./ParkedCartsModal";
 import Button from "@/Components/UI/Button";
 import Input from "@/Components/UI/Input";
+import Select from "@/Components/UI/Select";
+import { CgPathCrop } from "react-icons/cg";
 
 const categories = [
     { id: "all", name: "All Items" },
@@ -23,14 +25,14 @@ export default function PosIndex({POSProducts}:{POSProducts:Product[]}) {
     const { //Zustand 
         cart,
         orderNumber,
-        customerName,
+        customerId,
         notes,
         parkedCarts,
         addToCart,
         updateQuantity,
         removeItem,
         clearCart,
-        setCustomerName,
+        setCustomerId,
         setNotes,
         parkCurrentCart,
         loadParkedCart,
@@ -108,8 +110,8 @@ export default function PosIndex({POSProducts}:{POSProducts:Product[]}) {
             try {
                 // Prepare order data
                 const orderData = {
-                    order_number: orderNumber,
-                    customer_name: customerName,
+                    orderNumber: orderNumber,
+                    customerId: customerId,
                     notes: notes,
                     items: cart.map(item => ({
                         product_id: item.id,
@@ -124,34 +126,20 @@ export default function PosIndex({POSProducts}:{POSProducts:Product[]}) {
                 };
 
                 // Send order to backend
-                const response = await fetch('/api/v1/pos/orders', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
+                router.patch(route('orders.checkout'),orderData, {
+                    onBefore: () => {
+                        setIsProcessing(true);
                     },
-                    body: JSON.stringify(orderData)
+                    onError: (error) => {
+                        alert('Failed to process order. Please try again.');
+                        throw new Error('Failed to process order');
+                    },
+                    onFinish: () => {
+                          setIsProcessing(false);
+                    }
                 });
-
-                if (!response.ok) {
-                    throw new Error('Failed to process order');
-                }
-
-                const result = await response.json();
-                
-                // Clear the cart and get new order number
-                await clearCart(); // This will refresh the order number
-                
-                // Show success message
-                alert(`Order ${orderNumber} processed successfully!`);
-                
-                // Redirect or stay on page
-                // router.get(route('cashier.checkout'));
-                
-            } catch (error) {
-                console.error('Checkout error:', error);
-                alert('Failed to process order. Please try again.');
-            } finally {
-                setIsProcessing(false);
+            }catch(error){
+                throw error;
             }
         }
     };
@@ -174,7 +162,7 @@ export default function PosIndex({POSProducts}:{POSProducts:Product[]}) {
         try {
             const parkedCartId = await parkCurrentCart(
                 parkCartName || `Cart ${new Date().toLocaleTimeString()}`,
-                customerName,
+                customerId,
                 notes
             );
             setShowParkConfirmation(false);
@@ -209,7 +197,7 @@ export default function PosIndex({POSProducts}:{POSProducts:Product[]}) {
 
                         {/* Customer Info Bar */}
                         <div className="mb-4 grid grid-cols-2 gap-2">
-                            <input
+                            {/* <input
                                 type="text"
                                 placeholder="Customer Name (optional)"
                                 value={customerName}
@@ -217,13 +205,25 @@ export default function PosIndex({POSProducts}:{POSProducts:Product[]}) {
                                     setCustomerName(e.target.value)
                                 }
                                 className="px-3 py-2 bg-surface-container-high border-none rounded-lg text-sm"
+                            /> */}
+                            <Select
+                                label="Select Customer"
+                                value={customerId}
+                                onChange={(value)=>setCustomerId(value?.toString() || '')}
+                                options={[ { id: 1, value: 1, label: "Martin Mukundi (Interlocking Blocks)" },
+                                { id: 2, value: 2, label: "Silvia Nyakio" },
+                                { id: 3, value: 3, label: "Daniel Simiyu" },]}
+                                placeholder="Search for customer..."
+                                Icon={HiOutlineUser}
+                                size="sm"
                             />
-                            <input
-                                type="text"
+                            <Input
+                                type='textarea'
+                                label="Order note"
                                 placeholder="Order Notes (optional)"
                                 value={notes}
                                 onChange={(e) => setNotes(e.target.value)}
-                                className="px-3 py-2 bg-surface-container-high border-none rounded-lg text-sm"
+                                className=""
                             />
                         </div>
 

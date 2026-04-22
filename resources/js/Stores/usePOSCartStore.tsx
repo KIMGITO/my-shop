@@ -2,17 +2,22 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { CartItem, Product } from "@/types/pos";
-import axios from 'axios';
+import axios from "axios";
+import { router } from "@inertiajs/react";
 
 export interface ParkedCart {
     id: string;
     name: string;
-    items: CartItem[];
+    items: {
+        id: number | string;
+        quantity: number;
+        price: number;
+    }[];
     subtotal: number;
     tax: number;
     total: number;
     parkedAt: Date | string;
-    customerName?: string;
+    customerId?: string;
     notes?: string;
     orderNumber: string;
 }
@@ -20,8 +25,8 @@ export interface ParkedCart {
 interface POSCartStore {
     // State
     cart: CartItem[];
-    orderNumber: string; 
-    customerName: string;
+    orderNumber: string;
+    customerId: string;
     notes: string;
     parkedCarts: ParkedCart[];
 
@@ -29,15 +34,15 @@ interface POSCartStore {
     addToCart: (product: Product) => void;
     updateQuantity: (id: string, quantity: number) => void;
     removeItem: (id: string) => void;
-    clearCart: () => Promise<void>; 
+    clearCart: () => Promise<void>;
     setOrderNumber: (orderNumber: string) => void;
-    setCustomerName: (name: string) => void;
+    setCustomerId: (id: string) => void;
     setNotes: (notes: string) => void;
 
     // Actions - Cart Parking
     parkCurrentCart: (
         cartName: string,
-        customerName?: string,
+        customerId?: string,
         notes?: string
     ) => Promise<string>;
     loadParkedCart: (cartId: string) => void;
@@ -63,20 +68,22 @@ export const usePOSCartStore = create<POSCartStore>()(
         (set, get) => ({
             // Initial state
             cart: [],
-            orderNumber: '',
-            customerName: "",
+            orderNumber: "",
+            customerId: "",
             notes: "",
             parkedCarts: [],
 
             // Add to cart
-            addToCart:async (product) => {
+            addToCart: async (product) => {
                 const { cart, orderNumber, refreshOrderNumber } = get();
-                
+
                 if (!orderNumber) {
                     await refreshOrderNumber();
                 }
 
-                const existingItem = cart.find((item) => item.id === product.id);
+                const existingItem = cart.find(
+                    (item) => item.id === product.id
+                );
 
                 if (existingItem) {
                     set({
@@ -112,20 +119,20 @@ export const usePOSCartStore = create<POSCartStore>()(
             clearCart: async () => {
                 // Clear the cart and get a fresh order number
                 // const nextNumber = await get().refreshOrderNumber();
-                
+
                 set({
                     cart: [],
-                    customerName: "",
+                    customerId: "",
                     notes: "",
                     orderNumber: "",
                 });
             },
 
             setOrderNumber: (orderNumber) => set({ orderNumber }),
-            setCustomerName: (name) => set({ customerName: name }),
+            setCustomerId: (id) => set({ customerId: id }),
             setNotes: (notes) => set({ notes }),
 
-            parkCurrentCart: async (cartName, customerName, notes) => {
+            parkCurrentCart: async (cartName, customerId, notes) => {
                 const state = get();
 
                 if (state.cart.length === 0) {
@@ -134,19 +141,39 @@ export const usePOSCartStore = create<POSCartStore>()(
 
                 // Save current order number with parked cart
                 const currentOrderNumber = state.orderNumber;
-                
+
                 const parkedCart: ParkedCart = {
                     id: Date.now().toString(),
                     name: cartName || `Cart ${state.parkedCarts.length + 1}`,
-                    items: [...state.cart],
+                    items: [
+                        ...state.cart.map((item) => ({
+                            id: item.id,
+                            quantity: item.quantity,
+                            price: item.price,
+                        })),
+                    ],
                     subtotal: state.getSubtotal(),
                     tax: state.getTax(),
                     total: state.getTotal(),
                     parkedAt: new Date(),
-                    customerName: customerName || state.customerName,
+                    customerId: customerId || state.customerId,
                     notes: notes || state.notes,
-                    orderNumber: currentOrderNumber, 
+                    orderNumber: currentOrderNumber,
                 };
+
+                try {
+                    router.patch(route("orders.park"), parkedCart, {
+                        onSuccess: (response) => {
+                            console.log(response.data);
+                        },
+                        onError: (error) => {
+                            console.log(error);
+                        },
+                    });
+                } catch (error) {
+                    console.log(error);
+                    throw error;
+                }
 
                 // Get new order number for the next cart
                 const nextNumber = await get().refreshOrderNumber();
@@ -154,7 +181,7 @@ export const usePOSCartStore = create<POSCartStore>()(
                 set({
                     parkedCarts: [...state.parkedCarts, parkedCart],
                     cart: [],
-                    customerName: "",
+                    customerId: "",
                     notes: "",
                     orderNumber: "",
                 });
@@ -169,7 +196,7 @@ export const usePOSCartStore = create<POSCartStore>()(
                 if (parkedCart) {
                     set({
                         cart: [...parkedCart.items],
-                        customerName: parkedCart.customerName || "",
+                        customerId: parkedCart.customerId || "",
                         notes: parkedCart.notes || "",
                         orderNumber: parkedCart.orderNumber, // Restore order number
                     });
@@ -179,7 +206,9 @@ export const usePOSCartStore = create<POSCartStore>()(
 
             deleteParkedCart: (cartId) => {
                 set({
-                    parkedCarts: get().parkedCarts.filter((c) => c.id !== cartId),
+                    parkedCarts: get().parkedCarts.filter(
+                        (c) => c.id !== cartId
+                    ),
                 });
             },
 
@@ -193,7 +222,9 @@ export const usePOSCartStore = create<POSCartStore>()(
 
             refreshOrderNumber: async () => {
                 try {
-                    const response = await axios.get('/api/v1/pos/orders/order-number');
+                    const response = await axios.get(
+                        "/api/v1/pos/orders/order-number"
+                    );
                     const orderNumber = response.data.orderNumber;
                     set({ orderNumber: orderNumber });
                     return orderNumber;
@@ -206,10 +237,16 @@ export const usePOSCartStore = create<POSCartStore>()(
                 }
             },
 
-            getSubtotal: () => get().cart.reduce((sum, item) => sum + item.price * item.quantity, 0),
+            getSubtotal: () =>
+                get().cart.reduce(
+                    (sum, item) => sum + item.price * item.quantity,
+                    0
+                ),
             getTax: (taxRate = 0.08) => get().getSubtotal() * taxRate,
-            getTotal: (taxRate = 0.08) => get().getSubtotal() + get().getTax(taxRate),
-            getItemCount: () => get().cart.reduce((count, item) => count + item.quantity, 0),
+            getTotal: (taxRate = 0.08) =>
+                get().getSubtotal() + get().getTax(taxRate),
+            getItemCount: () =>
+                get().cart.reduce((count, item) => count + item.quantity, 0),
 
             getCartSummary: () => {
                 const subtotal = get().getSubtotal();
@@ -223,11 +260,11 @@ export const usePOSCartStore = create<POSCartStore>()(
             name: "pos-cart-storage",
             partialize: (state) => ({
                 cart: state.cart,
-                parkedCarts: state.parkedCarts.map(cart => ({
+                parkedCarts: state.parkedCarts.map((cart) => ({
                     ...cart,
-                    orderNumber: cart.orderNumber // Preserve order numbers for parked carts
+                    orderNumber: cart.orderNumber, // Preserve order numbers for parked carts
                 })),
-                customerName: state.customerName,
+                customerId: state.customerId,
                 notes: state.notes,
                 orderNumber: state.orderNumber,
             }),

@@ -11,6 +11,8 @@ interface QuantitySelectorProps {
     max?: number;
     size?: "sm" | "md" | "lg";
     disabled?: boolean;
+    flyX?: number; 
+    flyY?: number;
 }
 
 export const QuantitySelector: React.FC<QuantitySelectorProps> = ({
@@ -20,6 +22,8 @@ export const QuantitySelector: React.FC<QuantitySelectorProps> = ({
     max = 99,
     size = "md",
     disabled = false,
+    flyX = 0,
+    flyY,
 }) => {
     const [localValue, setLocalValue] = useState<string>(String(quantity));
     // Internal state to trigger the "plus one" fly-away animation
@@ -69,6 +73,9 @@ export const QuantitySelector: React.FC<QuantitySelectorProps> = ({
         onUpdate(String(next));
     };
 
+    const defaultFlyY = size === "sm" ? -100 : -150;
+    const finalFlyY = flyY !== undefined ? flyY : defaultFlyY;
+
     return (
         <div
             className={cn(
@@ -114,7 +121,8 @@ export const QuantitySelector: React.FC<QuantitySelectorProps> = ({
                 <AnimatedAddButton
                     onClick={handleIncrease}
                     added={isAnimating}
-                        flyY={size === "sm" ? -100 : -150}
+                    flyX={flyX}
+                    flyY={finalFlyY}
                 />
             </div>
         </div>

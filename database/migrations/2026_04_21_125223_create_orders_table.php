@@ -17,12 +17,13 @@ return new class extends Migration
             $table->string('type');
             $table->string('source');//online web,  pos,  manual
             $table->enum('status',[
+                'initiated',
                 'active',
                 'parked',
                 'completed',
                 'cancelled',
                 'expired',
-            ])->default('active');
+            ])->default('initiated');
             $table->foreignId('customer_id')->nullable()->constrained('users');
             $table->foreignId('user_id')->constrained();
             $table->decimal('total_amount', 12, 2)->default(0);
