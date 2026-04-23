@@ -1,5 +1,8 @@
 <?php
 
+use App\Enums\OrderStatus;
+use App\Enums\TransactionSource;
+use App\Enums\TransactionType;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -14,16 +17,9 @@ return new class extends Migration
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
             $table->string('order_number');
-            $table->string('type');
-            $table->string('source');//online web,  pos,  manual
-            $table->enum('status',[
-                'initiated',
-                'active',
-                'parked',
-                'completed',
-                'cancelled',
-                'expired',
-            ])->default('initiated');
+            $table->enum('type', array_column(TransactionType::cases(),'value'))->default(TransactionType::POS->value);
+            $table->enum('source',array_column(TransactionSource::cases(),'value'))->default(TransactionSource::POS->value);//online web,  pos,  manual
+            $table->enum('status', array_column(OrderStatus::cases(),'value'))->default(OrderStatus::INITIATED->value);
             $table->foreignId('customer_id')->nullable()->constrained('users');
             $table->foreignId('user_id')->constrained();
             $table->decimal('total_amount', 12, 2)->default(0);

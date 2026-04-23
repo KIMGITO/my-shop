@@ -24,9 +24,10 @@ class OrderController extends Controller
         $orderData = new CreateOrderData(
             type:TransactionType::POS,
             source:'pos',
-            status: OrderStatus::ACTIVE,
+            status: OrderStatus::INITIATED,
             userId: Auth::id(),
             customerId:null,
+            expires_at: now()->addHours(24),
         );
         $orderNumber = $this->orderService->createOrder($orderData);
 
@@ -39,56 +40,19 @@ class OrderController extends Controller
     }
 
     public function parkOrder(Request $request)
-
-{
-    dd($request->all());
-
-    $validated = $request->validate([
-        'orderNumber'   => 'required|string|exists:orders,order_number',
-        'items'         => 'required|array|min:1',
-        'items.*.id'    => 'required',
-        'items.*.quantity' => 'required|integer|min:1',
-        'items.*.price' => 'required|numeric',
-        'subtotal'      => 'required|numeric',
-        'tax'           => 'required|numeric',
-        'total'         => 'required|numeric',
-        'notes'         => 'nullable|string',
-        'customerId'    => 'nullable|exists:users,id',
-    ]);
-
-
-    try {
-        DB::beginTransaction();
-
-        $order = Order::where('order_number', $validated['orderNumber'])->firstOrFail();
-
-        $order->update([
-            'status'        => 'parked', 
-            'total_amount'  => $validated['total'],
-            'tax'    => $validated['tax'],
-            'notes'         => $validated['notes'],
-            'customer_id'   => $validated['customerId'],
+    {
+        $payload = $request->validate([
+            'orderNumber' => 'required|string',
+            'customerId' => 'nullable|integer|exists:customers,id',
+            'discount' => 'nullable|numeric',
+            'tax' => 'nullable|numeric',
+            'notes' => 'nullable|string',
+            'total' => 'required|numeric',
         ]);
 
-        // 3. Sync the items (Delete old ones if any, and create new ones)
-        $order->items()->delete();
-        foreach ($validated['items'] as $item) {
-            $order->items()->create([
-                'product_id' => $item['id'],
-                'quantity'   => $item['quantity'],
-                'unit_price' => $item['price'],
-                'subtotal'   => $item['price'] * $item['quantity'],
-            ]);
-        }
+        $order = $this->orderService->parkOrder($payload);
+        dd($order);
 
-        DB::commit();
-
-        return back()->with('message', "Cart '{$validated['orderNumber']}' parked successfully.");
-
-    } catch (\Exception $e) {
-        DB::rollBack();
-        return back()->withErrors(['error' => 'Failed to park order: ' . $e->getMessage()]);
+        return response()->json(['message' => 'Order parked successfully', 'orderNumber' => $order->order_number]);
     }
-}
-    
 }

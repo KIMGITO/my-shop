@@ -43,7 +43,7 @@ interface POSCartStore {
     parkCurrentCart: (
         cartName: string,
         customerId?: string,
-        notes?: string
+        notes?: string,
     ) => Promise<string>;
     loadParkedCart: (cartId: string) => void;
     deleteParkedCart: (cartId: string) => void;
@@ -82,7 +82,7 @@ export const usePOSCartStore = create<POSCartStore>()(
                 }
 
                 const existingItem = cart.find(
-                    (item) => item.id === product.id
+                    (item) => item.id === product.id,
                 );
 
                 if (existingItem) {
@@ -90,7 +90,7 @@ export const usePOSCartStore = create<POSCartStore>()(
                         cart: cart.map((item) =>
                             item.id === product.id
                                 ? { ...item, quantity: item.quantity + 1 }
-                                : item
+                                : item,
                         ),
                     });
                 } else {
@@ -106,7 +106,7 @@ export const usePOSCartStore = create<POSCartStore>()(
                 } else {
                     set({
                         cart: get().cart.map((item) =>
-                            item.id === id ? { ...item, quantity } : item
+                            item.id === id ? { ...item, quantity } : item,
                         ),
                     });
                 }
@@ -162,7 +162,7 @@ export const usePOSCartStore = create<POSCartStore>()(
                 };
 
                 try {
-                    router.patch(route("orders.park"), parkedCart, {
+                    router.patch(route("orders.park"), parkedCart as any, {
                         onSuccess: (response) => {
                             console.log(response.data);
                         },
@@ -207,7 +207,7 @@ export const usePOSCartStore = create<POSCartStore>()(
             deleteParkedCart: (cartId) => {
                 set({
                     parkedCarts: get().parkedCarts.filter(
-                        (c) => c.id !== cartId
+                        (c) => c.id !== cartId,
                     ),
                 });
             },
@@ -215,7 +215,7 @@ export const usePOSCartStore = create<POSCartStore>()(
             updateParkedCartName: (cartId, newName) => {
                 set({
                     parkedCarts: get().parkedCarts.map((c) =>
-                        c.id === cartId ? { ...c, name: newName } : c
+                        c.id === cartId ? { ...c, name: newName } : c,
                     ),
                 });
             },
@@ -223,7 +223,7 @@ export const usePOSCartStore = create<POSCartStore>()(
             refreshOrderNumber: async () => {
                 try {
                     const response = await axios.get(
-                        "/api/v1/pos/orders/order-number"
+                        "/api/v1/pos/orders/order-number",
                     );
                     const orderNumber = response.data.orderNumber;
                     set({ orderNumber: orderNumber });
@@ -240,7 +240,7 @@ export const usePOSCartStore = create<POSCartStore>()(
             getSubtotal: () =>
                 get().cart.reduce(
                     (sum, item) => sum + item.price * item.quantity,
-                    0
+                    0,
                 ),
             getTax: (taxRate = 0.08) => get().getSubtotal() * taxRate,
             getTotal: (taxRate = 0.08) =>
@@ -268,6 +268,6 @@ export const usePOSCartStore = create<POSCartStore>()(
                 notes: state.notes,
                 orderNumber: state.orderNumber,
             }),
-        }
-    )
+        },
+    ),
 );

@@ -31,6 +31,17 @@ class CreateOrderData
         public float $balance = 0,
         public ?SupportCarbon $expires_at = null,
     ) {
-        $this->expires_at = $expires_at ?? now()->addMinutes(60);
+        $this->expires_at = $expires_at ?? now()->addHours(24);
+        $this->type = $type;
+        $this->source = $source;
+        $this->status = $status;
+        $this->customerId = $customerId;
+        $this->userId = $userId;
+        $this->discount = $discount;
+        $this->tax = $tax;
+        $this->notes = $notes;
+        $this->total_amount = $total_amount;
+        $this->paid_amount = $paid_amount;
+        $this->balance = $balance;
     }
 }

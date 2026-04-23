@@ -14,5 +14,8 @@ class OrderRepository extends BaseRepository
         parent::__construct($model);
     }
 
-    
+    public function findByOrderNumber(string $orderNumber): ?Order
+    {
+        return $this->model->where('order_number', $orderNumber)->first();
+    }
 }
