@@ -115,25 +115,32 @@ export const MultipleImagesUpload: React.FC<MultiImageUploadProps> = ({
     };
 
     const handleAddUrl = () => {
-        if (!urlInput.trim()) return;
+    const trimmedUrl = urlInput.trim();
+    if (!trimmedUrl) return;
 
-        const activeImages = value.filter((img) => !img.isDeleted);
-        if (activeImages.length >= maxFiles) {
-            setUploadError(`Maximum ${maxFiles} images allowed`);
-            return;
-        }
+    // 1. Get ONLY the images that are currently visible/not deleted
+    const activeImages = value.filter((img) => !img.isDeleted);
+    
+    if (activeImages.length >= maxFiles) {
+        setUploadError(`Maximum ${maxFiles} images allowed`);
+        return;
+    }
 
-        const newImage: ImageItem = {
-            id: crypto.randomUUID(),
-            url: urlInput.trim(),
-            isMain: showMainImageControl && activeImages.length === 0,
-            isDeleted: false,
-        };
-
-        onChange([...value, newImage]);
-        setUrlInput("");
-        setUploadError(null);
+    // 2. Create the new item
+    const newImage: ImageItem = {
+        id: crypto.randomUUID(),
+        url: trimmedUrl,
+        // Match the logic in handleFileSelect: 
+        // If there are no active images, this MUST be the main one.
+        isMain: showMainImageControl && activeImages.length === 0,
+        isDeleted: false,
     };
+
+    // 3. Update and Reset
+    onChange([...value, newImage]);
+    setUrlInput("");
+    setUploadError(null);
+};
 
     const handleRemoveImage = (id: string) => {
         const imageToRemove = value.find((img) => img.id === id);

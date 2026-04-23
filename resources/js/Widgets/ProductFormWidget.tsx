@@ -70,45 +70,6 @@ export const ProductFormWidget: React.FC<ProductFormWidgetProps> = ({
                 </h4>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <Input
-                        label="Product Name"
-                        value={data.name}
-                        onChange={(e) => setData("name", e.target.value)}
-                        placeholder="e.g., Fresh Organic Tomatoes"
-                        Icon={HiOutlineShoppingBag}
-                        error={errors.name}
-                        disabled={processing}
-                        required
-                    />
-
-                    <Input
-                        label="Unit Price (KES)"
-                        type="number"
-                        step="0.01"
-                        value={data.price}
-                        onChange={(e) =>
-                            setData("price", parseFloat(e.target.value))
-                        }
-                        placeholder="0.00"
-                        Icon={GiPriceTag}
-                        error={errors.price}
-                        disabled={processing}
-                        required
-                    />
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <Input
-                        label="Unit"
-                        value={data.unit}
-                        onChange={(e) => setData("unit", e.target.value)}
-                        placeholder="e.g., kg, piece, bunch"
-                        error={errors.unit}
-                        disabled={processing}
-                        Icon={TbRulerMeasure2}
-                        required
-                    />
-
                     <Select
                         size="sm"
                         label="Category"
@@ -123,20 +84,52 @@ export const ProductFormWidget: React.FC<ProductFormWidgetProps> = ({
                         Icon={MdCategory}
                         error={errors.category}
                         disabled={processing}
-                        required
+                    />
+                    <Input
+                        label="Product Name"
+                        value={data.name}
+                        onChange={(e) => setData("name", e.target.value)}
+                        placeholder="e.g., Fresh Organic Tomatoes"
+                        Icon={HiOutlineShoppingBag}
+                        error={errors.name}
+                        disabled={processing}
                     />
                 </div>
-                 <Input
-                        label="Shelf Life"
-                        value={data.shelfLife}
-                        type="number"
-                        onChange={(e) => setData("shelfLife", e.target.value)}
-                        placeholder="e.g., 4"
-                        error={errors.shelfLife}
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <Input
+                        label="Unit"
+                        value={data.unit}
+                        onChange={(e) => setData("unit", e.target.value)}
+                        placeholder="e.g., kg, piece, bunch"
+                        error={errors.unit}
                         disabled={processing}
-                        Icon={FaHeartbeat}
-                        required
+                        Icon={TbRulerMeasure2}
                     />
+                    <Input
+                        label="Unit Price (KES)"
+                        type="number"
+                        step="0.01"
+                        value={data.price}
+                        onChange={(e) =>
+                            setData("price", parseFloat(e.target.value))
+                        }
+                        placeholder="0.00"
+                        Icon={GiPriceTag}
+                        error={errors.price}
+                        disabled={processing}
+                    />
+                </div>
+                <Input
+                    label="Shelf Life"
+                    value={data.shelfLife}
+                    type="number"
+                    onChange={(e) => setData("shelfLife", e.target.value)}
+                    placeholder="e.g., 4"
+                    error={errors.shelfLife}
+                    disabled={processing}
+                    Icon={FaHeartbeat}
+                />
             </div>
 
             <ImageUpload
@@ -145,7 +138,7 @@ export const ProductFormWidget: React.FC<ProductFormWidgetProps> = ({
                 label="Product Images"
                 error={errors.images}
                 disabled={processing}
-                required
+                showUrlInput={false}
                 maxFiles={5}
                 showMainImageControl={true}
             />
