@@ -2,6 +2,7 @@
 
 namespace App\Models\Inventory;
 
+use App\Models\Batch;
 use App\Models\ProductImage;
 use App\Models\Traits\HasSkuByCategoryName;
 use App\Services\CloudinaryService;
@@ -38,6 +39,10 @@ class Product extends Model
     public function images()
     {
         return $this->hasMany(ProductImage::class);
+    }
+
+    public function bathes (){
+        return  $this->hasMany(Batch::class);
     }
 
     public function getMainProductImageAttribute()

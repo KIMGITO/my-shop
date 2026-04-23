@@ -11,6 +11,8 @@ interface OrderSummaryProps {
     onCheckout: () => void;
     onVoid: () => void;
     onPark: () => void;
+    onRemove: (id: string) => void;
+    onUpdateQuantity: (id: string, quantity: string) => void;
     orderNumber: string;
 }
 
@@ -23,6 +25,8 @@ export const OrderSummary: React.FC<OrderSummaryProps> = ({
     onVoid,
     onPark,
     orderNumber,
+    onRemove,
+    onUpdateQuantity,
 }) => {
     const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
 
@@ -50,8 +54,12 @@ export const OrderSummary: React.FC<OrderSummaryProps> = ({
                         <CartItem
                             key={item.id}
                             item={item}
-                            onUpdateQuantity={() => {}}
-                            onRemove={() => {}}
+                            onUpdateQuantity={(id, quantity) => {
+                                onUpdateQuantity(id, quantity);
+                            }}
+                            onRemove={(id) => {
+                                onRemove(id);
+                            }}
                         />
                     ))
                 )}
@@ -60,18 +68,20 @@ export const OrderSummary: React.FC<OrderSummaryProps> = ({
             <div className="space-y-2 pt-4 border-t-2 border-dashed border-outline-variant/30">
                 <div className="flex justify-between text-on-surface-variant text-sm">
                     <span>Subtotal ({itemCount} items)</span>
-                    <span className="tabular-nums">${subtotal.toFixed(2)}</span>
+                    <span className="tabular-nums">
+                        Ksh{subtotal.toFixed(2)}
+                    </span>
                 </div>
                 <div className="flex justify-between text-on-surface-variant text-sm">
                     <span>Tax (8%)</span>
-                    <span className="tabular-nums">${tax.toFixed(2)}</span>
+                    <span className="tabular-nums">Ksh{tax.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between items-end pt-2">
                     <span className="text-lg font-bold text-on-surface">
                         Total
                     </span>
                     <span className="text-2xl font-black text-primary tabular-nums">
-                        ${total.toFixed(2)}
+                        Ksh{total.toFixed(2)}
                     </span>
                 </div>
             </div>
@@ -99,7 +109,7 @@ export const OrderSummary: React.FC<OrderSummaryProps> = ({
                 className="w-full py-4 signature-gradient  font-black rounded-xl shadow-lg flex items-center justify-center gap-2 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
                 Quick Checkout
-                    <MdOutlineShoppingCartCheckout />
+                <MdOutlineShoppingCartCheckout />
             </Button>
         </div>
     );
