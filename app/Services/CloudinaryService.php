@@ -97,4 +97,15 @@ class CloudinaryService
     {
         $this->cloudinary->uploadApi()->destroy($publicId);
     }
+
+    /**
+     * Remove background from an image using Cloudinary's Eager Transformations
+     */
+
+    public function removeBackground(string $url): string
+    {
+        $new_url = str_replace('/upload/', '/upload/e_bgremoval/', $url);
+        return $new_url;
+
+    }
 }

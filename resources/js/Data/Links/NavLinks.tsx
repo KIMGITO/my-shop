@@ -92,7 +92,7 @@ export const adminNav: NavItem[] = [
         path: "/admin/inventory/products",
         icon: AiFillProduct,
     },
-  
+    { label: "POS", path: "/pos", icon: MdPointOfSale },
     {
         label: "Stock Adjustment",
         path: "/admin/inventory/adjustment",
@@ -178,7 +178,7 @@ export const allNavGroups = {
 // ============================================================================
 
 export const getNavByRole = (
-    role: "customer" | "cashier" | "admin" | "dispatch" | "settings"
+    role: "customer" | "cashier" | "admin" | "dispatch" | "settings",
 ) => {
     const navMap = {
         customer: defaultCustomerNav,

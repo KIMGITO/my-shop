@@ -136,7 +136,7 @@ export const ProductFormWidget: React.FC<ProductFormWidgetProps> = ({
                 value={data.images || []}
                 onChange={(images) => setData("images", images)}
                 label="Product Images"
-                error={errors.images}
+                error={errors.productImages}
                 disabled={processing}
                 showUrlInput={false}
                 maxFiles={5}

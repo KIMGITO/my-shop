@@ -14,9 +14,10 @@ class ProductService
     /**
      * Create a new class instance.
      */
-    public function __construct(Product $product)
+    public function __construct(Product $product,  protected CloudinaryService $cloudinary)
     {
         $this->product  = $product;
+        $this->cloudinary = $cloudinary;
     }
 
     public function stockStatus()
