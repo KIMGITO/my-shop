@@ -20,7 +20,5 @@ class POSController extends Controller
 
     }
 
-    public function checkout(){
-        return Inertia::render('Cashier/Checkout');
-    }
+   
 }

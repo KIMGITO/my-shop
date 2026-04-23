@@ -36,6 +36,8 @@ export const CartItem: React.FC<CartItemProps> = ({
                     quantity={item.quantity}
                     onUpdate={(quantity) => onUpdateQuantity(item.id, quantity)}
                     size="sm"
+                    flyX={-90}
+                    flyY={200}
                 
                 />
                 <button

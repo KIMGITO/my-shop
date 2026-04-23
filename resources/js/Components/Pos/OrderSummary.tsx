@@ -2,6 +2,7 @@ import React from "react";
 import { CartItem } from "./CartItem";
 import Button from "../UI/Button";
 import { MdOutlineShoppingCartCheckout } from "react-icons/md";
+import { AnimatePresence, motion } from "framer-motion";
 
 interface OrderSummaryProps {
     items: CartItem[];
@@ -50,18 +51,30 @@ export const OrderSummary: React.FC<OrderSummaryProps> = ({
                         <p className="text-sm">No items added</p>
                     </div>
                 ) : (
-                    items.map((item) => (
-                        <CartItem
-                            key={item.id}
-                            item={item}
-                            onUpdateQuantity={(id, quantity) => {
-                                onUpdateQuantity(id, quantity);
-                            }}
-                            onRemove={(id) => {
-                                onRemove(id);
-                            }}
-                        />
-                    ))
+                    <div className="space-y-2">
+                        <AnimatePresence initial={false}>
+                            {items.map((item, index) => (
+                                <motion.div
+                                    key={item.id}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, x: -20 }}
+                                    transition={{
+                                        duration: 0.2,
+                                        delay: index * 0.05,
+                                        ease: "easeOut",
+                                    }}
+                                    layout 
+                                >
+                                    <CartItem
+                                        item={item}
+                                        onUpdateQuantity={onUpdateQuantity}
+                                        onRemove={onRemove}
+                                    />
+                                </motion.div>
+                            ))}
+                        </AnimatePresence>
+                    </div>
                 )}
             </div>
 
