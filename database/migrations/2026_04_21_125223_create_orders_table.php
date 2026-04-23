@@ -18,7 +18,7 @@ return new class extends Migration
             $table->id();
             $table->string('order_number');
             $table->enum('type', array_column(TransactionType::cases(),'value'))->default(TransactionType::POS->value);
-            $table->enum('source',array_column(TransactionSource::cases(),'value'))->default(TransactionSource::POS->value);//online web,  pos,  manual
+            $table->enum('source',array_column(TransactionSource::cases(),'value'))->default(TransactionSource::POS->value);
             $table->enum('status', array_column(OrderStatus::cases(),'value'))->default(OrderStatus::INITIATED->value);
             $table->foreignId('customer_id')->nullable()->constrained('users');
             $table->foreignId('user_id')->constrained();
