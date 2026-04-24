@@ -5,6 +5,7 @@ namespace App\Services;
 use App\DTOs\CreateOrderData;
 use App\Enums\OrderStatus;
 use App\Enums\TransactionType;
+use App\Repositories\Inventory\BatchRepository;
 use App\Repositories\Inventory\ProductRepository;
 use App\Repositories\OrderRepository;
 use App\Services\TransactionNamingService;
@@ -18,7 +19,7 @@ class OrderService
      */
     public function __construct(
         protected OrderRepository $orderRepository,
-        protected ProductRepository $productRepository,
+        protected BatchRepository $batchRepository,
         protected TransactionNamingService $transactionNaming
     ) {}
 
@@ -71,7 +72,7 @@ class OrderService
     {
         // Release previous stock reservations to prevent double-counting
         foreach ($order->items as $existingItem) {
-            $this->productRepository->releaseStock($existingItem->product_id, $existingItem->quantity);
+            $this->batchRepository->releaseStock($existingItem->product_id, $existingItem->quantity);
         }
 
         // Fresh start for line items
@@ -86,7 +87,7 @@ class OrderService
             ]);
 
             // Re-reserve based on new quantities
-            $this->productRepository->reserveStock($item['batch_id'], $item['quantity']);
+            $this->batchRepository->reserveStock($item['batch_id'], $item['quantity']);
         }
     }
 
