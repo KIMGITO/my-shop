@@ -61,6 +61,7 @@ class BatchService
     public function processBatch(array $payload, $id = null){
         
         try{
+            
 
             $data = toSnake($payload);
 

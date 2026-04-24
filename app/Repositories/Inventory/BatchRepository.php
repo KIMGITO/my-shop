@@ -14,4 +14,6 @@ class BatchRepository extends BaseRepository
     {
         parent::__construct($model);
     }
+
+    
 }
