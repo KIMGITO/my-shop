@@ -128,6 +128,7 @@ export default function PosIndex({
     const handleLoadParkedCart = (cartId: string) => {
         if (cart.length > 0 && !window.confirm("Current cart will be cleared. Continue?")) return;
         
+        console.log(cartId);
         loadParkedCart(cartId, POSProducts);
         setShowParkedModal(false);
     };

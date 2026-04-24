@@ -52,20 +52,24 @@ export const usePOSCartStore = create<POSCartStore>()(
             parkedCarts: [],
 
             addToCart: async (product) => {
-                const { cart, orderNumber, refreshOrderNumber } = get();
-                if (!orderNumber) await refreshOrderNumber();
+    const { cart, orderNumber, refreshOrderNumber } = get();
+    if (!orderNumber) await refreshOrderNumber();
 
-                const existingItem = cart.find((item) => item.id === product.id);
-                if (existingItem) {
-                    set({
-                        cart: cart.map((item) =>
-                            item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
-                        ),
-                    });
-                } else {
-                    set({ cart: [...cart, { ...product, quantity: 1 }] });
-                }
-            },
+    // Use a consistent ID check (forcing string comparison)
+    const existingItem = cart.find((item) => String(item.id) === String(product.id));
+    
+    if (existingItem) {
+        set({
+            cart: cart.map((item) =>
+                String(item.id) === String(product.id) 
+                    ? { ...item, quantity: item.quantity + 1 } 
+                    : item
+            ),
+        });
+    } else {
+        set({ cart: [...cart, { ...product, quantity: 1 }] });
+    }
+},
 
             updateQuantity: (id, quantity) => {
                 set({
@@ -133,36 +137,39 @@ export const usePOSCartStore = create<POSCartStore>()(
             },
 
              loadParkedCart: (cartId, allProducts) => {
-                const { parkedCarts, deleteParkedCart } = get();
-                const parked = parkedCarts.find((c) => c.id === cartId);
+    const { parkedCarts, deleteParkedCart, cart: currentCart } = get();
+    const parked = parkedCarts.find((c) => c.id === cartId);
 
-                if (parked) {
-                    const hydratedItems = parked.items.map(pItem => {
-                        const originalProduct = allProducts.find(p => Number(p.id) === Number(pItem.batch_id));
-                        
-                        if (!originalProduct) {
-                            console.warn(`Product with ID ${pItem.batch_id} not found in allProducts`);
-                        }
+    if (parked) {
+        const hydratedItems = parked.items.map(pItem => {
+            // Find the master product data
+            const originalProduct = allProducts.find(p => Number(p.id) === Number(pItem.batch_id));
+            
+            if (!originalProduct) {
+                console.warn(`Product with ID ${pItem.batch_id} not found`);
+            }
 
-                        return {
-                            ...originalProduct,
-                            quantity: pItem.quantity,
-                            price: pItem.price,
-                            id: pItem.batch_id.toString() 
-                        };
-                    });
+            return {
+                ...originalProduct,
+                id: pItem.batch_id.toString(), // Ensure this matches your store's ID format
+                quantity: pItem.quantity,
+                price: pItem.price,
+            };
+        });
 
-                    set({
-                        cart: hydratedItems as CartItem[],
-                        customerId: parked.customerId || "",
-                        notes: parked.notes || "",
-                        orderNumber: parked.orderNumber,
-                    });
-                    
-                    router.patch(route("orders.unpark", { orderNumber: parked.orderNumber }));
-                    deleteParkedCart(cartId);
-                }
-            },
+        set({
+            // If you want to MERGE with existing cart items instead of replacing:
+            // cart: [...currentCart, ...hydratedItems], 
+            cart: hydratedItems, 
+            customerId: parked.customerId || "",
+            notes: parked.notes || "",
+            orderNumber: parked.orderNumber,
+        });
+        
+        router.patch(route("orders.unpark", { orderNumber: parked.orderNumber }));
+        deleteParkedCart(cartId);
+    }
+},
 
             deleteParkedCart: (cartId) => {
                 set({ parkedCarts: get().parkedCarts.filter((c) => c.id !== cartId) });
