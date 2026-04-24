@@ -21,40 +21,40 @@ class BatchService
 
 
    public function getFormattedBatches()
-{
-    try {
-        $batches = Batch::with('product')->get();
-        
-        $formatted = $batches->map(function ($batch) {
-            $product = $batch->product;
+    {
+        try {
+            $batches = Batch::with('product')->get();
             
-            return array_merge( $batch->toArray(), [
+            $formatted = $batches->map(function ($batch) {
+                $product = $batch->product;
                 
-                'product' => $product ? [
-                    'id' => $product->id,
-                    'name' => $product->name,
-                    'image' => $product->main_product_image,
-                ] : null,
-                
-                'status' => $this->getBatchStatus($batch),
-                
-                'receiveDate' => Carbon::parse($batch->created_at)->format('d M Y'),
-                
-                'expiryDate' => Carbon::parse($batch->created_at)
-                    ->addDays($product?->shelf_life ?? 0)
-                    ->format('d M Y'),
-                
-                'intakeQuantity' => $batch->intake_quantity . ' ' . ($product->unit ?? ''),
-                'balance' => $batch->balance . ' ' .($product->unit?? ''),
-            ]);
-        });
-        
-        return $formatted;
-        
-    } catch (\Throwable $th) {
-        throw $th;
+                return array_merge( $batch->toArray(), [
+                    
+                    'product' => $product ? [
+                        'id' => $product->id,
+                        'name' => $product->name,
+                        'image' => $product->main_product_image,
+                    ] : null,
+                    
+                    'status' => $this->getBatchStatus($batch),
+                    
+                    'receiveDate' => Carbon::parse($batch->created_at)->format('d M Y'),
+                    
+                    'expiryDate' => Carbon::parse($batch->created_at)
+                        ->addDays($product?->shelf_life ?? 0)
+                        ->format('d M Y'),
+                    
+                    'intakeQuantity' => $batch->intake_quantity . ' ' . ($product->unit ?? ''),
+                    'balance' => $batch->balance . ' ' .($product->unit?? ''),
+                ]);
+            });
+            
+            return $formatted;
+            
+        } catch (\Throwable $th) {
+            throw $th;
+        }
     }
-}
 
    
     // process batches 

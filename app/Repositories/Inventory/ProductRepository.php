@@ -82,5 +82,4 @@ class ProductRepository extends BaseRepository
     }
 
 
-   
 }
