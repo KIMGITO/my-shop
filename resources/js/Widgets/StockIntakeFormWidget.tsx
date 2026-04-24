@@ -110,7 +110,7 @@ export const StockIntakeFormWidget: React.FC<StockIntakeFormWidgetProps> = ({
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-outline-variant/10">
                         <Input
-                            label="Batch Number"
+                            label="Batch Number(set by system)"
                             disabled
                             value={data.batchNumber}
                             error={errors.batchNumber}
@@ -118,7 +118,8 @@ export const StockIntakeFormWidget: React.FC<StockIntakeFormWidgetProps> = ({
                             className="uppercase"
                         />
                         <Input
-                            label="Expiry Date"
+                            disabled={true}
+                            label="Expiry Date (set by product)"
                             type="date"
                             value={data.expiryDate}
                             onChange={(e) =>

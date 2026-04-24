@@ -29,7 +29,7 @@ class BatchRequest extends FormRequest
         return [
             'productId' => ['required', 'exists:products,id', 'numeric'],
             'supplierId' => ['required', 'exists:suppliers,id', 'numeric'],
-            'expiryDate' => ['required', 'date', 'after_or_equal:today'],
+            'expiryDate' => ['nullable', 'date', 'after_or_equal:today'],
             'intakeQuantity' => ['required', 'decimal:0,2'],
             'currentPrice' => ['nullable', 'decimal:0,2'],
         ];
