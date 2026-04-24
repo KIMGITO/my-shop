@@ -84,7 +84,6 @@ class ProductController extends Controller
                     $product->id
                 );
             }
-// 0797571738
             DB::commit();
             return redirect()->back()->with('success', 'Product updated successfully');
         } catch (Throwable $e) {

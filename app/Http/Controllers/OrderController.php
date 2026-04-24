@@ -5,11 +5,9 @@ namespace App\Http\Controllers;
 use App\DTOs\CreateOrderData;
 use App\Enums\OrderStatus;
 use App\Enums\TransactionType;
-use App\Models\Order;
+use App\Http\Requests\OrderRequest;
 use App\Services\OrderService;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class OrderController extends Controller
@@ -35,24 +33,22 @@ class OrderController extends Controller
     }
 
 
-    public function checkout(){
-        return Inertia::render('Cashier/Checkout');
+    public function checkout(OrderRequest $request){
+
+        $payload = $request->validated();
+
+        $order = $this->orderService->checkout($payload);
+
+        return Inertia::render('Cashier/Checkout', ['order' => $order->load('items')]);
     }
 
-    public function parkOrder(Request $request)
+    public function parkOrder(OrderRequest $request)
     {
-        $payload = $request->validate([
-            'orderNumber' => 'required|string',
-            'customerId' => 'nullable|integer|exists:customers,id',
-            'discount' => 'nullable|numeric',
-            'tax' => 'nullable|numeric',
-            'notes' => 'nullable|string',
-            'total' => 'required|numeric',
-        ]);
+        $payload = $request->validated();
 
         $order = $this->orderService->parkOrder($payload);
-        dd($order);
 
-        return response()->json(['message' => 'Order parked successfully', 'orderNumber' => $order->order_number]);
+        return redirect()->back()->with(['message' => 'Order parked successfully', 'orderNumber' => $order->order_number,'isParkedModelOpen' => true]);
+
     }
 }

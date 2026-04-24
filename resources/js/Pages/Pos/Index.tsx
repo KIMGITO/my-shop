@@ -21,8 +21,17 @@ const categories = [
     { id: "yoghurt", name: "Yoghurt" },
 ];
 
-export default function PosIndex({POSProducts}:{POSProducts:Product[]}) {
-    const { //Zustand 
+export default function PosIndex({
+    POSProducts,
+    isParkedModelOpen = false,
+}: {
+    POSProducts: Product[];
+    isParkedModelOpen: boolean;
+}) {
+
+    console.log("open", isParkedModelOpen);
+    const {
+        //Zustand
         cart,
         orderNumber,
         customerId,
@@ -47,9 +56,9 @@ export default function PosIndex({POSProducts}:{POSProducts:Product[]}) {
     const [searchQuery, setSearchQuery] = useState("");
     const [activeCategory, setActiveCategory] = useState("all");
     const [sortBy, setSortBy] = useState<"name" | "price" | "popular">(
-        "popular"
+        "popular",
     );
-    const [showParkedModal, setShowParkedModal] = useState(false);
+    const [showParkedModal, setShowParkedModal] = useState(isParkedModelOpen);
     const [parkCartName, setParkCartName] = useState("");
     const [showParkConfirmation, setShowParkConfirmation] = useState(false);
     const [isProcessing, setIsProcessing] = useState(false);
@@ -59,8 +68,6 @@ export default function PosIndex({POSProducts}:{POSProducts:Product[]}) {
     const tax = getTax(0.08);
     const total = getTotal(0.08);
     const itemCount = getItemCount();
-
-   
 
     // Filter and sort products
     const filteredProducts = useMemo(() => {
@@ -72,7 +79,7 @@ export default function PosIndex({POSProducts}:{POSProducts:Product[]}) {
 
         if (searchQuery) {
             products = products.filter((p) =>
-                p.name.toLowerCase().includes(searchQuery.toLowerCase())
+                p.name.toLowerCase().includes(searchQuery.toLowerCase()),
             );
         }
 
@@ -85,7 +92,7 @@ export default function PosIndex({POSProducts}:{POSProducts:Product[]}) {
                 break;
             case "popular":
                 products.sort(
-                    (a, b) => (b.frequency || 0) - (a.frequency || 0)
+                    (a, b) => (b.frequency || 0) - (a.frequency || 0),
                 );
                 break;
         }
@@ -106,39 +113,40 @@ export default function PosIndex({POSProducts}:{POSProducts:Product[]}) {
 
         if (confirm(`Process order ${orderNumber} for $${total.toFixed(2)}?`)) {
             setIsProcessing(true);
-            
+
             try {
                 // Prepare order data
                 const orderData = {
                     orderNumber: orderNumber,
                     customerId: customerId,
                     notes: notes,
-                    items: cart.map(item => ({
-                        product_id: item.id,
+                    items: cart.map((item) => ({
+                        batch_id: item.id,
                         quantity: item.quantity,
                         price: item.price,
-                        product_name: item.name
+                        subtotal: item.price * item.quantity,
+                        product_name: item.name,
                     })),
                     subtotal: subtotal,
                     tax: tax,
                     total: total,
-                    status: 'completed'
+                    status: "completed",
                 };
 
                 // Send order to backend
-                router.patch(route('orders.checkout'),orderData, {
+                router.patch(route("orders.checkout"), orderData, {
                     onBefore: () => {
                         setIsProcessing(true);
                     },
                     onError: (error) => {
-                        alert('Failed to process order. Please try again.');
-                        throw new Error('Failed to process order');
+                        alert("Failed to process order. Please try again.");
+                        throw new Error("Failed to process order");
                     },
                     onFinish: () => {
-                          setIsProcessing(false);
-                    }
+                        setIsProcessing(false);
+                    },
                 });
-            }catch(error){
+            } catch (error) {
                 throw error;
             }
         }
@@ -163,13 +171,14 @@ export default function PosIndex({POSProducts}:{POSProducts:Product[]}) {
             const parkedCartId = await parkCurrentCart(
                 parkCartName || `Cart ${new Date().toLocaleTimeString()}`,
                 customerId,
-                notes
+                notes,
             );
             setShowParkConfirmation(false);
             setParkCartName("");
-            alert(`Cart parked successfully! New order number: ${orderNumber}`);
+            setShowParkedModal(true);
+            // alert(`Cart parked successfully! New order number: ${orderNumber}`);
         } catch (error) {
-            console.error('Park error:', error);
+            console.error("Park error:", error);
             alert("Failed to park cart");
         }
     };
@@ -177,7 +186,7 @@ export default function PosIndex({POSProducts}:{POSProducts:Product[]}) {
     const handleLoadParkedCart = (cartId: string) => {
         if (cart.length > 0) {
             const confirm = window.confirm(
-                "Current cart will be cleared. Continue?"
+                "Current cart will be cleared. Continue?",
             );
             if (!confirm) return;
         }
@@ -193,7 +202,6 @@ export default function PosIndex({POSProducts}:{POSProducts:Product[]}) {
                     {/* Left Side - Products */}
                     <div className="flex-1 flex flex-col overflow-hidden">
                         {/* Order Number Display */}
-                       
 
                         {/* Customer Info Bar */}
                         <div className="mb-4 grid grid-cols-2 gap-2">
@@ -209,16 +217,24 @@ export default function PosIndex({POSProducts}:{POSProducts:Product[]}) {
                             <Select
                                 label="Select Customer"
                                 value={customerId}
-                                onChange={(value)=>setCustomerId(value?.toString() || '')}
-                                options={[ { id: 1, value: 1, label: "Martin Mukundi (Interlocking Blocks)" },
-                                { id: 2, value: 2, label: "Silvia Nyakio" },
-                                { id: 3, value: 3, label: "Daniel Simiyu" },]}
+                                onChange={(value) =>
+                                    setCustomerId(value?.toString() || "")
+                                }
+                                options={[
+                                    {
+                                        id: 1,
+                                        value: 1,
+                                        label: "Martin Mukundi (Interlocking Blocks)",
+                                    },
+                                    { id: 2, value: 2, label: "Silvia Nyakio" },
+                                    { id: 3, value: 3, label: "Daniel Simiyu" },
+                                ]}
                                 placeholder="Search for customer..."
                                 Icon={HiOutlineUser}
                                 size="sm"
                             />
                             <Input
-                                type='textarea'
+                                type="textarea"
                                 label="Order note"
                                 placeholder="Order Notes (optional)"
                                 value={notes}
@@ -380,11 +396,11 @@ export default function PosIndex({POSProducts}:{POSProducts:Product[]}) {
                         </div>
                     </div>
                 )}
-                
+
                 {/* Parked Carts Modal */}
                 {showParkedModal && (
                     <ParkedCartsModal
-                        isOpen
+                        isOpen={showParkedModal}
                         parkedCarts={parkedCarts}
                         onLoadCart={handleLoadParkedCart}
                         onDeleteCart={deleteParkedCart}

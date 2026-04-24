@@ -70,6 +70,7 @@ class BatchService
             }else{
                 // crate
                 $data['balance'] = $data['intake_quantity'];
+                $data['available_quantity'] = $data['intake_quantity'];
                 $data['is_active'] = true;
                 $this->batchRepository->create($data);
             }

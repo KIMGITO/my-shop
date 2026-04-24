@@ -9,7 +9,7 @@ use App\Services\BatchService;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 
-#[Fillable(['product_id', 'batch_number', 'expiry_date', 'supplier_id', 'intake_quantity', 'balance', 'current_price','is_active'])]
+#[Fillable(['product_id', 'batch_number', 'expiry_date', 'supplier_id', 'intake_quantity', 'balance', 'current_price','is_active','available_quantity','reserved_quantity'])]
 
 class Batch extends Model
 {

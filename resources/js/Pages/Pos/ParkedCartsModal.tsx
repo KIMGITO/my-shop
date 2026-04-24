@@ -4,9 +4,10 @@ import React, { useEffect, useState } from "react";
 import { RiCloseLargeLine } from "react-icons/ri";
 import { cn } from "@/Utils/helpers";
 import Button from "@/Components/UI/Button";
+import Badge from "@/Components/UI/Badge";
 
 interface ParkedCartsModalProps {
-    isOpen: boolean; // Added for consistency with your other modal
+    isOpen: boolean;
     parkedCarts: ParkedCart[];
     onLoadCart: (cartId: string) => void;
     onDeleteCart: (cartId: string) => void;
@@ -26,7 +27,9 @@ export const ParkedCartsModal: React.FC<ParkedCartsModalProps> = ({
     if (!isOpen) return null;
 
     useEffect(() => {
-        if (parkedCarts.length == 0) { onClose(); }
+        if (parkedCarts.length == 0) {
+            onClose();
+        }
     }, [parkedCarts.length]);
 
     return (
@@ -59,7 +62,7 @@ export const ParkedCartsModal: React.FC<ParkedCartsModalProps> = ({
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {parkedCarts.map((cart) => (
+                            {parkedCarts.map((cart, index) => (
                                 <div
                                     key={cart.id}
                                     className="group relative border border-outline-variant/20 rounded-2xl p-5 bg-surface-container-low hover:bg-surface-container transition-colors"
@@ -72,7 +75,7 @@ export const ParkedCartsModal: React.FC<ParkedCartsModalProps> = ({
                                                     value={editName}
                                                     onChange={(e) =>
                                                         setEditName(
-                                                            e.target.value
+                                                            e.target.value,
                                                         )
                                                     }
                                                     onBlur={() =>
@@ -92,14 +95,14 @@ export const ParkedCartsModal: React.FC<ParkedCartsModalProps> = ({
                                                         setEditingId(cart.id);
                                                         setEditName(cart.name);
                                                     }}
-                                                >
-                                                    {
-                                                        `Order ${cart.orderNumber}`}
+                                                    >
+                                                        <div className='flex items-center gap-2'><Badge children={index + 1} className="p-0.5 px-1.5 rounded-full "  />
+                                                    {`  Order ${cart.orderNumber}`}</div>
                                                 </h4>
                                             )}
                                             <div className="text-[10px] uppercase tracking-wider font-bold text-on-surface-variant/60 mt-1">
                                                 {new Date(
-                                                    cart.parkedAt
+                                                    cart.parkedAt,
                                                 ).toLocaleString([], {
                                                     dateStyle: "medium",
                                                     timeStyle: "short",
@@ -123,7 +126,7 @@ export const ParkedCartsModal: React.FC<ParkedCartsModalProps> = ({
                                                 className="text-error hover:bg-error/10 border-0"
                                                 onClick={() =>
                                                     confirm(
-                                                        "Delete this parked cart?"
+                                                        "Delete this parked cart?",
                                                     ) && onDeleteCart(cart.id)
                                                 }
                                             >
@@ -150,7 +153,7 @@ export const ParkedCartsModal: React.FC<ParkedCartsModalProps> = ({
                                                 {cart.items.reduce(
                                                     (sum, i) =>
                                                         sum + i.quantity,
-                                                    0
+                                                    0,
                                                 )}{" "}
                                                 Items
                                             </span>

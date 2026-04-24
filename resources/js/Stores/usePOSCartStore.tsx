@@ -164,7 +164,6 @@ export const usePOSCartStore = create<POSCartStore>()(
                 try {
                     router.patch(route("orders.park"), parkedCart as any, {
                         onSuccess: (response) => {
-                            console.log(response.data);
                         },
                         onError: (error) => {
                             console.log(error);
@@ -174,9 +173,6 @@ export const usePOSCartStore = create<POSCartStore>()(
                     console.log(error);
                     throw error;
                 }
-
-                // Get new order number for the next cart
-                const nextNumber = await get().refreshOrderNumber();
 
                 set({
                     parkedCarts: [...state.parkedCarts, parkedCart],

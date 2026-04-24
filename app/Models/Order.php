@@ -11,9 +11,12 @@ class Order extends Model
     protected $casts = [
         'expires_at' => 'datetime',
     ];
+
+    protected $with = ['items:id,order_id,batch_id,quantity,price,subtotal','customer:id,name','user:id,name'];
+    
     public function items()
     {
-        // return $this->hasMany(OrderItem::class);
+        return $this->hasMany(OrderItem::class);
 
     }
     public function customer()

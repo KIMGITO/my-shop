@@ -87,6 +87,8 @@ export const adminNav: NavItem[] = [
         path: "/admin/inventory/analytics",
         icon: HiOutlineChartBar,
     },
+    { label: "POS", path: "/pos", icon: MdPointOfSale },
+
     {
         label: "Products",
         path: "/admin/inventory/products",

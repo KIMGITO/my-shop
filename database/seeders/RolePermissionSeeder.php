@@ -23,7 +23,7 @@ class RolePermissionSeeder extends Seeder
             'edit products',
             'delete products',
             'manage inventory',
-            'manage production', // Bakery: converting flour/milk to bread
+            'manage production', 
         ];
 
         $orderPermissions = [
