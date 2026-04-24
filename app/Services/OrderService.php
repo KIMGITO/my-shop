@@ -5,8 +5,8 @@ namespace App\Services;
 use App\DTOs\CreateOrderData;
 use App\Enums\OrderStatus;
 use App\Enums\TransactionType;
+use App\Models\Order;
 use App\Repositories\Inventory\BatchRepository;
-use App\Repositories\Inventory\ProductRepository;
 use App\Repositories\OrderRepository;
 use App\Services\TransactionNamingService;
 use Illuminate\Support\Facades\Auth;
@@ -14,39 +14,25 @@ use Illuminate\Support\Facades\DB;
 
 class OrderService
 {
-    /**
-     * Use Constructor Property Promotion for cleaner dependency injection.
-     */
     public function __construct(
         protected OrderRepository $orderRepository,
         protected BatchRepository $batchRepository,
         protected TransactionNamingService $transactionNaming
     ) {}
 
-    /**
-     * The "Master" Checkout Method
-     * Handles creation, items, and inventory in one transaction.
-     */
     public function checkout(array $payload)
     {
         return $this->saveOrder($payload, OrderStatus::ACTIVE);
     }
 
-    /**
-     * Moves status to PARKED.
-     */
     public function parkOrder(array $payload)
     {
         return $this->saveOrder($payload, OrderStatus::PARKED);
     }
 
-    /**
-     * Unified Internal Save Method
-     */
     private function saveOrder(array $payload, OrderStatus $status)
     {
         return DB::transaction(function () use ($payload, $status) {
-            // 1. Locate or Initialize the Order
             $order = isset($payload['orderNumber']) 
                 ? $this->orderRepository->findByOrderNumber($payload['orderNumber']) 
                 : null;
@@ -55,49 +41,42 @@ class OrderService
                 $order->update($this->mapPayloadToUpdateData($payload, $status));
             } else {
                 $orderData = $this->processOrderData($payload, $status);
-                $order = $this->createOrder($orderData);
+                // FIX: Pass the payload orderNumber if it exists, otherwise generate
+                $specificNumber = $payload['orderNumber'] ?? $this->getOrderNumber();
+                $order = $this->createOrder($orderData, $specificNumber);
             }
 
-            // 2. Synchronize Items and Stock
             $this->syncOrderItems($order, $payload['items']);
 
             return $order;
         });
     }
 
-    /**
-     * Handles the heavy lifting of inventory adjustment.
-     */
     protected function syncOrderItems($order, array $items): void
     {
-        // Release previous stock reservations to prevent double-counting
+        // FIX: Use batch_id for stock release
         foreach ($order->items as $existingItem) {
-            $this->batchRepository->releaseStock($existingItem->product_id, $existingItem->quantity);
+            $this->batchRepository->releaseStock($existingItem->batch_id, $existingItem->quantity);
         }
 
-        // Fresh start for line items
         $order->items()->delete();
 
         foreach ($items as $item) {
             $order->items()->create([
-                'batch_id' => $item['batch_id'],
-                'quantity'   => $item['quantity'],
-                'price'      => $item['price'],
-                'subtotal'   => $item['quantity'] * $item['price'],
+                'batch_id' => $item['batch_id'], // Ensure frontend sends 'batch_id'
+                'quantity' => $item['quantity'],
+                'price'    => $item['price'],
+                'subtotal' => $item['quantity'] * $item['price'],
             ]);
 
-            // Re-reserve based on new quantities
             $this->batchRepository->reserveStock($item['batch_id'], $item['quantity']);
         }
     }
 
-    /**
-     * Core creation logic. 
-     */
-    public function createOrder(CreateOrderData $data)
+    public function createOrder(CreateOrderData $data, ?string $orderNumber = null)
     {
         return $this->orderRepository->create([
-            'order_number' => $this->getOrderNumber(),
+            'order_number' => $orderNumber ?? $this->getOrderNumber(),
             'type'         => $data->type,
             'source'       => $data->source,
             'status'       => $data->status,
@@ -117,6 +96,9 @@ class OrderService
     {
         return $this->transactionNaming->generate('orders', 'order_number', TransactionType::POS);
     }
+
+    // processOrderData and mapPayloadToUpdateData remain unchanged...
+
 
     public function processOrderData(array $payload, OrderStatus $status): CreateOrderData
     {
@@ -148,5 +130,22 @@ class OrderService
             'balance'      => $payload['total'] - ($payload['paid'] ?? 0),
             'expires_at'   => $payload['expireTime'] ?? now()->addHours(24),
         ];
+    }
+
+    /**
+ * Completely cancels an order and restores batch stock.
+ */
+    public function voidOrder(string $orderNumber): void
+    {
+        $order = $this->orderRepository->findByOrderNumber($orderNumber);
+        DB::transaction(function () use ($order) {
+            foreach ($order->items as $item) {
+                $this->batchRepository->releaseStock($item->batch_id, $item->quantity);
+            }
+
+            // 2. Delete the order (or soft delete/mark as voided)
+            $order->items()->delete();
+            $order->delete();
+        });
     }
 }

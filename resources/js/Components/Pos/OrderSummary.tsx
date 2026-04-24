@@ -55,7 +55,7 @@ export const OrderSummary: React.FC<OrderSummaryProps> = ({
                         <AnimatePresence initial={false}>
                             {items.map((item, index) => (
                                 <motion.div
-                                    key={item.id}
+                                    key={`${item.id}-${index}`}
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, x: -20 }}

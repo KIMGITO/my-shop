@@ -118,13 +118,14 @@ export default function CashierCheckout({customer}:{customer?:Customer}) {
                             </div>
                             <div className="divide-y divide-outline-variant/5 max-h-[50vh] overflow-y-auto">
                                 <AnimatePresence mode="popLayout">
-                                    {cart.map((item) => (
+                                    {cart.map((item,index) => (
                                         <motion.div
                                             layout
                                             initial={{ opacity: 0 }}
                                             animate={{ opacity: 1 }}
                                             exit={{ opacity: 0, scale: 0.95 }}
-                                            key={item.id}
+                                            key={`${item.id}-${index}`}
+
                                             className="p-6 flex items-center justify-between"
                                         >
                                             <div className="flex-1">
@@ -149,11 +150,6 @@ export default function CashierCheckout({customer}:{customer?:Customer}) {
                                                         );
                                                         reviewOrder();
                                                     }
-                                                        
-                                                    
-                                                        
-
-
                                                     }
                                                 />
                                                 <Button

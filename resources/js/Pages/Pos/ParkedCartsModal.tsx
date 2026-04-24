@@ -64,7 +64,7 @@ export const ParkedCartsModal: React.FC<ParkedCartsModalProps> = ({
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {parkedCarts.map((cart, index) => (
                                 <div
-                                    key={cart.id}
+                                    key={`${cart.id}-${index}`}
                                     className="group relative border border-outline-variant/20 rounded-2xl p-5 bg-surface-container-low hover:bg-surface-container transition-colors"
                                 >
                                     <div className="flex justify-between items-start mb-3">
@@ -125,9 +125,7 @@ export const ParkedCartsModal: React.FC<ParkedCartsModalProps> = ({
                                                 variant="ghost"
                                                 className="text-error hover:bg-error/10 border-0"
                                                 onClick={() =>
-                                                    confirm(
-                                                        "Delete this parked cart?",
-                                                    ) && onDeleteCart(cart.id)
+                                                   onDeleteCart(cart.id)
                                                 }
                                             >
                                                 Delete
@@ -179,9 +177,9 @@ export const ParkedCartsModal: React.FC<ParkedCartsModalProps> = ({
                                             </div>
                                         </div>
                                         <div className="text-[10px] text-right text-on-surface-variant leading-tight">
-                                            Sub: ${cart.subtotal.toFixed(2)}
+                                            Sub: ${(cart.subtotal ?? 0).toFixed(2)}
                                             <br />
-                                            Tax: ${cart.tax.toFixed(2)}
+                                            Tax: ${(cart.tax ?? 0).toFixed(2)}
                                         </div>
                                     </div>
                                 </div>

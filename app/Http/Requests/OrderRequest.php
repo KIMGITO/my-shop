@@ -25,7 +25,7 @@ class OrderRequest extends FormRequest
     {
         return [
             'orderNumber' => 'nullable|string',
-            'customerId' => 'nullable|integer|exists:customers,id',
+            'customerId' => 'nullable|integer|exists:users,id',
             'discount' => 'nullable|numeric',
             'tax' => 'nullable|numeric',
             'notes' => 'nullable|string',

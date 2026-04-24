@@ -2,505 +2,424 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-    HiOutlineUser,
     HiOutlineCreditCard,
     HiOutlineBanknotes,
     HiOutlineDevicePhoneMobile,
     HiOutlineArrowsRightLeft,
     HiOutlineArrowLeft,
+    HiOutlinePhone,
+    HiOutlinePaperAirplane,
 } from "react-icons/hi2";
 import { cn } from "@/Utils/helpers";
 import Button from "@/Components/UI/Button";
-import { Select } from "@/Components/UI/Select";
 
 type PaymentMethod = "mpesa" | "cash" | "credit" | "split";
 
 interface PaymentTerminalProps {
     total: number;
-    customer?: {
-        id:number,
-        name:string,
-    };
-    selectedCustomerId?: number | string | null;
+    customer?: { id: number; name: string; phone?: string };
     onBack?: () => void;
     onComplete: (data: any) => void;
-    onCustomerChange?: (id:any) => void;
-    isProcessing?: boolean;
-    allowedPaymentMethods?: PaymentMethod[]; 
+    allowedPaymentMethods?: PaymentMethod[];
 }
+
+// Helper function to round to whole number
+const roundToWholeNumber = (amount: number): number => {
+    return Math.ceil(amount);
+};
+
+// Helper function to round cash to nearest 5
+const roundToNearest5 = (amount: number): number => {
+    return Math.ceil(amount / 5) * 5;
+};
 
 export default function PaymentTerminal({
     total,
     customer,
     onBack,
     onComplete,
-    allowedPaymentMethods = ["mpesa", "cash", "credit", "split"], // Default all methods
+    allowedPaymentMethods = ["mpesa", "cash", "credit", "split"],
 }: PaymentTerminalProps) {
-    // Determine the first allowed method as default
-    const defaultMethod = allowedPaymentMethods[0] || "mpesa";
-    const [activeTab, setActiveTab] = useState<PaymentMethod>(defaultMethod);
-
-    const selectedCustomerId = customer?.id;
-
-    // Payment Amounts
+    // FIRST: Round the incoming total to a whole number
+    const roundedTotal = useMemo(() => roundToWholeNumber(total), [total]);
+    
+    const [activeTab, setActiveTab] = useState<PaymentMethod>(allowedPaymentMethods[0] || "mpesa");
     const [cashAmount, setCashAmount] = useState<number>(0);
     const [mpesaAmount, setMpesaAmount] = useState<number>(0);
     const [creditAmount, setCreditAmount] = useState<number>(0);
-    const [changeGiven, setChangeGiven] = useState<number>(0);
+    
+    // Track original cash input before rounding
+    const [rawCashInput, setRawCashInput] = useState<number>(0);
+    
+    // STK Push States
+    const [showStkOption, setShowStkOption] = useState(false);
+    const [phoneNumber, setPhoneNumber] = useState(customer?.phone || "");
 
-    // Check if a payment method is allowed
-    const isMethodAllowed = (method: PaymentMethod): boolean => {
-        return allowedPaymentMethods.includes(method);
-    };
-
-    // Get visible tabs based on allowed methods
+    // 1. Logic for visible tabs
     const visibleTabs = useMemo(() => {
-        const tabs: { method: PaymentMethod; label: string; Icon: any }[] = [];
-
-        if (isMethodAllowed("mpesa")) {
-            tabs.push({
-                method: "mpesa",
-                label: "M-Pesa",
-                Icon: HiOutlineDevicePhoneMobile,
-            });
-        }
-        if (isMethodAllowed("cash")) {
-            tabs.push({
-                method: "cash",
-                label: "Cash",
-                Icon: HiOutlineBanknotes,
-            });
-        }
-        if (isMethodAllowed("split")) {
-            tabs.push({
-                method: "split",
-                label: "Split",
-                Icon: HiOutlineArrowsRightLeft,
-            });
-        }
-        if (isMethodAllowed("credit")) {
-            tabs.push({
-                method: "credit",
-                label: "Credit",
-                Icon: HiOutlineCreditCard,
-            });
-        }
-
-        return tabs;
+        const icons = { mpesa: HiOutlineDevicePhoneMobile, cash: HiOutlineBanknotes, split: HiOutlineArrowsRightLeft, credit: HiOutlineCreditCard };
+        const labels = { mpesa: "M-Pesa", cash: "Cash", split: "Split", credit: "Credit" };
+        return allowedPaymentMethods.map(m => ({ method: m, label: labels[m], Icon: icons[m] }));
     }, [allowedPaymentMethods]);
 
-    // Update active tab if current tab becomes not allowed
+    // Handle Tab Changes & Auto-fills using the rounded total
     useEffect(() => {
-        if (!isMethodAllowed(activeTab) && visibleTabs.length > 0) {
-            setActiveTab(visibleTabs[0].method);
-        }
-    }, [allowedPaymentMethods, activeTab, visibleTabs]);
-
-    // 1. Tab Initialization Logic
-    useEffect(() => {
-        if (!isMethodAllowed(activeTab)) return;
-
         if (activeTab === "mpesa") {
-            setMpesaAmount(total);
+            setMpesaAmount(roundedTotal);
             setCashAmount(0);
+            setRawCashInput(0);
             setCreditAmount(0);
         } else if (activeTab === "cash") {
+            const roundedCashTotal = roundToNearest5(roundedTotal);
+            setCashAmount(roundedCashTotal);
+            setRawCashInput(roundedTotal);
             setMpesaAmount(0);
             setCreditAmount(0);
-            setCashAmount(0);
         } else if (activeTab === "credit") {
+            setCreditAmount(roundedTotal);
             setMpesaAmount(0);
             setCashAmount(0);
-            setCreditAmount(total);
-        } else if (activeTab === "split") {
-            setMpesaAmount(0);
-            setCashAmount(0);
-            setCreditAmount(0);
+            setRawCashInput(0);
         }
-    }, [activeTab, total]);
+    }, [activeTab, roundedTotal]);
 
-    useEffect(() => {
-        if (activeTab === "split") {
-            const isOnlyCash =
-                cashAmount >= total && mpesaAmount === 0 && creditAmount === 0;
-            const isOnlyMpesa =
-                mpesaAmount >= total && cashAmount === 0 && creditAmount === 0;
-            const isOnlyCredit =
-                creditAmount >= total && cashAmount === 0 && mpesaAmount === 0;
+    // Calculate paid total using whole numbers (no decimals)
+    const paidTotal = React.useMemo(() => {
+        const cash = typeof cashAmount === 'number' ? cashAmount : 0;
+        const mpesa = typeof mpesaAmount === 'number' ? mpesaAmount : 0;
+        const credit = typeof creditAmount === 'number' ? creditAmount : 0;
+        return cash + mpesa + credit;
+    }, [cashAmount, mpesaAmount, creditAmount]);
 
-            if (isOnlyCash && isMethodAllowed("cash")) setActiveTab("cash");
-            if (isOnlyMpesa && isMethodAllowed("mpesa")) setActiveTab("mpesa");
-            if (isOnlyCredit && isMethodAllowed("credit"))
-                setActiveTab("credit");
-        }
-    }, [cashAmount, mpesaAmount, creditAmount, total]);
+    // Calculate remaining and change based on rounded total
+    const remaining = Math.max(0, roundedTotal - paidTotal);
+    const changeGiven = paidTotal > roundedTotal ? paidTotal - roundedTotal : 0;
 
-    const handleSplitChange = (
-        type: "cash" | "mpesa" | "credit",
-        val: number
-    ) => {
-        if (type === "cash") setCashAmount(val);
+    const canComplete = paidTotal >= roundedTotal && roundedTotal > 0 && (activeTab === "credit" ? !!customer?.id : true);
 
-        if (type === "mpesa") {
-            if (activeTab === "split") {
-                const maxAllowed = Math.max(0, total - cashAmount);
-                setMpesaAmount(Math.min(val, maxAllowed));
-            } else {
-                setMpesaAmount(val);
-            }
-        }
-
-        if (type === "credit") setCreditAmount(val);
+    // Handle cash amount change with rounding
+    const handleCashChange = (value: number) => {
+        setRawCashInput(value);
+        const roundedValue = roundToNearest5(value);
+        setCashAmount(roundedValue);
     };
 
-    const paidTotal = cashAmount + mpesaAmount + creditAmount;
-    const remaining = Math.max(0, total - paidTotal);
-   
-    
-    useEffect(() => {
-        const changeToGive =
-            paidTotal > total && cashAmount > paidTotal - total
-                ? Math.floor((paidTotal - total) / 5) * 5
-                : 0;
-        setChangeGiven(changeToGive);
-    }, [paidTotal, cashAmount]);
+    // Handle M-Pesa change (whole numbers only, no decimals)
+    const handleMpesaChange = (value: number) => {
+        setMpesaAmount(value);
+    };
 
-    const canComplete =
-        total != 0 &&
-        paidTotal >= total &&
-        (creditAmount > 0 ? !!selectedCustomerId : true);
+    // Handle credit change (whole numbers only)
+    const handleCreditChange = (value: number) => {
+        setCreditAmount(value);
+    };
 
-    // Don't render if no payment methods are allowed
-    if (visibleTabs.length === 0) {
-        return (
-            <div className="min-h-screen bg-surface-container-lowest flex items-center justify-center">
-                <div className="text-center">
-                    <p className="text-error">No payment methods available</p>
-                </div>
-            </div>
-        );
-    }
+    // Handle completion with proper data
+    const handleComplete = () => {
+        onComplete({ 
+            originalTotal: total,
+            roundedTotal: roundedTotal,
+            cashAmount: cashAmount,
+            mpesaAmount: mpesaAmount, 
+            creditAmount: creditAmount, 
+            changeGiven: changeGiven,
+            totalPaid: paidTotal,
+            phoneNumber,
+            // Include rounding info for reporting
+            totalRounded: roundedTotal !== total,
+            cashRounded: cashAmount !== rawCashInput,
+            originalCashInput: rawCashInput,
+            roundingOverpayment: cashAmount - rawCashInput
+        });
+    };
 
     return (
-        <div className="min-h-screen bg-surface-container-lowest flex flex-col overflow-x-hidden">
-            {/* Header Area - Responsive */}
-            <div className="px-4 sm:px-6 py-4 sm:p-6 flex items-center justify-between border-b border-outline-variant/10 bg-surface-container-low sticky top-0 z-10">
+        <div className="h-full bg-surface-container-lowest flex flex-col border-l border-outline-variant/10 shadow-xl">
+            {/* Header */}
+            <div className="px-4 py-4 flex items-center justify-between bg-surface-container-low border-b border-outline-variant/10">
                 {onBack && (
-                    <button
-                        onClick={onBack}
-                        className="p-2 sm:p-3 rounded-full hover:bg-surface-container-highest transition-colors shrink-0"
-                    >
-                        <HiOutlineArrowLeft className="text-xl sm:text-2xl text-on-surface" />
+                    <button onClick={onBack} className="p-2 rounded-full hover:bg-surface-container-highest">
+                        <HiOutlineArrowLeft className="text-xl text-on-surface" />
                     </button>
                 )}
-                <div className="text-center px-2 flex-1">
-                    <p className="text-[8px] sm:text-[10px] font-black uppercase tracking-[0.2em] text-on-surface-variant whitespace-nowrap">
-                        Checkout Total
-                    </p>
-                    <h1 className="text-xl sm:text-2xl md:text-3xl font-black text-primary break-all">
-                        KES {total.toLocaleString()}
+                <div className="text-right">
+                    <p className="text-[10px] font-black uppercase text-on-surface-variant leading-none mb-1">Total Payable</p>
+                    <h1 className="text-xl font-black text-primary leading-none">
+                        KES {roundedTotal.toLocaleString()}
                     </h1>
-                </div>
-                <div
-                    className={cn(
-                        "w-8 sm:w-12 shrink-0",
-                        !onBack && "invisible"
+                    {roundedTotal !== total && (
+                        <p className="text-[8px] text-on-surface-variant/60 mt-1">
+                            (Rounded from {total.toLocaleString()})
+                        </p>
                     )}
-                />
+                </div>
             </div>
 
-            <main className="flex-1 max-w-7xl mx-auto w-full px-3 sm:px-4 md:px-6 py-4 sm:py-6 md:py-8">
-                <div className="flex flex-col gap-6 md:gap-8">
-                    {/* Left Column */}
-                    <div className="flex-1 min-w-0 space-y-6 md:space-y-8">
-                        <section>
-                            <h3 className="text-xs font-black uppercase tracking-widest text-on-surface-variant mb-3 md:mb-4 ml-2">
-                               {customer?.name}
-                            </h3>
-                            {/* <Select
-                                label="Select Customer"
-                                value={selectedCustomerId || ""}
-                                onChange={setSelectedCustomerId}
-                                options={customers}
-                                placeholder="Search for customer..."
-                                Icon={HiOutlineUser}
-                                size="lg"
-                            /> */}
-                        </section>
+            <div className="flex-1 overflow-y-auto p-4 space-y-6">
+                {/* Payment Tabs */}
+                <section className="grid grid-cols-2 gap-2">
+                    {visibleTabs.map((tab) => (
+                        <button
+                            key={tab.method}
+                            onClick={() => setActiveTab(tab.method as any)}
+                            className={cn(
+                                "flex items-center gap-3 p-3 rounded-2xl border-2 transition-all",
+                                activeTab === tab.method 
+                                    ? "bg-primary border-primary text-on-primary shadow-md" 
+                                    : "bg-surface-container-low border-outline-variant/20 text-on-surface-variant hover:border-primary/40"
+                            )}
+                        >
+                            <tab.Icon className="text-lg shrink-0" />
+                            <span className="text-[11px] font-bold uppercase tracking-tight">{tab.label}</span>
+                        </button>
+                    ))}
+                </section>
 
-                        <section>
-                            <h3 className="text-xs font-black uppercase tracking-widest text-on-surface-variant mb-3 md:mb-4 ml-2">
-                                2. Payment Method
-                            </h3>
-                            <div
-                                className={cn(
-                                    "grid gap-2 sm:gap-3",
-                                    visibleTabs.length === 1 && "grid-cols-1",
-                                    visibleTabs.length === 2 && "grid-cols-2",
-                                    visibleTabs.length === 3 && "grid-cols-3",
-                                    visibleTabs.length === 4 &&
-                                        "grid-cols-2 sm:grid-cols-4"
-                                )}
-                            >
-                                {visibleTabs.map((tab) => (
-                                    <TabButton
-                                        key={tab.method}
-                                        active={activeTab === tab.method}
-                                        onClick={() => setActiveTab(tab.method)}
-                                        label={tab.label}
-                                        Icon={tab.Icon}
+                {/* Amount Inputs Area */}
+                <section className="space-y-4">
+                    <AnimatePresence mode="wait">
+                        <motion.div key={activeTab} initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="space-y-4">
+                            {activeTab === "split" ? (
+                                <div className="space-y-3">
+                                    <PaymentInput 
+                                        label="Cash (rounded to nearest 5)" 
+                                        value={rawCashInput} 
+                                        onChange={handleCashChange}
+                                        maximum={roundedTotal}
+                                        remaining={roundedTotal - (mpesaAmount + creditAmount)}
+                                        rounding="nearest5"
+                                        actualValue={cashAmount}
                                     />
-                                ))}
-                            </div>
-                        </section>
-
-                        <section className="bg-surface-container-low rounded-[1.5rem] sm:rounded-[2rem] md:rounded-[2.5rem] p-4 sm:p-6 md:p-8 border border-outline-variant/10 shadow-sm overflow-x-auto">
-                            <AnimatePresence mode="wait">
-                                <motion.div
-                                    key={activeTab}
-                                    initial={{ opacity: 0, x: 20 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    exit={{ opacity: 0, x: -20 }}
-                                    className="min-w-[200px]"
-                                >
-                                    {activeTab === "split" ? (
-                                        <div className="space-y-4 md:space-y-6">
-                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
-                                                {isMethodAllowed("cash") && (
-                                                    <PaymentInput
-                                                        label="Cash Received"
-                                                        value={cashAmount}
-                                                        onChange={(v: number) =>
-                                                            handleSplitChange(
-                                                                "cash",
-                                                                v
-                                                            )
-                                                        }
-                                                        disabled={total <= 0}
-                                                    />
-                                                )}
-                                                {isMethodAllowed("mpesa") && (
-                                                    <PaymentInput
-                                                        label="M-Pesa Amount"
-                                                        value={mpesaAmount}
-                                                        onChange={(v: number) =>
-                                                            handleSplitChange(
-                                                                "mpesa",
-                                                                v
-                                                            )
-                                                        }
-                                                        disabled={
-                                                            cashAmount >= total
-                                                        }
-                                                    />
-                                                )}
-                                            </div>
-                                            {isMethodAllowed("credit") && (
-                                                <PaymentInput
-                                                    label="Credit Balance"
-                                                    value={creditAmount}
-                                                    onChange={(v: number) =>
-                                                        handleSplitChange(
-                                                            "credit",
-                                                            v
-                                                        )
-                                                    }
-                                                    disabled={
-                                                        !selectedCustomerId
-                                                    }
-                                                    error={
-                                                        !selectedCustomerId
-                                                            ? "Select Customer for credit"
-                                                            : ""
-                                                    }
-                                                />
-                                            )}
-                                        </div>
-                                    ) : (
-                                        <PaymentInput
-                                            label={`${activeTab.toUpperCase()} Amount`}
-                                            value={
-                                                activeTab === "cash"
-                                                    ? cashAmount
-                                                    : activeTab === "mpesa"
-                                                    ? mpesaAmount
-                                                    : creditAmount
-                                            }
-                                            onChange={(v: number) => {
-                                                handleSplitChange(
-                                                    activeTab as any,
-                                                    v
-                                                );
-                                            }}
-                                            size="xl"
-                                            disabled={total <= 0}
+                                    <PaymentInput 
+                                        label="M-Pesa" 
+                                        value={mpesaAmount} 
+                                        onChange={handleMpesaChange}
+                                        maximum={roundedTotal - cashAmount}
+                                        remaining={roundedTotal - cashAmount}
+                                    />
+                                    {allowedPaymentMethods.includes("credit") && (
+                                        <PaymentInput 
+                                            label="Credit" 
+                                            value={creditAmount} 
+                                            onChange={handleCreditChange}
+                                            maximum={roundedTotal - (cashAmount + mpesaAmount)}
+                                            remaining={roundedTotal - (cashAmount + mpesaAmount)}
                                         />
                                     )}
-                                </motion.div>
-                            </AnimatePresence>
-                        </section>
-                    </div>
-
-                    {/* Right Column - Sticky Summary */}
-                    <div className="flex-shrink-0">
-                        <div className="bg-surface-container-high rounded-[1.5rem] sm:rounded-[2rem] md:rounded-[3rem] p-4 sm:p-6 md:p-4 shadow-xl border border-primary/5 sticky top-20 lg:top-24">
-                            <h3 className="text-center font-black uppercase tracking-widest text-xs mb-4 md:mb-8">
-                                Summary
-                            </h3>
-
-                            <div className="space-y-3 md:space-y-4 mb-6 md:mb-8">
-                                <SummaryItem label="Total Bill" value={total} />
-                                <div className="h-px bg-outline-variant/20 my-2 md:my-4" />
-                                {cashAmount > 0 && (
-                                    <SummaryItem
-                                        label="Cash Paid"
-                                        value={cashAmount}
-                                        highlight
-                                    />
-                                )}
-                                {mpesaAmount > 0 && (
-                                    <SummaryItem
-                                        label="M-Pesa Paid"
-                                        value={mpesaAmount}
-                                        highlight
-                                    />
-                                )}
-                                {creditAmount > 0 && (
-                                    <SummaryItem
-                                        label="Credited"
-                                        value={creditAmount}
-                                        highlight
-                                    />
-                                )}
-                            </div>
-
-                            {changeGiven > 0 && (
-                                <div className="bg-secondary/10 rounded-2xl p-3 md:p-4 mb-6 md:mb-8 text-center border border-secondary/20">
-                                    <p className="text-[10px] font-black uppercase">
-                                        Change Due
-                                    </p>
-                                    <p className="text-2xl md:text-3xl font-black text-on-secondary break-all">
-                                        KES {changeGiven.toFixed(2)}
-                                    </p>
                                 </div>
+                            ) : activeTab === "cash" ? (
+                                <PaymentInput
+                                    label="CASH AMOUNT (Rounded to nearest 5)"
+                                    value={rawCashInput}
+                                    onChange={handleCashChange}
+                                    maximum={100000}
+                                    rounding="nearest5"
+                                    actualValue={cashAmount}
+                                />
+                            ) : activeTab === "mpesa" ? (
+                                <PaymentInput
+                                    label="M-PESA AMOUNT"
+                                    value={mpesaAmount}
+                                    onChange={handleMpesaChange}
+                                    maximum={roundedTotal}
+                                />
+                            ) : (
+                                <PaymentInput
+                                    label="CREDIT AMOUNT"
+                                    value={creditAmount}
+                                    onChange={handleCreditChange}
+                                    maximum={roundedTotal}
+                                />
                             )}
+                        </motion.div>
+                    </AnimatePresence>
 
-                            {remaining > 0 && (
-                                <div className="bg-error/5 rounded-2xl p-3 md:p-4 mb-6 md:mb-8 text-center border border-error/10">
-                                    <p className="text-[10px] font-black uppercase text-error">
-                                        Unpaid Balance
-                                    </p>
-                                    <p className="text-xl md:text-2xl font-black text-error break-all">
-                                        KES {remaining.toFixed(2)}
-                                    </p>
-                                </div>
-                            )}
-
-                            <Button
-                                className="w-full py-6 md:py-8 lg:py-10 rounded-[1.5rem] sm:rounded-[2rem] md:rounded-[2.5rem] text-xl md:text-2xl font-black shadow-2xl shadow-primary/20"
-                                disabled={!canComplete}
-                                onClick={() =>
-                                    onComplete({
-                                        cashAmount,
-                                        mpesaAmount,
-                                        creditAmount,
-                                        changeGiven,
-                                        selectedCustomerId,
-                                    })
-                                }
-                            >
-                                {canComplete
-                                    ? "Finish Transaction"
-                                    : `Pay KES ${remaining.toFixed(2)}`}
-                            </Button>
+                    {/* Total rounding warning */}
+                    {/* {roundedTotal !== total && (
+                        <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-xl p-3">
+                            <p className="text-blue-700 dark:text-blue-400 text-xs font-bold">
+                                🔄 Total rounded to nearest KES: {roundedTotal.toLocaleString()}
+                            </p>
                         </div>
+                    )} */}
+
+                    {/* Cash rounding warning */}
+                    {/* {(activeTab === "cash" || (activeTab === "split" && rawCashInput > 0)) && 
+                     cashAmount !== rawCashInput && rawCashInput > 0 && (
+                        <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-xl p-3">
+                            <p className="text-amber-700 dark:text-amber-400 text-xs font-bold">
+                                💰 Cash amount rounded up from KES {rawCashInput} to KES {cashAmount} (nearest 5)
+                                {cashAmount > rawCashInput && ` • Extra KES ${cashAmount - rawCashInput} will be given as change`}
+                            </p>
+                        </div>
+                    )} */}
+
+                    {/* M-Pesa STK Push Section */}
+                    {(activeTab === "mpesa" || (activeTab === "split" && mpesaAmount > 0)) && (
+                        <div className="pt-2">
+                            <button 
+                                onClick={() => setShowStkOption(!showStkOption)}
+                                className={cn(
+                                    "w-full py-2 px-4 rounded-xl border flex items-center justify-between transition-all",
+                                    showStkOption ? "bg-primary/10 border-primary text-primary" : "bg-surface-container border-outline-variant/30 text-on-surface-variant"
+                                )}
+                            >
+                                <div className="flex items-center gap-2">
+                                    <HiOutlineDevicePhoneMobile className="text-lg" />
+                                    <span className="text-xs font-bold uppercase">Use STK Push</span>
+                                </div>
+                                <span className="material-symbols-outlined text-sm">{showStkOption ? 'expand_less' : 'expand_more'}</span>
+                            </button>
+
+                            <AnimatePresence>
+                                {showStkOption && (
+                                    <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
+                                        <div className="mt-3 p-4 bg-surface-container-high rounded-2xl border border-outline-variant/20 space-y-3">
+                                            <div className="relative">
+                                                <HiOutlinePhone className="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant" />
+                                                <input
+                                                    type="tel"
+                                                    value={phoneNumber}
+                                                    onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, ''))}
+                                                    placeholder="0712345678"
+                                                    className="w-full bg-surface-container-lowest border-none rounded-xl py-3 pl-12 text-lg font-black focus:ring-2 focus:ring-primary/20"
+                                                />
+                                            </div>
+                                            <Button 
+                                                variant="secondary" 
+                                                className="w-full py-3 flex items-center justify-center gap-2"
+                                                disabled={phoneNumber.length < 10 || mpesaAmount <= 0}
+                                                onClick={() => {
+                                                    console.log("STK Push to:", phoneNumber, "Amount:", mpesaAmount);
+                                                }}
+                                            >
+                                                <HiOutlinePaperAirplane className="rotate-[-45deg]" />
+                                                Send STK Push
+                                            </Button>
+                                        </div>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </div>
+                    )}
+                </section>
+            </div>
+
+            {/* Footer Summary & Action */}
+            <div className="p-4 bg-surface-container border-t border-outline-variant/20 space-y-4">
+                <div className="space-y-2">
+                    <div className="flex justify-between items-center">
+                        <span className="text-[10px] uppercase font-bold text-on-surface-variant">Total Paid</span>
+                        <span className="text-sm font-black">KES {paidTotal.toLocaleString()}</span>
                     </div>
+                    
+                    {/* Show breakdown when cash is rounded */}
+                    {cashAmount !== rawCashInput && rawCashInput > 0 && (
+                        <div className="flex justify-between items-center text-xs text-on-surface-variant">
+                            <span>Cash collected (rounded)</span>
+                            <span>KES {cashAmount.toLocaleString()}</span>
+                        </div>
+                    )}
+                    
+                    {changeGiven > 0 && (
+                        <div className="flex justify-between items-center text-secondary font-black">
+                            <span className="text-[10px] uppercase">Change Due</span>
+                            <span>KES {changeGiven.toLocaleString()}</span>
+                        </div>
+                    )}
+                    {remaining > 0 && (
+                        <div className="flex justify-between items-center text-error font-black">
+                            <span className="text-[10px] uppercase">Remaining Balance</span>
+                            <span>KES {remaining.toLocaleString()}</span>
+                        </div>
+                    )}
                 </div>
-            </main>
+
+                <Button
+                    className="w-full py-4 rounded-2xl text-lg font-black shadow-lg"
+                    disabled={!canComplete}
+                    onClick={handleComplete}
+                >
+                    {remaining > 0 ? `Pay Remaining KES ${remaining.toLocaleString()}` : "Complete Sale"}
+                </Button>
+            </div>
         </div>
     );
 }
 
-// Sub-components (TabButton, PaymentInput, SummaryItem remain the same)
-function TabButton({ active, onClick, label, Icon }: any) {
-    return (
-        <button
-            onClick={onClick}
-            className={cn(
-                "flex flex-col items-center justify-center p-2 sm:p-3 md:p-4 rounded-[1rem] sm:rounded-[1.5rem] md:rounded-[2rem] border-2 transition-all gap-1 sm:gap-2 min-w-0",
-                active
-                    ? "bg-primary border-primary text-on-primary shadow-lg shadow-primary/30"
-                    : "bg-transparent border-outline-variant/30 text-on-surface-variant hover:border-primary/50"
-            )}
-        >
-            <Icon className="text-xl sm:text-2xl shrink-0" />
-            <span className="text-[8px] sm:text-[9px] md:text-[10px] font-black uppercase tracking-tighter whitespace-nowrap">
-                {label}
-            </span>
-        </button>
-    );
-}
+// Input Helper with whole number support
+function PaymentInput({ 
+    label, 
+    value, 
+    onChange, 
+    maximum = 100000,
+    remaining,
+    rounding,
+    actualValue
+}: {
+    label: string;
+    value: number;
+    onChange: (value: number) => void;
+    maximum?: number;
+    remaining?: number;
+    rounding?: "nearest5";
+    actualValue?: number;
+}) {
+    const handleTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const val = e.target.value;
+        
+        // Handle empty string
+        if (val === "") {
+            onChange(0);
+            return;
+        }
 
-function PaymentInput({
-    label,
-    value,
-    onChange,
-    disabled,
-    error,
-    size = "lg",
-}: any) {
+        // Allow only whole numbers (no decimals)
+        if (/^\d+$/.test(val)) {
+            let numericValue = parseInt(val, 10);
+            
+            // Handle NaN
+            if (isNaN(numericValue)) {
+                onChange(0);
+                return;
+            }
+
+            // Apply maximum constraint
+            const effectiveMax = remaining !== undefined ? Math.min(maximum, remaining) : maximum;
+            if (numericValue > effectiveMax) {
+                onChange(effectiveMax);
+                return;
+            }
+
+            onChange(numericValue);
+        }
+    };
+
+    // Format display value
+    const displayValue = value === 0 ? "" : value.toString();
+    const effectiveMax = remaining !== undefined ? Math.min(maximum, remaining) : maximum;
+
     return (
-        <div
-            className={cn(
-                "space-y-2 w-full",
-                disabled && "opacity-30 grayscale pointer-events-none"
-            )}
-        >
-            <label className="text-[10px] font-black uppercase text-primary ml-2 sm:ml-3 md:ml-4 tracking-widest">
-                {label}
-            </label>
-            <div className="relative w-full">
+        <div className="space-y-1.5 w-full">
+            <div className="flex justify-between items-center px-2">
+                <label className="text-[10px] font-black uppercase text-on-surface-variant tracking-tight">
+                    {label}
+                </label>
+                <span className="text-[8px] text-on-surface-variant/40 font-bold uppercase">
+                    Max: {effectiveMax.toLocaleString()}
+                </span>
+            </div>
+            <div className="relative">
                 <input
-                    type="number"
-                    value={value || ""}
-                    onChange={(e) => onChange(parseFloat(e.target.value) || 0)}
+                    type="text" 
+                    inputMode="numeric"
+                    value={displayValue}
+                    onChange={handleTextChange}
                     onFocus={(e) => e.target.select()}
-                    className={cn(
-                        "w-full bg-surface-container-lowest border-none rounded-[1.5rem] sm:rounded-[2rem] font-black text-center text-on-surface focus:ring-4 focus:ring-primary/10 transition-all",
-                        size === "xl"
-                            ? "py-6 sm:py-8 md:py-10 text-3xl sm:text-4xl md:text-5xl"
-                            : "py-4 sm:py-5 md:py-6 text-xl sm:text-2xl"
-                    )}
-                    placeholder="0.00"
+                    className="w-full bg-surface-container-low border-none rounded-2xl py-4 text-center text-xl font-black text-on-surface focus:ring-2 focus:ring-primary/20 transition-all placeholder:text-on-surface-variant/30"
+                    placeholder="0"
                 />
             </div>
-            {error && (
-                <div className="text-center text-error text-xs mt-1">
-                    {error}
-                </div>
-            )}
-        </div>
-    );
-}
-
-function SummaryItem({ label, value, highlight }: any) {
-    return (
-        <div className="flex justify-between items-center gap-2 sm:gap-4">
-            <span className="text-[10px] font-black uppercase text-on-surface-variant whitespace-nowrap">
-                {label}
-            </span>
-            <span
-                className={cn(
-                    "text-base sm:text-lg font-black text-right break-all",
-                    highlight ? "text-primary" : "text-on-surface"
-                )}
-            >
-                KES{" "}
-                {value.toLocaleString(undefined, {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                })}
-            </span>
         </div>
     );
 }

@@ -70,7 +70,7 @@ Route::middleware(['auth'])->group(function () {
     // ============================================================================
 
     Route::prefix('checkout')->name('checkout.')->group(function () {
-        Route::get('/', fn() => Inertia::render('Checkout/Index'))->name('index');
+        // Route::get('/', fn() => Inertia::render('Checkout/Index'))->name('index');
         Route::get('/confirmation', fn() => Inertia::render('Checkout/Confirmation'))->name('confirmation');
         Route::post('/process', fn() => redirect()->route('checkout.confirmation'))->name('process');
     });
@@ -173,6 +173,8 @@ Route::middleware(['auth'])->group(function () {
 
     Route::prefix('orders')->name('orders.')->group(function () {
         Route::patch('/checkout', [OrderController::class, 'checkout'])->name('checkout');
+        Route::patch('/{orderNumber}/unpark', [OrderController::class, 'unpark'])->name('unpark');
+        Route::delete('/{orderNumber}/void', [OrderController::class, 'void'])->name('void');
         Route::patch('/park', [OrderController::class, 'parkOrder'])->name('park');
     });
 
