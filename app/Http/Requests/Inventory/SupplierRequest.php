@@ -22,6 +22,7 @@ class SupplierRequest extends FormRequest
     public function rules(): array
     {
         $supplierId = $this->route('supplier');
+        $isEdit = $this->isMethod('put') || $this->isMethod('patch');
 
         return [
             "name" => ['required', 'string', 'max:255'],
@@ -37,6 +38,9 @@ class SupplierRequest extends FormRequest
             ],
             "type" => ['required', 'string', 'max:100'],
             "logo" => [
+                Rule::requiredIf(function () use ($isEdit) {
+                    return request()->removeExistingLogo || !$isEdit;
+                }),
                 'nullable',
                 function ($attribute, $value, $fail) {
                     if ($value instanceof \Illuminate\Http\UploadedFile) {
@@ -44,11 +48,12 @@ class SupplierRequest extends FormRequest
                             $fail('Invalid image format.');
                         }
                     } elseif (!is_string($value) && !is_null($value)) {
-                        $fail('Logo must be .');
+                        $fail('Logo must be a file or string.');
                     }
                 }
             ],
-            "removeExistingLogo" => ['boolean', 'required'],
+
+            "removeExistingLogo" => ['required', 'boolean'],
             "contact" => ['nullable', 'string', 'max:255'],
         ];
     }
