@@ -48,7 +48,7 @@ class OrderController extends Controller
 
         $order = $this->orderService->checkout($payload);
 
-        return Inertia::render('Cashier/Checkout', ['order' => $order->load('items')]);
+        return Inertia::render('Cashier/Checkout', ['order' => $order->load('items'), 'taxRate' => /*config('shop.tax_rate') || */ 0.08]);
     }
 
     public function parkOrder(OrderRequest $request)

@@ -11,8 +11,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class OrderItem extends Model
 {
-    protected $fillable = ['order_id', 'batch_id', 'quantity', 'price', 'subtotal'];
 
+protected $with = ['batch'];
     public function order()
     {
         return $this->belongsTo(Order::class);

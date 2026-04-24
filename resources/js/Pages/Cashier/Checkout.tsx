@@ -1,193 +1,96 @@
 // resources/js/Pages/Cashier/Checkout.tsx
+
 import React, { useState } from "react";
 import { Head, router } from "@inertiajs/react";
-import { motion, AnimatePresence } from "framer-motion";
-import { HiOutlineTrash, HiOutlineArrowLeft } from "react-icons/hi2";
 import AuthenticatedLayout from "@/Components/Layout/AuthenticatedLayout";
-import { usePOSCartStore } from "@/Stores/usePOSCartStore";
-import { QuantitySelector } from "@/Components/UI/QuantitySelector";
-import Button from "@/Components/UI/Button";
 import PaymentTerminal from "@/Components/UI/PaymentTerminal";
+import { usePOSCartStore } from "@/Stores/usePOSCartStore";
 
-// 1. Mock Data for testing
-const MOCK_CUSTOMERS = [
-    { id: 1, value: 1, label: "Martin Mukundi (Interlocking Blocks)" },
-    { id: 2, value: 2, label: "Silvia Nyakio" },
-    { id: 3, value: 3, label: "Daniel Simiyu" },
-];
-
-interface Customer {
-    id:number,
-    name:string,
+interface Props {
+    order: any; // The order passed from your controller
+    customers: any[];
+    taxRate: number;
 }
 
-export default function CashierCheckout({customer}:{customer?:Customer}) {
-    const {
-        cart,
-        orderNumber,
-        updateQuantity,
-        removeItem,
-        clearCart,
-        getTotal,
-    } = usePOSCartStore();
+export default function CashierCheckout({ order, customers, taxRate }: Props) {
 
-    // 2. Add missing state for customer selection
-    const [selectedId, setSelectedId] = useState<string | number | null>(null);
+    console.log(order);
+
+    const { clearCart } = usePOSCartStore();
     const [isProcessing, setIsProcessing] = useState(false);
 
-    const total = getTotal(0.08); // 8% Tax
+    // We use the order's calculated total from the backend
+    const total = parseFloat(order.total_amount);
 
-    const formatMoney = (amount: number) =>
-        `KES ${amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
-
-    const handleCompleteSale = async (paymentData: any) => {
+    const handleCompletePayment = (paymentData: any) => {
         setIsProcessing(true);
-    
-       
-        // Find the customer name from our list for the backend
-        const customer = MOCK_CUSTOMERS.find((c) => c.value === selectedId);
 
-        const transactionData = {
-            orderNumber,
-            items: cart.map((item) => ({
-                id: item.id,
-                quantity: item.quantity,
-                price: item.price,
-            })),
-            total,
-            payment_details: {
-                cashReceived: paymentData.cashAmount,
-                mpesaReceived: paymentData.mpesaAmount,
-                creditGiven: paymentData.creditAmount,
-                changeGiven: paymentData.changeGiven,
+        // Submit the payment to a separate 'process' or 'complete' route
+        router.post(route('orders.complete', order.id), {
+            payment_method: paymentData.method,
+            amounts: {
+                cash: paymentData.cashAmount,
+                mpesa: paymentData.mpesaAmount,
+                credit: paymentData.creditAmount,
             },
-            customer_id: paymentData.selectedCustomerId,
-            status: paymentData.credit > 0 ? "partial_credit" : "paid",
-        };
-
-        console.log(transactionData);
-
-        // router.post("/cashier/transaction", transactionData, {
-        //     onSuccess: () => {
-        //         clearCart();
-        //     },
-        //     onFinish: () => setIsProcessing(false),
-        // });
+            phone: paymentData.phoneNumber, // For STK Push
+        }, {
+            onSuccess: () => {
+                clearCart(); // Success! Wipe the local temporary cart
+            },
+            onFinish: () => setIsProcessing(false)
+        });
     };
-
-    const  reviewOrder = () => {
-        setTimeout(() => {
-            router.visit(route("pos.index"), {
-                preserveScroll: true,
-                onSuccess: () => setIsProcessing(false),
-            });
-        }, 400);
-    }
-
 
     return (
         <AuthenticatedLayout>
-            <Head title="Checkout" />
+            <Head title={`Payment - ${order.order_number}`} />
 
-            <div className="min-h-screen bg-surface-container-lowest p-4 md:p-8">
-                <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
-                    {/* Left: Cart & Summary */}
-                    <div className="lg:col-span-5 space-y-6">
-                        <motion.div
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            className="flex items-center gap-4 mb-2"
-                        >
-                            <Button
-                                variant="ghost"
-                                onClick={() => reviewOrder()}
-                                className="rounded-full h-12 w-12 p-0 bg-surface-container-high"
-                            >
-                                <HiOutlineArrowLeft className="text-xl" />
-                            </Button>
-                            <h1 className="text-3xl font-headline font-black tracking-tight">
-                                Review Order
-                            </h1>
-                        </motion.div>
+            <div className="max-w-6xl mx-auto p-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
+                {/* Left: Order Summary (Source of Truth) */}
+                <div className="lg:col-span-5">
+                    <h1 className="text-3xl font-black mb-6">Confirm Payment</h1>
+                    <div className="bg-surface-container-low rounded-3xl p-6 border border-outline-variant/10">
+                        <div className="flex justify-between items-center mb-4 pb-4 border-b">
+                            <span className="font-bold text-primary">{order.order_number}</span>
+                            <span className="text-xs uppercase font-black opacity hover:cursor-pointer border p-0.5 px-1 border-primary/20 rounded underline text-primary" onClick={()=>{router.visit(route('pos.index'))}}>Review Cart</span>
+                        </div>
 
-                        <div className="bg-surface-container-low rounded-[2.5rem] shadow-sm border border-outline-variant/10 overflow-hidden">
-                            <div className="p-6 border-b border-outline-variant/5">
-                                <span className="text-xs font-bold uppercase tracking-widest text-on-secondary">
-                                    Ticket {orderNumber}
-                                </span>
+                        <div className="space-y-4 mb-6 max-h-[40vh] overflow-y-auto">
+                            {order.items.map((item: any, index:any) => (
+                                <div key={`${item.id}-${index}`} className="flex justify-between">
+                                    <div>
+                                        <p className="font-bold capitalize">{index+1} {item.batch.product.name}</p>
+                                        <p className="text-xs opacity-60">{item.quantity} x KES {item.price}</p>
+                                    </div>
+                                    <p className="font-bold">KES {item.quantity * item.price}</p>
+                                </div>
+                            ))}
+                        </div>
+
+                        <div className="pt-4 border-t border-dashed space-y-2">
+                            <div className="flex justify-between text-sm">
+                                <span>Tax ({taxRate * 100}%)</span>
+                                <span>KES {order.tax_amount}</span>
                             </div>
-                            <div className="divide-y divide-outline-variant/5 max-h-[50vh] overflow-y-auto">
-                                <AnimatePresence mode="popLayout">
-                                    {cart.map((item,index) => (
-                                        <motion.div
-                                            layout
-                                            initial={{ opacity: 0 }}
-                                            animate={{ opacity: 1 }}
-                                            exit={{ opacity: 0, scale: 0.95 }}
-                                            key={`${item.id}-${index}`}
-
-                                            className="p-6 flex items-center justify-between"
-                                        >
-                                            <div className="flex-1">
-                                                <p className="font-bold text-lg">
-                                                    {item.name}
-                                                </p>
-                                                <p className="text-sm text-on-secondary font-medium">
-                                                    {formatMoney(item.price)}
-                                                </p>
-                                            </div>
-                                            <div className="flex items-center justify-end ">
-                                                <QuantitySelector
-                                                    size="sm"
-                                                    quantity={item.quantity}
-                                                    flyX={-45}
-                                                    flyY={200}
-                                                    onUpdate={(v) =>
-{
-                                                        updateQuantity(
-                                                            item.id,
-                                                            Number(v)
-                                                        );
-                                                        reviewOrder();
-                                                    }
-                                                    }
-                                                />
-                                                <Button
-                                                    variant="ghost"
-                                                    onClick={() =>
-                                                        removeItem(item.id)
-                                                    }
-                                                    className="text-error/60 hover:text-error transition-colors"
-                                                >
-                                                    <HiOutlineTrash className="text-2xl" />
-                                                </Button>
-                                            </div>
-                                        </motion.div>
-                                    ))}
-                                </AnimatePresence>
+                            <div className="flex justify-between text-2xl font-black text-primary">
+                                <span>Total</span>
+                                <span>KES {total.toLocaleString()}</span>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    {/* Right: Payment Terminal */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="lg:col-span-7"
-                    >
-                        {/* 3. Wired up props correctly */}
-                        <PaymentTerminal
-                            total={total}
-                            customer={customer}
-                            selectedCustomerId={selectedId}
-                            onCustomerChange={(id: number | string) =>
-                                setSelectedId(id)
-                            }
-                            onComplete={handleCompleteSale}
-                            isProcessing={isProcessing}
-                            allowedPaymentMethods={["mpesa", "cash"]}
-                        />
-                    </motion.div>
+                {/* Right: The Terminal */}
+                <div className="lg:col-span-7">
+                    <PaymentTerminal
+                        total={total}
+                        customer={order.customer}
+                        customers={customers}
+                        allowedPaymentMethods={['mpesa','cash']}
+                        onComplete={handleCompletePayment}
+                        isProcessing={isProcessing}
+                    />
                 </div>
             </div>
         </AuthenticatedLayout>

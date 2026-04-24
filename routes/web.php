@@ -130,7 +130,7 @@ Route::middleware(['auth'])->group(function () {
     Route::prefix('orders')->name('orders.')->group(function () {
         Route::get('/', fn() => Inertia::render('Orders/Index'))->name('index');
         Route::get('/history', fn() => Inertia::render('Orders/History'))->name('history');
-        Route::get('/{id}', fn($id) => Inertia::render('Orders/Show', ['id' => $id]))->name('show');
+        // Route::get('/{id}', fn($id) => Inertia::render('Orders/Show', ['id' => $id]))->name('show');
     });
 
     // Subscriptions
