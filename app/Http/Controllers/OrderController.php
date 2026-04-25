@@ -7,12 +7,10 @@ use App\Enums\OrderStatus;
 use App\Enums\TransactionType;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\OrderRequest;
-use App\Models\Order;
 use App\Repositories\Inventory\BatchRepository;
 use App\Repositories\OrderRepository;
 use App\Services\OrderService;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class OrderController extends Controller
