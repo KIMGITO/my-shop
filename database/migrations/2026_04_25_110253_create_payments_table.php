@@ -16,7 +16,9 @@ return new class extends Migration
         Schema::create('payments', function (Blueprint $table) {
             $table->id();
             $table->foreignId('order_id')->constrained()->cascadeOnDelete();
-            $table->decimal('amount', 10, 2);
+            $table->decimal('amount_due', 10, 2);
+            $table->decimal('amount_paid',10,2);
+            $table->decimal('change_given',10,2)->default(0);
             $table->enum('method', array_column(PaymentMethods::cases(),  'value'))->default('mpesa');
             $table->enum('status', array_column(PaymentStatus::cases(), 'value'))->default('draft');
             $table->string('reference')->nullable();
@@ -24,6 +26,9 @@ return new class extends Migration
             $table->string('phone_number')->nullable();
             $table->text('notes')->nullable();
             $table->timestamps();
+
+            $table->index('method');
+            $table->index('status');
         });
     }
 

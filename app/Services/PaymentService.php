@@ -18,10 +18,17 @@ class PaymentService
     /**
      * Smartly splits an amount between Mpesa and Cash.
      */
-    public function processSplitPayment(int $orderId, float $totalAmount, array $splitData): array
+    public function processSplitPayment(int $orderId, float $totalAmount, array $splitData, ?int $customer_id): array
     {
         $mpesaAmount = $splitData['mpesa_amount'] ?? 0;
         $cashAmount = $totalAmount - $mpesaAmount;
+        $creditAmount = $totalAmount - ($mpesaAmount + $cashAmount);
+
+        if($creditAmount > 0 && $customer_id === null) {
+            throw new Exception("No customer selected for credit recording.");
+        }else{
+            // handle credit recording logic .
+        }
 
         if ($cashAmount < 0) {
             throw new Exception("Mpesa amount cannot exceed the total order value.");
@@ -52,22 +59,22 @@ class PaymentService
     }
 
     public function processCash(int $orderId, array $data): Payment 
-{
-    $amountPaid = $data['amount_paid'] ?? 0; 
-    $totalDue = $data['amount_due'] ?? 0;    
+    {
+        $amountPaid = $data['amount_paid'] ?? 0; 
+        $totalDue = $data['amount_due'] ?? 0;    
 
-    $change = max(0, $amountPaid - $totalDue);
-    $actualPayment = $amountPaid - $change;
+        $change = max(0, $amountPaid - $totalDue);
+        $actualPayment = $amountPaid - $change;
 
-    return $this->registerPayment([
-        'order_id' => $orderId,
-        'method'   => 'cash',
-        'amount'   => $actualPayment, 
-        'amount_paid' => $amountPaid,
-        'change_returned' => $change,
-        'status'   => 'completed'
-    ]);
-}
+        return $this->registerPayment([
+            'order_id' => $orderId,
+            'method'   => 'cash',
+            'amount_due'   => $actualPayment, 
+            'amount_paid' => $amountPaid,
+            'change_returned' => $change,
+            'status'   => 'completed'
+        ]);
+    }
 
     /**
      * Handles the actual persistence logic.

@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-#(Fillable(['order_id','amount','method','status','reference','transaction_code','phone_number','notes]));
+#(Fillable(['order_id','amount_due','amount_paid','change_given','method','status','reference','transaction_code','phone_number','notes]));
 
 class Payment extends Model
 {
