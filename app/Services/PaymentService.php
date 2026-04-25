@@ -19,33 +19,76 @@ class PaymentService
      * Smartly splits an amount between Mpesa and Cash.
      */
     public function processSplitPayment(int $orderId, float $totalAmount, array $splitData, ?int $customer_id): array
-    {
-        $mpesaAmount = $splitData['mpesa_amount'] ?? 0;
-        $cashAmount = $totalAmount - $mpesaAmount;
-        $creditAmount = $totalAmount - ($mpesaAmount + $cashAmount);
-
-        if($creditAmount > 0 && $customer_id === null) {
-            throw new Exception("No customer selected for credit recording.");
-        }else{
-            // handle credit recording logic .
+{
+    // Extract amounts with proper validation
+    $mpesaAmount = isset($splitData['mpesaAmount']) ? (float)$splitData['mpesaAmount'] : 0;
+    $cashAmount = isset($splitData['cashAmount']) ? (float)$splitData['cashAmount'] : 0;
+    
+    // Calculate total paid and change
+    $totalPaid = $mpesaAmount + $cashAmount;
+    $changeGiven = 0;
+    $creditAmount = 0;
+    
+    if ($totalPaid > $totalAmount) {
+        // Customer overpaid - calculate change
+        $changeGiven = $totalPaid - $totalAmount;
+        $totalPaid = $totalAmount; // Amount actually applied to the bill
+        $creditAmount = 0;
+        
+        // Adjust the payment amounts if needed (e.g., change comes from cash)
+        // Assuming change is given from cash payment
+        if ($cashAmount > 0 && $changeGiven > 0) {
+            $cashAmount = $cashAmount - $changeGiven;
         }
-
-        if ($cashAmount < 0) {
-            throw new Exception("Mpesa amount cannot exceed the total order value.");
-        }
-
-        $results = [];
-
-        if ($mpesaAmount > 0) {
-            $results['mpesa'] = $this->processMpesa($orderId, ['amount' => $mpesaAmount]);
-        }
-
-        if ($cashAmount > 0) {
-            $results['cash'] = $this->processCash($orderId, ['amount' => $cashAmount]);
-        }
-
-        return $results;
+    } elseif ($totalPaid < $totalAmount) {
+        // Customer underpaid - remaining becomes credit
+        $creditAmount = $totalAmount - $totalPaid;
+        $changeGiven = 0;
     }
+    
+    // Handle credit logic
+    if ($creditAmount > 0) {
+        if ($customer_id === null) {
+            throw new Exception("No customer selected for credit recording.");
+        }
+        // handle credit recording logic here
+        // Example: $this->recordCredit($orderId, $customer_id, $creditAmount);
+    }
+    
+
+    $results = [];
+    
+    // Process M-Pesa payment
+    $amountDue = $totalAmount;
+    if ($mpesaAmount > 0) {
+        $results['mpesa'] = $this->processMpesa($orderId, ['amount_paid' => $mpesaAmount, 'amount_due' => $amountDue]);
+
+        $amountDue = $totalAmount - $mpesaAmount;
+    }
+    
+    // Process Cash payment (after change adjustment)
+    if ($cashAmount > 0) {
+        $results['cash'] = $this->processCash($orderId, [
+            'amount_due' => $amountDue,
+            'amount_paid' => $cashAmount,
+            'change_given' => $changeGiven  
+        ]);
+    }
+    
+    // Add summary to results
+    $results['summary'] = [
+        'total_amount' => $totalAmount,
+        'mpesa_amount' => $mpesaAmount,
+        'cash_amount' => $cashAmount,
+        'total_paid' => $mpesaAmount + $cashAmount,
+        'credit_amount' => $creditAmount,
+        'change_given' => $changeGiven
+    ];
+
+    
+    
+    return $results;
+}
 
     public function processMpesa(int $orderId, array $data): Payment 
     {
@@ -83,7 +126,7 @@ class PaymentService
     {
         $paymentId = Arr::get($payload, 'payment_id');
         
-        if ($paymentId) {
+        if ($paymentId !== null) {
             return $this->paymentRepository->update($paymentId, $payload);
         }
 

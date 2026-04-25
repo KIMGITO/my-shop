@@ -80,7 +80,7 @@ export default function PosIndex({
 
         if (confirm(`Process order ${orderNumber} for $${total.toFixed(2)}?`)) {
             setIsProcessing(true);
-            router.patch(route("orders.checkout"), {
+            router.post(route("orders.checkout"), {
                 orderNumber,
                 customerId,
                 notes,

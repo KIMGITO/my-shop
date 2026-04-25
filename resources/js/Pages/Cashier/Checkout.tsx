@@ -8,13 +8,12 @@ import { usePOSCartStore } from "@/Stores/usePOSCartStore";
 
 interface Props {
     order: any; // The order passed from your controller
-    customers: any[];
+    customer: any;
     taxRate: number;
 }
 
-export default function CashierCheckout({ order, customers, taxRate }: Props) {
+export default function CashierCheckout({ order, taxRate }: Props) {
 
-    console.log(order);
 
     const { clearCart } = usePOSCartStore();
     const [isProcessing, setIsProcessing] = useState(false);
@@ -25,15 +24,13 @@ export default function CashierCheckout({ order, customers, taxRate }: Props) {
     const handleCompletePayment = (paymentData: any) => {
         setIsProcessing(true);
 
-        // Submit the payment to a separate 'process' or 'complete' route
-        router.post(route('orders.complete', order.id), {
-            payment_method: paymentData.method,
-            amounts: {
-                cash: paymentData.cashAmount,
-                mpesa: paymentData.mpesaAmount,
-                credit: paymentData.creditAmount,
-            },
-            phone: paymentData.phoneNumber, // For STK Push
+
+        router.post(route('payments.process', order.id), {
+            cash: paymentData.cashAmount,
+            mpesa: paymentData.mpesaAmount,
+            credit: paymentData.creditAmount,
+            phone: paymentData.phoneNumber,
+            customerId: order.customer_id,
         }, {
             onSuccess: () => {
                 clearCart(); // Success! Wipe the local temporary cart
@@ -86,10 +83,8 @@ export default function CashierCheckout({ order, customers, taxRate }: Props) {
                     <PaymentTerminal
                         total={total}
                         customer={order.customer}
-                        customers={customers}
-                        allowedPaymentMethods={['mpesa','cash']}
+                        allowedPaymentMethods={['mpesa','cash','split']}
                         onComplete={handleCompletePayment}
-                        isProcessing={isProcessing}
                     />
                 </div>
             </div>

@@ -7,6 +7,7 @@ use App\Enums\OrderStatus;
 use App\Enums\TransactionType;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\OrderRequest;
+use App\Models\Order;
 use App\Repositories\Inventory\BatchRepository;
 use App\Repositories\OrderRepository;
 use App\Services\OrderService;
@@ -40,13 +41,34 @@ class OrderController extends Controller
     }
 
 
-    public function checkout(OrderRequest $request){
+    // public function checkout(OrderRequest $request){
 
+    //     $payload = $request->validated();
+
+    //     $order = $this->orderService->checkout($payload);
+
+    //     return Inertia::render('Cashier/Checkout', ['order' => $order->load('items'), 'taxRate' => /*config('shop.tax_rate') || */ 0.08]);
+    // }
+    
+
+    public function checkout(OrderRequest $request)
+    {
         $payload = $request->validated();
 
+        // 1. Save the order basics (items, total, etc.)
         $order = $this->orderService->checkout($payload);
 
-        return Inertia::render('Cashier/Checkout', ['order' => $order->load('items'), 'taxRate' => /*config('shop.tax_rate') || */ 0.08]);
+        // 2. Redirect to the payment page for this specific order
+        return redirect()->route('orders.payment', $order->id);
+    }
+
+    public function showPayment(Order $order)
+    {
+        // This loads the "another page" you mentioned
+        return Inertia::render('Cashier/Checkout', [
+            'order' => $order->load('items'),
+            'taxRate' => 0.08, // Or from config
+        ]);
     }
 
     public function parkOrder(OrderRequest $request)

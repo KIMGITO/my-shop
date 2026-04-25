@@ -2,33 +2,56 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\Rule;
 
 class PaymentRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
+     * Prepare the data for validation.
      */
-    public function authorize(): bool
+    protected function prepareForValidation(): void
     {
-        return Gate::allows('process payments');
+        $this->merge([
+            'cashAmount'   =>  $this->cash ,
+            'mpesaAmount'  =>  $this->mpesa,
+            'creditAmount' =>  $this->credit,
+            'phoneNumber' =>  $this->phone,
+            'orderId' => $this->route('order')->id ?? null,
+            'customerId' => $this->route('order')->customer_id ?? null,
+        ]);
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
         return [
-            'order_id' => ['required','exists:orders,id'],
-            'cash_amount' => ['required','numeric','min:0'],
-            'mpesa_amount' => ['required','numeric','min:0'],
-            'credit_amount'=>['required','numeric','min:0'],
-            'amount_paid'=> ['required','numeric','min:0'],
+            // Ensure order ID exists in the route and database
+            'orderId' => [
+                'required',
+                'exists:orders,id'
+            ],
+            'phoneNumber' => ['nullable', 'string', 'max:20'],
+            'cashAmount'  => ['required', 'numeric', 'min:0'],
+            'mpesaAmount' => ['required', 'numeric', 'min:0'],
+            'creditAmount'=> ['required', 'numeric', 'min:0'],
+
+            // Customer is required ONLY if creditAmount > 0
+            'customerId' => [
+                'required_if:creditAmount,>0', 
+                'nullable', 
+                'exists:customers,id'
+            ],
+        ];
+    }
+
+    /**
+     * Custom error messages for clarity.
+     */
+    public function messages(): array
+    {
+        return [
+            'customer_id.required_if' => 'A customer must be selected to process a credit payment.',
+            'order_id.exists'         => 'The specified order does not exist.',
         ];
     }
 }

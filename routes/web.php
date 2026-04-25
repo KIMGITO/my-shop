@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AddressController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\POSController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
@@ -172,10 +173,16 @@ Route::middleware(['auth'])->group(function () {
     });
 
     Route::prefix('orders')->name('orders.')->group(function () {
-        Route::patch('/checkout', [OrderController::class, 'checkout'])->name('checkout');
+        Route::post('/checkout', [OrderController::class, 'checkout'])->name('checkout');
+        Route::get('/{order}/payment', [OrderController::class, 'showPayment'])->name('payment');
         Route::patch('/{orderNumber}/unpark', [OrderController::class, 'unpark'])->name('unpark');
         Route::delete('/{orderNumber}/void', [OrderController::class, 'void'])->name('void');
         Route::patch('/park', [OrderController::class, 'parkOrder'])->name('park');
+    });
+
+
+    Route::prefix('payments')->name('payments.')->group(function () {
+        Route::post('/process/{order}', [PaymentController::class, 'store'])->name('process');
     });
 
     // ============================================================================

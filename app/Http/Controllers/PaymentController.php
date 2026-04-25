@@ -17,8 +17,9 @@ class PaymentController extends Controller
 
     public function  store(PaymentRequest  $request, Order $order){
         $data = $request->validated();
+
         $totalAmount = $order->total_amount;
-        $splitData = Arr::only($data, ['mpesa_amount','cash_amount','credit_amount']);
+        $splitData = Arr::only($data, ['mpesaAmount','cashAmount','creditAmount']);
 
         $results  =  $this->paymentService->processSplitPayment($order->id, $totalAmount, $splitData, $order->customer_id);
         return back()->with('success', 'Payment processed successfully.')->with('payment_details', $results);
