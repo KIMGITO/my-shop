@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\PaymentMethods;
 use App\Enums\PaymentStatus;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -16,7 +17,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('order_id')->constrained()->cascadeOnDelete();
             $table->decimal('amount', 10, 2);
-            $table->enum('method', ['cash', 'card', 'mobile_money']);
+            $table->enum('method', array_column(PaymentMethods::cases(),  'value'))->default('mpesa');
             $table->enum('status', array_column(PaymentStatus::cases(), 'value'))->default('draft');
             $table->string('reference')->nullable();
             $table->string('transaction_code')->nullable();

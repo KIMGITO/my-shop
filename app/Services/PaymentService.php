@@ -5,38 +5,81 @@ namespace App\Services;
 use App\Models\Payment;
 use App\Repositories\OrderRepository;
 use App\Repositories\PaymentRepository;
-use Throwable;
+use Exception;
+use Illuminate\Support\Arr;
 
 class PaymentService
 {
-    /**
-     * Create a new class instance.
-     */
     public function __construct(
         protected PaymentRepository $paymentRepository,
         protected OrderRepository $orderRepository,
-        )
+    ) {}
+
+    /**
+     * Smartly splits an amount between Mpesa and Cash.
+     */
+    public function processSplitPayment(int $orderId, float $totalAmount, array $splitData): array
     {
-        $this->paymentRepository = $paymentRepository;
-        $this->orderRepository = $orderRepository;
+        $mpesaAmount = $splitData['mpesa_amount'] ?? 0;
+        $cashAmount = $totalAmount - $mpesaAmount;
+
+        if ($cashAmount < 0) {
+            throw new Exception("Mpesa amount cannot exceed the total order value.");
+        }
+
+        $results = [];
+
+        if ($mpesaAmount > 0) {
+            $results['mpesa'] = $this->processMpesa($orderId, ['amount' => $mpesaAmount]);
+        }
+
+        if ($cashAmount > 0) {
+            $results['cash'] = $this->processCash($orderId, ['amount' => $cashAmount]);
+        }
+
+        return $results;
     }
 
-    public function  registerPayment(string $orderId,  array $payload): Payment {
-        // if has payment_id,  update else new 
-        try {
-            if($payload['payment_id']){
-                $payment = $this->paymentRepository->find($payload['payment_id']);
-                $payment->update(to_snake($payload));
+    public function processMpesa(int $orderId, array $data): Payment 
+    {
+        $payload = array_merge($data, [
+            'order_id' => $orderId,
+            'method' => 'mpesa',
+            'status' => 'pending'
+        ]);
 
-                return $payment;
-            } 
+        return $this->registerPayment($payload);
+    }
 
-            $payment = $this->paymentRepository->create(to_snake($payload));
-            return $payment;
+    public function processCash(int $orderId, array $data): Payment 
+{
+    $amountPaid = $data['amount_paid'] ?? 0; 
+    $totalDue = $data['amount_due'] ?? 0;    
+
+    $change = max(0, $amountPaid - $totalDue);
+    $actualPayment = $amountPaid - $change;
+
+    return $this->registerPayment([
+        'order_id' => $orderId,
+        'method'   => 'cash',
+        'amount'   => $actualPayment, 
+        'amount_paid' => $amountPaid,
+        'change_returned' => $change,
+        'status'   => 'completed'
+    ]);
+}
+
+    /**
+     * Handles the actual persistence logic.
+     */
+    public function registerPayment(array $payload): Payment 
+    {
+        $paymentId = Arr::get($payload, 'payment_id');
+        
+        if ($paymentId) {
+            return $this->paymentRepository->update($paymentId, $payload);
         }
-        catch(Throwable $th){
-            throw $th;
-        }
 
+        return $this->paymentRepository->create($payload);
     }
 }
