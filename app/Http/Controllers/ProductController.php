@@ -63,7 +63,7 @@ class ProductController extends Controller
             $payload = $request->validated();
 
         
-            $product->update(toSnake($payload));
+            $product->update(to_snake($payload));
 
             if ($request->delete_images) {
                 $this->productRepo->deleteProductImages($request->delete_images);

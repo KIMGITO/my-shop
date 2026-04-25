@@ -38,7 +38,7 @@ class ProductRepository extends BaseRepository
 
             $productImages = $batch
                 ->images()
-                ->createMany(toSnake($uploads));
+                ->createMany(to_snake($uploads));
 
             DB::commit();
 

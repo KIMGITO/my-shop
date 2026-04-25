@@ -63,7 +63,7 @@ class BatchService
         try{
             
 
-            $data = toSnake($payload);
+            $data = to_snake($payload);
 
             if($id){
                 // update

@@ -38,8 +38,8 @@ if (!function_exists('toCamel')) {
     }
 }
 
-if (!function_exists('toSnake')) {
-    function toSnake(array $data): array
+if (!function_exists('to_snake')) {
+    function to_snake(array $data): array
     {
         $result = [];
 
@@ -49,7 +49,7 @@ if (!function_exists('toSnake')) {
 
             // Recursively handle nested arrays
             if (is_array($value)) {
-                $value = toSnake($value);
+                $value = to_snake($value);
             }
 
             $result[$snakeKey] = $value;
