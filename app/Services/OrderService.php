@@ -5,6 +5,7 @@ namespace App\Services;
 use App\DTOs\CreateOrderData;
 use App\Enums\OrderStatus;
 use App\Enums\TransactionType;
+use App\Jobs\ReleaseProducts;
 use App\Models\Order;
 use App\Repositories\Inventory\BatchRepository;
 use App\Repositories\OrderRepository;
@@ -75,7 +76,7 @@ class OrderService
 
     public function createOrder(CreateOrderData $data, ?string $orderNumber = null)
     {
-        return $this->orderRepository->create([
+        $order =  $this->orderRepository->create([
             'order_number' => $orderNumber ?? $this->getOrderNumber(),
             'type'         => $data->type,
             'source'       => $data->source,
@@ -90,6 +91,12 @@ class OrderService
             'expires_at'   => $data->expires_at,
             'notes'        => $data->notes,
         ]);
+
+        // dd($order);
+
+        ReleaseProducts::dispatch($order->order_number )->delay( now()->addSeconds(5));
+
+        return $order;
     }
 
     public function getOrderNumber(): string

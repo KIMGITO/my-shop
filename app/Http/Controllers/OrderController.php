@@ -34,11 +34,11 @@ class OrderController extends Controller
             status: OrderStatus::INITIATED,
             userId: Auth::id(),
             customerId:null,
-            expires_at: now()->addHours(24),
+            expires_at: now()->addSecond(5),
         );
-        $orderNumber = $this->orderService->createOrder($orderData);
+        $order = $this->orderService->createOrder($orderData);
 
-        return response()->json(['orderNumber' => $orderNumber->order_number]);
+        return response()->json(['orderNumber' => $order->order_number]);
     }
 
 
