@@ -86,7 +86,7 @@ export const OrderSummary: React.FC<OrderSummaryProps> = ({
                     </span>
                 </div>
                 <div className="flex justify-between text-on-surface-variant text-sm">
-                    <span>Tax </span>
+                    <span>{`Tax ${tax * 100}%`} </span>
                     <span className="tabular-nums">Ksh{tax.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between items-end pt-2">
@@ -94,7 +94,7 @@ export const OrderSummary: React.FC<OrderSummaryProps> = ({
                         Total
                     </span>
                     <span className="text-2xl font-black text-primary tabular-nums">
-                        Ksh{total.toFixed(2)}
+                        Ksh {total.toFixed(2)}
                     </span>
                 </div>
             </div>
