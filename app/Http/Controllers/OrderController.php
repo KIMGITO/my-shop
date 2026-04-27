@@ -67,7 +67,7 @@ class OrderController extends Controller
         // This loads the "another page" you mentioned
         return Inertia::render('Cashier/Checkout', [
             'order' => $order->load('items'),
-            'taxRate' => 0.08, // Or from config
+            'taxRate' => config('finance.tax.vat'),
         ]);
     }
 

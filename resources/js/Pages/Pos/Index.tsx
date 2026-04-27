@@ -1,6 +1,6 @@
 // pages/pos/index.tsx
 import React, { useState, useMemo } from "react";
-import { Head, router } from "@inertiajs/react";
+import { Head, router, usePage } from "@inertiajs/react";
 import { Product } from "@/types/pos";
 import { HiOutlineSearch, HiOutlineUser } from "react-icons/hi";
 import AuthenticatedLayout from "@/Components/Layout/AuthenticatedLayout";
@@ -56,13 +56,17 @@ export default function PosIndex({
     const [showParkConfirmation, setShowParkConfirmation] = useState(false);
     const [isProcessing, setIsProcessing] = useState(false);
 
+
+    const {props} = usePage();
+    const taxRate = props.taxRate as number;
+
+
     const subtotal = getSubtotal();
-    const tax = getTax(0.08);
-    const total = getTotal(0.08);
+    const tax = getTax(taxRate);
+    const total = getTotal(Number(taxRate));
     const itemCount = getItemCount();
 
 
-    console.log("POSProducts",POSProducts);
     
     const filteredProducts = useMemo(() => {
         let products = [...POSProducts];
@@ -131,7 +135,6 @@ export default function PosIndex({
     const handleLoadParkedCart = (cartId: string) => {
         if (cart.length > 0 && !window.confirm("Current cart will be cleared. Continue?")) return;
         
-        console.log(cartId);
         loadParkedCart(cartId, POSProducts);
         setShowParkedModal(false);
     };

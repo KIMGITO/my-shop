@@ -3,7 +3,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { CartItem, Product } from "@/types/pos";
 import axios from "axios";
-import { router } from "@inertiajs/react";
+import { router, usePage } from "@inertiajs/react";
 
 export interface ParkedCart {
     id: string;
@@ -194,8 +194,8 @@ export const usePOSCartStore = create<POSCartStore>()(
             },
 
             getSubtotal: () => get().cart.reduce((sum, item) => sum + item.price * item.quantity, 0),
-            getTax: (taxRate = 0.08) => get().getSubtotal() * taxRate,
-            getTotal: (taxRate = 0.08) => get().getSubtotal() + get().getTax(taxRate),
+            getTax: (taxRate = 0) => get().getSubtotal() * taxRate,
+            getTotal: (taxRate = 0) => get().getSubtotal() + get().getTax(taxRate),
             getItemCount: () => get().cart.reduce((count, item) => count + item.quantity, 0),
         }),
         { name: "pos-cart-storage" }
