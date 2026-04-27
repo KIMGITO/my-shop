@@ -56,7 +56,7 @@ class BatchRepository extends BaseRepository
     public function confirmSale(int $batchId, int $quantity): void
     {
         Batch::where('id', $batchId)->update([
-            'physical_quantity' => DB::raw("physical_quantity - $quantity"),
+            'available_quantity' => DB::raw("available_quantity - $quantity"),
             'reserved_quantity' => DB::raw("reserved_quantity - $quantity"),
         ]);
     }

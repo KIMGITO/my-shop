@@ -19,8 +19,8 @@ return new class extends Migration
             $table->decimal('amount_due', 10, 2);
             $table->decimal('amount_paid',10,2);
             $table->decimal('change_given',10,2)->default(0);
-            $table->enum('method', array_column(PaymentMethods::cases(),  'value'))->default('mpesa');
-            $table->enum('status', array_column(PaymentStatus::cases(), 'value'))->default('draft');
+            $table->enum('method', array_column(PaymentMethods::cases(),  'value'))->default(PaymentMethods::MPESA->value);
+            $table->enum('status', array_column(PaymentStatus::cases(), 'value'))->default(PaymentStatus::PENDING->value);
             $table->string('reference')->nullable();
             $table->string('transaction_code')->nullable();
             $table->string('phone_number')->nullable();
