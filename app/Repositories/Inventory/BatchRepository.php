@@ -3,7 +3,6 @@
 namespace App\Repositories\Inventory;
 
 use App\Models\Batch;
-use App\Models\Inventory\Product;
 use App\Repositories\BaseRepository;
 use Exception;
 use Illuminate\Support\Facades\DB;

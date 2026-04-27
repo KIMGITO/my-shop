@@ -2,12 +2,9 @@
 
 namespace App\Repositories;
 
-use App\Enums\OrderStatus;
-use App\Enums\PaymentStatus;
 use App\Models\Order;
 use App\Repositories\BaseRepository;
 use Exception;
-use Illuminate\Support\Facades\DB;
 
 class OrderRepository extends BaseRepository
 {

@@ -183,18 +183,7 @@ class OrderService
         if($order->status === OrderStatus::CANCELLED->value || $order->status === OrderStatus::EXPIRED->value){
             throw new \Exception("Order with number {$order->order_number} cannot be completed as it is marked as cancelled or voided");
         }
-        // remove order items from stock
-        try{
-            $orderItems = $order->items;
-
-            foreach ($orderItems as $item) {
-                $this->batchRepository->confirmSale($item->batch_id, $item->quantity);
-            }
-            return $order;
-
-        }catch(\Exception $e){
-            throw new \Exception("Failed to confirm sale for order {$order->order_number}: " . $e->getMessage());
-        }
+       
         // mark order as completed
         $this->orderRepository->update($orderId, [
             'status' => OrderStatus::COMPLETED->value

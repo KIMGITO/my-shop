@@ -2,12 +2,13 @@
 
 namespace App\Services;
 
-use App\Enums\OrderStatus;
 use App\Enums\PaymentMethods;
 use App\Enums\PaymentStatus;
 use App\Models\Payment;
+use App\Repositories\Inventory\BatchRepository;
 use App\Repositories\OrderRepository;
 use App\Repositories\PaymentRepository;
+use App\Services\OrderService;
 use Exception;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
@@ -18,6 +19,7 @@ class PaymentService
         protected PaymentRepository $paymentRepository,
         protected OrderRepository $orderRepository,
         protected OrderService $orderService,
+        protected BatchRepository $batchRepository,
     ) {}
 
     /**
@@ -42,7 +44,7 @@ class PaymentService
             // Customer overpaid - calculate change
             $overpayment = $totalPaid - $totalAmount;
             $changeGiven = $overpayment;
-            $totalPaid = $totalAmount; // Amount actually applied to the bill
+            $totalPaid = $totalAmount; 
             $creditAmount = 0;
             
             // Adjust the payment amounts - change comes from cash first
@@ -98,7 +100,6 @@ class PaymentService
         
         // Process Cash payment (after change adjustment)
         if ($finalCashAmount > 0) {
-
             if($finalCashAmount + $finalMpesaAmount >= $totalAmount){
                 $payment_status = PaymentStatus::PAID->value;
             }else{
@@ -111,6 +112,19 @@ class PaymentService
                 'status' => $payment_status,
             ]);
         }
+
+        DB::transaction(function () use ($orderId) {
+            $order = $this->orderRepository->find($orderId);
+            if($order->balance == 0){
+                $this->orderService->completeOrder($orderId);
+                
+                $order->items->each(function($item) {
+                    $this->batchRepository->confirmSale($item->batch_id, $item->quantity);
+                });
+            }
+        });
+        
+
         
         // Add summary to results (keeping your original keys)
         $results['summary'] = [
@@ -175,7 +189,7 @@ class PaymentService
         }
         $this->orderService->completeOrder($payload['order_id']);
         return $this->paymentRepository->create($payload);
-    
+
 
     }
 }
