@@ -28,12 +28,13 @@ interface POSCartStore {
     updateQuantity: (id: string, quantity: number) => void;
     removeItem: (id: string) => void;
     clearCart: () => void;
-    voidOrder: () => Promise<void>; // Added for DB cleanup
+    voidOrder: () => void; // Added for DB cleanup
     setOrderNumber: (orderNumber: string) => void;
     setCustomerId: (id: string) => void;
     setNotes: (notes: string) => void;
     parkCurrentCart: (cartName: string) => Promise<void>;
     loadParkedCart: (cartId: string, allProducts: Product[]) => void;
+    unpackCart: (cartId:string) => void;
     deleteParkedCart: (cartId: string) => void;
     refreshOrderNumber: () => Promise<string>;
     getSubtotal: () => number;
@@ -83,10 +84,9 @@ export const usePOSCartStore = create<POSCartStore>()(
 
             clearCart: () => set({ cart: [], customerId: "", notes: "", orderNumber: "" }),
 
-            voidOrder: async () => {
+            voidOrder: () => {
                 const { orderNumber, clearCart } = get();
                 if (orderNumber) {
-                    //  backend to delete order and release stock
                     router.delete(route("orders.void", { orderNumber: orderNumber }));
                 }
                 clearCart();
@@ -116,7 +116,7 @@ export const usePOSCartStore = create<POSCartStore>()(
                     total: state.getTotal(),
                 };
 
-                router.patch(route("orders.park"), parkedCartPayload, {
+                router.patch(route("orders.pack"), parkedCartPayload, {
                     onSuccess: () => {
                         set((prev) => ({
                             parkedCarts: [
@@ -137,41 +137,50 @@ export const usePOSCartStore = create<POSCartStore>()(
             },
 
              loadParkedCart: (cartId, allProducts) => {
-    const { parkedCarts, deleteParkedCart, cart: currentCart } = get();
-    const parked = parkedCarts.find((c) => c.id === cartId);
+                const { parkedCarts, unpackCart, cart: currentCart } = get();
+                const parked = parkedCarts.find((c) => c.id === cartId);
 
-    if (parked) {
-        const hydratedItems = parked.items.map(pItem => {
-            // Find the master product data
-            const originalProduct = allProducts.find(p => Number(p.id) === Number(pItem.batch_id));
-            
-            if (!originalProduct) {
-                console.warn(`Product with ID ${pItem.batch_id} not found`);
-            }
+                if (parked) {
+                    const hydratedItems = parked.items.map(pItem => {
+                        const originalProduct = allProducts.find(p => Number(p.id) === Number(pItem.batch_id));
+                        
+                        if (!originalProduct) {
+                            console.warn(`Product with ID ${pItem.batch_id} not found`);
+                        }
 
-            return {
-                ...originalProduct,
-                id: pItem.batch_id.toString(), // Ensure this matches your store's ID format
-                quantity: pItem.quantity,
-                price: pItem.price,
-            };
-        });
+                        return {
+                            ...originalProduct,
+                            id: pItem.batch_id.toString(), // Ensure this matches your store's ID format
+                            quantity: pItem.quantity,
+                            price: pItem.price,
+                        };
+                    });
 
-        set({
-            // If you want to MERGE with existing cart items instead of replacing:
-            // cart: [...currentCart, ...hydratedItems], 
-            cart: hydratedItems, 
-            customerId: parked.customerId || "",
-            notes: parked.notes || "",
-            orderNumber: parked.orderNumber,
-        });
-        
-        router.patch(route("orders.unpark", { orderNumber: parked.orderNumber }));
-        deleteParkedCart(cartId);
-    }
-},
+                    set({
+                        cart: hydratedItems, 
+                        customerId: parked.customerId || "",
+                        notes: parked.notes || "",
+                        orderNumber: parked.orderNumber,
+                    });
+                    
+                    router.patch(route("orders.unpark", { orderNumber: parked.orderNumber }));
+                    unpackCart(cartId);
+                }
+            },
 
             deleteParkedCart: (cartId) => {
+
+                router.delete(route('orders.packed.delete',cartId),{
+                    onSuccess: () => {
+                        get().unpackCart(cartId)
+                    },
+                    onError:()=>{
+                        console.log('failed ');
+                    }
+                })
+            },
+
+            unpackCart:(cartId) => {
                 set({ parkedCarts: get().parkedCarts.filter((c) => c.id !== cartId) });
             },
 
@@ -179,6 +188,8 @@ export const usePOSCartStore = create<POSCartStore>()(
                 const response = await axios.get("/api/v1/pos/orders/order-number");
                 const num = response.data.orderNumber;
                 set({ orderNumber: num });
+
+                console.log('response', num)
                 return num;
             },
 

@@ -177,7 +177,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/{order}/payment', [OrderController::class, 'showPayment'])->name('payment');
         Route::patch('/{orderNumber}/unpark', [OrderController::class, 'unpark'])->name('unpark');
         Route::delete('/{orderNumber}/void', [OrderController::class, 'void'])->name('void');
-        Route::patch('/park', [OrderController::class, 'parkOrder'])->name('park');
+        Route::patch('/pack', [OrderController::class, 'parkOrder'])->name('pack');
+        Route::delete('/pack/{orderNumber}', [OrderController::class, 'deletePack'])->name('packed.delete');
     });
 
 

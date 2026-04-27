@@ -145,13 +145,22 @@ class OrderService
     public function voidOrder(string $orderNumber): void
     {
         $order = $this->orderRepository->findByOrderNumber($orderNumber);
+
+        if(!$order){
+            throw new \Exception("Order with number {$orderNumber} not found");
+        }
+        if($order->status === OrderStatus::CANCELLED->value){
+            throw new \Exception("Order with number {$orderNumber} is already cancelled");
+        }
+        if($order->status === OrderStatus::COMPLETED->value){
+            throw new \Exception("Order with number {$orderNumber} cannot be cancelled as it is already completed");
+        }
+        
         DB::transaction(function () use ($order) {
             foreach ($order->items as $item) {
                 $this->batchRepository->releaseStock($item->batch_id, $item->quantity);
+                $item->delete();
             }
-
-            // 2. Delete the order (or soft delete/mark as voided)
-            $order->items()->delete();
             $order->delete();
         });
     }
@@ -192,5 +201,24 @@ class OrderService
         ]);
 
         return $order;
+    }
+
+    public function deleteByOrderNumber(string  $orderNumber):bool {
+        return DB::transaction(function() use ($orderNumber){
+        $packedOrder = $this->orderRepository->findByOrderNumber($orderNumber);
+        if(!$packedOrder){
+            throw new \Exception("Parked order with number {$orderNumber} not found");
+        }
+        if($packedOrder->status !== OrderStatus::PARKED->value){
+            throw new \Exception("Order with number {$orderNumber} cannot be deleted as it is not parked");
+        }
+
+        $packedOrder->items->each(function($item){
+            $this->batchRepository->releaseStock($item->batch_id, $item->quantity);
+            $item->delete();
+        });
+        return $packedOrder->delete();
+        });
+        
     }
 }

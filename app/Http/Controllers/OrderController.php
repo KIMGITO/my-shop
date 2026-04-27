@@ -97,4 +97,13 @@ class OrderController extends Controller
 
         return back()->with(['message' => 'Order unpacked successfully']);
     }
+
+    public function  deletePack($orderNumber)
+    {
+        if ($this->orderService->deleteByOrderNumber($orderNumber)) {
+            return back()->with(['message' => 'Parked order deleted successfully']);
+        }
+        return back()->with(['error' => 'Failed to delete parked order.']);
+
+    }
 }

@@ -61,6 +61,9 @@ export default function PosIndex({
     const total = getTotal(0.08);
     const itemCount = getItemCount();
 
+
+    console.log("POSProducts",POSProducts);
+    
     const filteredProducts = useMemo(() => {
         let products = [...POSProducts];
         if (activeCategory !== "all") products = products.filter((p) => p.category === activeCategory);
@@ -106,7 +109,7 @@ export default function PosIndex({
     };
 
     const handlePark = () => {
-        if (cart.length === 0) return alert("Cannot park empty cart");
+        if (cart.length === 0) return alert("Cannot pack empty cart");
         setShowParkConfirmation(true);
     };
 
@@ -119,7 +122,7 @@ export default function PosIndex({
             setParkCartName("");
             setShowParkedModal(true);
         } catch (error) {
-            alert("Failed to park cart");
+            alert("Failed to pack cart");
         } finally {
             setIsProcessing(false);
         }
@@ -196,7 +199,8 @@ export default function PosIndex({
                         <div className="flex-1 overflow-y-auto pb-20 lg:pb-0">
                             <div className="hidden lg:grid grid-cols-2 xl:grid-cols-3 gap-4">
                                 {filteredProducts.map((product) => (
-                                    <ProductCard key={product.id} product={product} onAddToCart={addToCart} variant="grid" />
+                                    <ProductCard 
+                                    key={product.id} product={product} onAddToCart={addToCart} variant="grid" />
                                 ))}
                             </div>
                             <div className="lg:hidden space-y-2">
@@ -228,7 +232,7 @@ export default function PosIndex({
                     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
                         <div className="bg-surface-container-lowest rounded-3xl w-full max-w-sm shadow-2xl overflow-hidden flex flex-col border border-outline-variant/10">
                             <div className="px-6 py-4 border-b border-outline-variant/10">
-                                <h3 className="text-xl font-bold font-headline text-on-surface">Park Current Cart</h3>
+                                <h3 className="text-xl font-bold font-headline text-on-surface">Pack Current Cart</h3>
                                 <p className="text-sm text-on-surface-variant mt-1">Order #{orderNumber} will be saved</p>
                             </div>
                             <div className="p-6 space-y-4">
@@ -247,7 +251,7 @@ export default function PosIndex({
                             </div>
                             <div className="px-6 py-4 bg-surface-container-low/50 flex gap-3">
                                 <Button variant="ghost" className="flex-1" onClick={() => setShowParkConfirmation(false)}>Cancel</Button>
-                                <Button variant="primary" className="flex-1" onClick={confirmPark} disabled={isProcessing}>Park Cart</Button>
+                                <Button variant="primary" className="flex-1" onClick={confirmPark} disabled={isProcessing}>Pack Cart</Button>
                             </div>
                         </div>
                     </div>

@@ -7,7 +7,9 @@ export interface Product {
     image: string;
     isOrganic?: boolean;
     isPopular?: boolean;
-    frequency?: number; // for frequently accessed tracking
+    frequency?: number;
+    availableQuantity: number;
+    reservedQuantity: number;
 }
 
 export interface CartItem extends Product {

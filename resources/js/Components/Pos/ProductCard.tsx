@@ -18,6 +18,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     variant = "grid",
 }) => {
 
+    console.log(product)
 
 
     const [added, setAdded] = useState(false);
@@ -52,7 +53,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     }
     
     return (
-        <div className="bg-surface-container-lowest p-4 rounded-xl flex flex-col gap-3 shadow-sm hover:shadow-md transition-all group">
+        <div className="bg-surface-container-lowest p-1 rounded-xl flex flex-col gap-3 shadow-sm hover:shadow-md transition-all group">
             <div className="relative h-32 rounded-lg overflow-hidden bg-surface-container">
                 <img
                     src={product.image}
@@ -72,7 +73,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             </div>
             <div>
                 <h3 className="font-bold text-on-surface">{product.name}</h3>
-                <p className="text-xs text-on-surface-variant">{product.unit}</p>
+                <p className="text-xs text-on-surface-variant">{product.availableQuantity} {product.unit}</p>
             </div>
             <div className="flex items-center justify-between mt-auto">
                 <span className="text-base font-black text-primary">Ksh{product.price.toFixed(2)}</span>

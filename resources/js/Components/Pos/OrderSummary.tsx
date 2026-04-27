@@ -112,7 +112,7 @@ export const OrderSummary: React.FC<OrderSummaryProps> = ({
                     variant="outline"
                     className="py-2.5 border hover:brightness-150  font-bold rounded-xl hover:bg-surface-container transition-colors text-sm"
                 >
-                    Park
+                    Pack
                 </Button>
             </div>
 
