@@ -1,44 +1,41 @@
+// ProductsPage.tsx (updated)
 import React, { useState } from "react";
 import { Head, router } from "@inertiajs/react";
 import { ProductCard } from "@/Components/Admin/ProductCard";
 import { FilterChip } from "@/Components/UI/FilterChip";
 import { SearchBar } from "@/Components/UI/SearchBar";
-import { ActionButton } from "@/Components/UI/ActionButton";
 import AuthenticatedLayout from "@/Components/Layout/AuthenticatedLayout";
-import { HiOutlineFilter, HiOutlinePlus, HiPlus } from "react-icons/hi";
+import { HiOutlinePlus, HiPlus } from "react-icons/hi";
 import { Product } from "@/types";
 import ProductFormModal from "./ProductFormModal";
-import { ImageItem } from "@/Components/UI/MultipleImagesUpload";
 import FloatingActionButton from "@/Components/Common/FloatingActionButton";
 import Button from "@/Components/UI/Button";
-import { CategoryModal } from "./CategoryModal";
+import CategoryModal from "./CategoryModal";
 
-const categories = [
-    { id: "all", label: "All Products", count: 24 },
-    { id: "milk", label: "Milk", count: 8 },
-    { id: "yoghurt", label: "Yoghurt", count: 6 },
-    { id: "bakery", label: "Bakery", count: 4 },
-    { id: "seasonal", label: "Seasonal", count: 6 },
-];
+interface Category {
+    id: number | string;
+    name: string;
+    description: string | null;
+    label?: string;
+    count?: number;
+}
 
 export default function ProductsPage({
     products,
+    categories: initialCategories,
     modalOpen = false,
 }: {
     modalOpen: boolean;
     products: Product[];
+    categories: Category[];
 }) {
-    console.log("products", products);
     const [searchQuery, setSearchQuery] = useState("");
     const [activeCategory, setActiveCategory] = useState("all");
     const [isModalOpen, setIsModalOpen] = useState(modalOpen);
     const [dataForEdit, setDataForEdit] = useState<Product | null>(null);
-    const [isCategoryModalOpen, setIsCategoryModalOpen] = useState<Boolean>(false);
-
-
-    const handleCreateCategory = (categoryData:{name:string,description:string}) => {
-        router.post(route('admin.inventory.categories.store'),categoryData);
-    }
+    const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+    const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+    const [categories, setCategories] = useState<Category[]>(initialCategories);
 
     const filteredProducts = products.filter((product) => {
         const matchesSearch =
@@ -71,22 +68,50 @@ export default function ProductsPage({
             )
         ) {
             router.delete(route("admin.inventory.products.destroy", id), {
-                onStart: () => {
-                    // Optional: Start a global loading bar or local state
-                },
+                onStart: () => {},
                 onSuccess: () => {
                     console.log("Product deleted successfully");
                 },
-                onError: (errors) => {
-                    // Handle any server-side errors
+                    onError: (errors) => {
                     alert(
                         "Failed to delete product: " + Object.values(errors)[0]
                     );
                 },
-                preserveScroll: true, 
+                preserveScroll: true,
             });
         }
     };
+
+    const handleCreateCategory = (newCategory: Category) => {
+        setCategories((prev) => [...prev, newCategory]);
+        // Optionally refresh products if needed
+        router.reload({ only: ["products"] });
+    };
+
+    const handleUpdateCategory = (updatedCategory: Category) => {
+        setCategories((prev) =>
+            prev.map((cat) =>
+                cat.id === updatedCategory.id ? updatedCategory : cat
+            )
+        );
+        // Reload products to update category names in product list
+        router.reload({ only: ["products"] });
+    };
+
+    const handleEditCategory = (category: Category) => {
+        setEditingCategory(category);
+        setIsCategoryModalOpen(true);
+    };
+
+    // Transform categories for FilterChip display
+    const displayCategories = [
+    { id: "all", label: "All Products", count: products.length },
+    ...(categories ? categories.map(cat => ({
+        id: cat.name.toLowerCase(),
+        label: cat.name,
+        count: products.filter(p => p.category === cat.name).length
+    })) : [])
+];
 
     return (
         <>
@@ -101,8 +126,8 @@ export default function ProductsPage({
                         </div>
                     </div>
 
-                    <div className="flex flex-wrap gap-3 mb-8">
-                        {categories.map((cat) => (
+                    <div className="flex flex-wrap gap-3 mb-8 items-center">
+                        {displayCategories.map((cat) => (
                             <FilterChip
                                 key={cat.id}
                                 label={cat.label}
@@ -111,9 +136,13 @@ export default function ProductsPage({
                                 onClick={() => setActiveCategory(cat.id)}
                             />
                         ))}
-                        <Button 
-                        className="rounded-full p-4 hover:bg-primary/60 hover:text-secondary " variant="outline" 
-                        onClick={() => setIsCategoryModalOpen(true)}
+                        <Button
+                            className="rounded-full p-4 hover:bg-primary/60 hover:text-secondary"
+                            variant="outline"
+                            onClick={() => {
+                                setEditingCategory(null);
+                                setIsCategoryModalOpen(true);
+                            }}
                         >
                             <HiPlus />
                         </Button>
@@ -138,6 +167,14 @@ export default function ProductsPage({
                         ))}
                     </div>
 
+                    {filteredProducts.length === 0 && (
+                        <div className="text-center py-12">
+                            <p className="text-on-surface-variant">
+                                No products found matching your criteria.
+                            </p>
+                        </div>
+                    )}
+
                     <ProductFormModal
                         isOpen={isModalOpen}
                         initialData={dataForEdit}
@@ -147,10 +184,21 @@ export default function ProductsPage({
                     <CategoryModal
                         isOpen={isCategoryModalOpen}
                         categories={categories}
-                        onClose={() => setIsCategoryModalOpen(false)}                       
-                        onCategoryCreated={(newCategory) => {
-                            handleCreateCategory(newCategory);
+                        selectedCategory={null}
+                        editingCategory={editingCategory}
+                        onClose={() => {
+                            setIsCategoryModalOpen(false);
+                            setEditingCategory(null);
                         }}
+                        onSelectCategory={(categoryName) => {
+                            // Auto-select the category filter when a category is selected
+                            const category = categories && categories.find(c => c.name === categoryName);
+                            if (category) {
+                                setActiveCategory(category.name.toLowerCase());
+                            }
+                        }}
+                        onCategoryCreated={handleCreateCategory}
+                        onCategoryUpdated={handleUpdateCategory}
                     />
                 </div>
 

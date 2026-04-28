@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Controller;
 use App\Http\Requests\Inventory\CategoryRequest;
 use App\Models\Category;
 use App\Repositories\CategoryRepository;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class CategoryController extends Controller
 {
@@ -13,7 +15,19 @@ class CategoryController extends Controller
 
         public function index()
         {
-            // Logic to fetch and return categories
+            $categories = $this->categoryRepository->all();
+            $categories->map(function($category){
+                $product_count = $category->products->count();
+                return [
+                    ...$category->toArray(),
+                    'count' => $product_count,
+                    'label' => $category->name,
+                ];
+            });
+
+            return Inertia::render('Admin/Category/Index', [
+                'categories' => toCamel($categories->toArray())
+            ]);
         }
     
         public function store(CategoryRequest $request)

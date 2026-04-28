@@ -3,33 +3,44 @@
 namespace App\Http\Controllers;
 
 use App\DTOs\ProductDTO;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\Inventory\ProductRequest;
 use App\Models\Inventory\Product;
-use App\Services\ProductService;
+use App\Repositories\CategoryRepository;
 use App\Repositories\Inventory\ProductRepository;
+use App\Services\ProductService;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Throwable;
 
 class ProductController extends Controller
 {
-    protected $productRepo;
-    protected $productService;
 
-    public function __construct(ProductRepository $productRepo, ProductService $productService)
+
+    public function __construct(protected ProductRepository $productRepo, protected ProductService $productService, protected CategoryRepository $categoryRepository)
     {
-        $this->productRepo = $productRepo;
-        $this->productService = $productService;
+       
     }
 
     public function index()
     {
         $products = $this->productRepo->all();
         $formattedProducts =  $this->productService->formatProductForUI($products);
+        //  $categories = $this->categoryRepository->all();
+        //     $categories->map(function($category){
+        //         $product_count = $category->products->count();
+        //         return [
+        //             ...$category->toArray(),
+        //             'count' => $product_count,
+        //             'label' => $category->name,
+        //         ];
+        //     });
+
 
         return Inertia::render('Admin/Product/Index', [
             'products' => toCamel($formattedProducts),
-            'modalOpen' => false
+            'modalOpen' => false,
+            'categories' => toCamel([])
         ]);
     }
 
