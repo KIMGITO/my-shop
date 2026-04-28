@@ -19,7 +19,7 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->decimal('rating', 3, 2)->default(0);
             $table->integer('reviews')->default(0);
-            $table->string('category')->nullable();
+            $table->foreignId('category_id')->constrained()->onDelete('cascade');
 
             // Status Flags
             $table->decimal('in_stock')->default(0);
@@ -28,6 +28,10 @@ return new class extends Migration
 
             $table->string('badge')->nullable();
             $table->timestamps();
+
+            $table->index('category_id');
+            $table->index('name');
+            
         });
     }
 
