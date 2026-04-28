@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Inventory\Product;
 use App\Repositories\CategoryRepository;
 use App\Repositories\Inventory\BatchRepository;
 use App\Repositories\Inventory\ProductRepository;
@@ -30,12 +31,15 @@ class ShopService
             ];
         })->toArray();
 
+      
+
+       
         $allProducts = $this->productRepository->all();
         $products = $this->productService->formatProductForUI($allProducts);
 
         return [
             'categories' =>$categories,
-            'products' => $products,
+            'products' => toCamel($products),
         ];
 
         

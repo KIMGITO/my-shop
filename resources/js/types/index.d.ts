@@ -15,6 +15,7 @@ export interface BaseProduct {
     name: string;
     price: number;
     image: string;
+    mainProductImage: string;
     description?: string;
     category?: string;
     sku?: string;

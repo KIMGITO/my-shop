@@ -13,7 +13,8 @@ class ShopController extends Controller
     ){}
 
     public function index(){
+        $shop = $this->shopService->shopItems();
         
-        return Inertia::render('Shop/Index', [$shop = $this->shopService->shopItems()]);
+        return Inertia::render('Shop/Index', $shop);
     }
 }

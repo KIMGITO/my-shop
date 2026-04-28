@@ -136,4 +136,25 @@
     100% {
         transform: translateX(100%);
     }
+
+}
+
+
+@keyframes tag-swing {
+    0% {
+        transform: rotate(-2deg);
+    }
+
+    50% {
+        transform: rotate(3deg);
+    }
+
+    100% {
+        transform: rotate(-2deg);
+    }
+}
+
+.animate-tag-swing {
+    transform-origin: top center;
+    animation: tag-swing 3s ease-in-out infinite;
 }
