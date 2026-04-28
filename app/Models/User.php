@@ -49,4 +49,14 @@ class User extends Authenticatable
     {
         return $query->role('customer');
     }
+
+    public function customer()
+    {
+        return $this->hasOne(Customer::class);
+    }
+
+    public function addresses()
+    {
+        return $this->hasMany(Address::class);
+    }
 }

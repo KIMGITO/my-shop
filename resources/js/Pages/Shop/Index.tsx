@@ -85,7 +85,7 @@ export default function ShopIndex() {
 
                 <Footer />
                 <FloatingActionButton />
-                <MobileNav />
+                {/* <MobileNav /> */}
             </div>
         </>
     );

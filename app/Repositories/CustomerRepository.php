@@ -2,13 +2,16 @@
 
 namespace App\Repositories;
 
-class CustomerRepository
+use App\Models\Customer;
+use App\Repositories\BaseRepository;
+
+class CustomerRepository extends BaseRepository
 {
     /**
      * Create a new class instance.
      */
-    public function __construct()
+    public function __construct(Customer $model)
     {
-        //
+        parent::__construct($model);
     }
 }
