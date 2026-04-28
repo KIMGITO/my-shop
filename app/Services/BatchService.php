@@ -56,7 +56,6 @@ class BatchService
         }
     }
 
-   
     // process batches 
     public function processBatch(array $payload, $id = null){
         
@@ -82,7 +81,6 @@ class BatchService
 
     }
 
-
     public function getBatchStatus(Batch $batch){
         try {
             $batch = $batch->load('product:id,shelf_life');
@@ -107,8 +105,6 @@ class BatchService
         }
     }
     
-
-   
 
 
 }

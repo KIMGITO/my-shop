@@ -6,6 +6,7 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\POSController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ShopController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UserController;
 use Illuminate\Foundation\Application;
@@ -36,7 +37,8 @@ Route::get('/', function () {
 // ============================================================================
 
 Route::prefix('shop')->name('shop.')->group(function () {
-    Route::get('/', fn() => Inertia::render('Shop/Index'))->name('index');
+    // Route::get('/', fn() => Inertia::render('Shop/Index'))->name('index');
+    Route::get('/', [ShopController::class, 'index'])->name('index');
     Route::get('/product/{id}', fn($id) => Inertia::render('Product/Show', ['id' => $id]))->name('show');
 });
 
