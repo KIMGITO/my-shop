@@ -9,6 +9,7 @@
     // ============================================================================
 
 use App\Http\Controllers\BatchController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UserController;
@@ -22,6 +23,13 @@ use Inertia\Inertia;
 
         // Inventory Management
         Route::prefix('inventory')->name('inventory.')->group(function () {
+            // categories
+            Route::prefix('categories')->name('categories.')->group(function () {
+                Route::get('/', fn() => Inertia::render('Admin/Category/Index'))->name('index');
+                Route::post('/', [CategoryController::class, 'store'])->name('store');
+                Route::put('/{category}', [CategoryController::class, 'update'])->name('update');
+                Route::delete('/{category}', [CategoryController::class, 'destroy'])->name('destroy');
+            });
             // products
             Route::prefix('products')->name('products.')->group(function () {
                 Route::get('/', [ProductController::class,  'index'])->name('index');

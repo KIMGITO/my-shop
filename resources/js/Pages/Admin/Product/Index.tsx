@@ -5,11 +5,13 @@ import { FilterChip } from "@/Components/UI/FilterChip";
 import { SearchBar } from "@/Components/UI/SearchBar";
 import { ActionButton } from "@/Components/UI/ActionButton";
 import AuthenticatedLayout from "@/Components/Layout/AuthenticatedLayout";
-import { HiOutlineFilter, HiOutlinePlus } from "react-icons/hi";
+import { HiOutlineFilter, HiOutlinePlus, HiPlus } from "react-icons/hi";
 import { Product } from "@/types";
 import ProductFormModal from "./ProductFormModal";
 import { ImageItem } from "@/Components/UI/MultipleImagesUpload";
 import FloatingActionButton from "@/Components/Common/FloatingActionButton";
+import Button from "@/Components/UI/Button";
+import { CategoryModal } from "./CategoryModal";
 
 const categories = [
     { id: "all", label: "All Products", count: 24 },
@@ -31,6 +33,12 @@ export default function ProductsPage({
     const [activeCategory, setActiveCategory] = useState("all");
     const [isModalOpen, setIsModalOpen] = useState(modalOpen);
     const [dataForEdit, setDataForEdit] = useState<Product | null>(null);
+    const [isCategoryModalOpen, setIsCategoryModalOpen] = useState<Boolean>(false);
+
+
+    const handleCreateCategory = (categoryData:{name:string,description:string}) => {
+        router.post(route('admin.inventory.categories.store'),categoryData);
+    }
 
     const filteredProducts = products.filter((product) => {
         const matchesSearch =
@@ -103,6 +111,12 @@ export default function ProductsPage({
                                 onClick={() => setActiveCategory(cat.id)}
                             />
                         ))}
+                        <Button 
+                        className="rounded-full p-4 hover:bg-primary/60 hover:text-secondary " variant="outline" 
+                        onClick={() => setIsCategoryModalOpen(true)}
+                        >
+                            <HiPlus />
+                        </Button>
                     </div>
 
                     <div className="mb-8 max-w-md">
@@ -128,6 +142,15 @@ export default function ProductsPage({
                         isOpen={isModalOpen}
                         initialData={dataForEdit}
                         onClose={() => setIsModalOpen(false)}
+                    />
+
+                    <CategoryModal
+                        isOpen={isCategoryModalOpen}
+                        categories={categories}
+                        onClose={() => setIsCategoryModalOpen(false)}                       
+                        onCategoryCreated={(newCategory) => {
+                            handleCreateCategory(newCategory);
+                        }}
                     />
                 </div>
 
