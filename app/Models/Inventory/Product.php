@@ -3,6 +3,7 @@
 namespace App\Models\Inventory;
 
 use App\Models\Batch;
+use App\Models\Category;
 use App\Models\ProductImage;
 use App\Models\Traits\HasSkuByCategoryName;
 use App\Services\CloudinaryService;
@@ -35,6 +36,10 @@ class Product extends Model
     use HasSkuByCategoryName;
 
     protected $appends = ['main_product_image'];
+
+    public function category(){
+        return $this->belongsTo(Category::class);
+    }
 
     public function images()
     {
