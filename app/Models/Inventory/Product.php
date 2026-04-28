@@ -18,7 +18,7 @@ use Illuminate\Database\Eloquent\Model;
         'description',
         'rating',
         'reviews',  
-        'category',
+        'category_id',
         'in_stock',
         'is_popular',
         'is_featured',

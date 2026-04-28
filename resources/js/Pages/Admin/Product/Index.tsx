@@ -35,6 +35,7 @@ export default function ProductsPage({
     const [dataForEdit, setDataForEdit] = useState<Product | null>(null);
     const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
     const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+    
     const [categories, setCategories] = useState<Category[]>(initialCategories);
 
     const filteredProducts = products.filter((product) => {

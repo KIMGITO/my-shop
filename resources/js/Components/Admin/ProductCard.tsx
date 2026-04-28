@@ -93,7 +93,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
                     <p className="text-on-surface-variant text-[10px] text-end font-semibold truncate">
                         {product.sku}
                     </p>
-                    <p className="text-on-surface-variant text-[10px] border p-2 rounded border-dashed md:text-sm truncate">
+                    <p className="text-on-surface-variant text-[10px]  md:text-sm truncate">
                         <span className="uppercase font-semibold">{product.category}</span>:{" "}
                         <span className="text-xs leading-loose italic capitalize">
                             {product.description}

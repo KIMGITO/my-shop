@@ -26,21 +26,21 @@ class ProductController extends Controller
     {
         $products = $this->productRepo->all();
         $formattedProducts =  $this->productService->formatProductForUI($products);
-        //  $categories = $this->categoryRepository->all();
-        //     $categories->map(function($category){
-        //         $product_count = $category->products->count();
-        //         return [
-        //             ...$category->toArray(),
-        //             'count' => $product_count,
-        //             'label' => $category->name,
-        //         ];
-        //     });
+         $categories = $this->categoryRepository->all();
+            $categories->map(function($category){
+                $product_count = $category->products->count();
+                return [
+                    ...$category->toArray(),
+                    'count' => $product_count,
+                    'label' => $category->name,
+                ];
+            });
 
 
         return Inertia::render('Admin/Product/Index', [
             'products' => toCamel($formattedProducts),
             'modalOpen' => false,
-            'categories' => toCamel([])
+            'categories' => toCamel($categories->toArray())
         ]);
     }
 
