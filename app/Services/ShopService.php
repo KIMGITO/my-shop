@@ -41,15 +41,17 @@ class ShopService
     }
 
     public function shopItem(int $id){
-        $product = $this->productRepository->find($id)->load(['images:product_id,id,url','batches']);
+        $product = $this->productRepository->find($id)->load(['images:product_id,id,url','batches','category:id,name']);
         return  ([
             'name' => $product['name'],
-            'ratting' => $product['ratting'],
+            'category' => $product->category->name ?? '',
+            'rating' => $product['rating'],
             'reviews'=> $product['reviews'],
             'price' => $product['price'],
             'unit'=> $product['unit'],
             'description' => $product['description'],
             'images' => $product->images->toArray(),
+            'features' =>[]
         ]);
 
         

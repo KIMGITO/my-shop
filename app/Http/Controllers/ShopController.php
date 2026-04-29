@@ -23,6 +23,6 @@ class ShopController extends Controller
         // show product in a shop page.
         $product = $this->shopService->shopItem($product->id);
 
-        return Inertia::render('Product/Show',['product' => ['product' => $product]]);
+        return Inertia::render('Product/Show',['product' => $product]);
     }
 }

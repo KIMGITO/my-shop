@@ -14,29 +14,7 @@ import QuantitySelector from "@/Components/UI/QuantitySelector";
 import ProductImageGallery from "@/Components/Product/ProductImageGallery";
 import RelatedProducts from "@/Components/Product/RelatedProducts";
 
-// Mock product data - in real app, this would come from backend
-const getProductData = (id: string) => {
-    const products = {
-        "1": {
-            id: 1,
-            name: "Golden Hour Whole Milk",
-            price: 6.5,
-            unit: "1 Litre",
-            rating: 4.8,
-            reviews: 128,
-            description:
-                "Experience the unparalleled richness of Kaykay's signature whole milk. Collected at the first light of dawn, our milk retains its natural butterfat and vitamin profile through minimal processing. No antibiotics, no synthetic hormones—just pure, buttery bliss from grass-fed Jerseys.",
-            shortDescription:
-                "Premium whole milk from grass-fed Jersey cows, collected at dawn for maximum freshness and creaminess.",
-            images: [
-                "https://lh3.googleusercontent.com/aida-public/AB6AXuDTtrE2do7hTtyPYVnUva_HYUTDfCw7yP3cXOiPMU4R2_znmUG3WW8WvmiPAs23qLuaokEeej8IHF5yY-S8vfG7pulAK47UIndO0sc0D6TyKk6NnbndznsFSNQT0d4V0OIrNC9AB2EhnX7Jgcio67YbdGzgBc7cmxG5531gca1xU4YJp97ppbHD8IjvZNJuaPse0G56d1D3U-MK346Fp9s-TTmIvUQ_p63gOa7gfoEMfI9_DVqjvIjXGbp65ojSsPAsRP-F_xUUdvLW",
-                "https://lh3.googleusercontent.com/aida-public/AB6AXuB1P6ExcCmjp97zxC64Iwt-LPrwVd5JJJDEM2dapUn4ZfscdgxpLQVQv-w2ddLyE9ZsL5hYvuzrlDOcZATzm00DQZdqeKlJcoj-e1KKyem-aE7xVd5yN45jpWai31OGnYMRRwccsR3DRaKvet80yrAA_hGuOcjCIJ_FXnihOz1b8FIT6nYYiqa5g4PleP0L3n0aJQZTqaCyr6a9ZGPUAeETUxEk-tb4X3CUGFHnQ7nDpHGaV0jLWHvRhLd2ixiBsBUEOAmVhzqc-ES_",
-                "https://lh3.googleusercontent.com/aida-public/AB6AXuCBUY6RXIs3YLtW_5Bpw-7maErqTszv69tDwB28FCw8jhNRotpHBrQKyzbZ2bbURpCiaOeKBnPIV9foaLIfZjfNu1wt-gmjsrThtxQpeXrmqr-wBzSQ0JCn-JEJVnffCrMzRtsQ9CNCaLcefO9OtS1K29BvkU1pkYlarC9pf5U2vdOBHgumTx9wEvcDK9PNZnfqMEWesNisqCEgcr4mFKcfl_yaItcPw5bKLy0SGNVMGSP5I0v9hfCijCie3vhe4X70JQSBRCiH55NA",
-            ],
-            category: "Milk",
-            inStock: true,
-            badge: "Farm-To-Table",
-            features: [
+const  features =  [
                 {
                     icon: "eco",
                     label: "100% Organic",
@@ -57,19 +35,64 @@ const getProductData = (id: string) => {
                     label: "High Protein",
                     description: "8g per serving",
                 },
-            ],
-            nutritionalInfo: {
-                servingSize: "1 cup (240ml)",
-                calories: 150,
-                totalFat: "8g",
-                protein: "8g",
-                calcium: "30%",
-            },
-        },
-    };
+            ];
 
-    return products[id as keyof typeof products] || products["1"];
-};
+// Mock product data - in real app, this would come from backend
+// const getProductData = (id: string) => {
+//     const products = {
+//         "1": {
+//             id: 1,
+//             name: "Golden Hour Whole Milk",
+//             price: 6.5,
+//             unit: "1 Litre",
+//             rating: 4.8,
+//             reviews: 128,
+//             description:
+//                 "Experience the unparalleled richness of Kaykay's signature whole milk. Collected at the first light of dawn, our milk retains its natural butterfat and vitamin profile through minimal processing. No antibiotics, no synthetic hormones—just pure, buttery bliss from grass-fed Jerseys.",
+//             shortDescription:
+//                 "Premium whole milk from grass-fed Jersey cows, collected at dawn for maximum freshness and creaminess.",
+//             images: [
+//                 "https://lh3.googleusercontent.com/aida-public/AB6AXuDTtrE2do7hTtyPYVnUva_HYUTDfCw7yP3cXOiPMU4R2_znmUG3WW8WvmiPAs23qLuaokEeej8IHF5yY-S8vfG7pulAK47UIndO0sc0D6TyKk6NnbndznsFSNQT0d4V0OIrNC9AB2EhnX7Jgcio67YbdGzgBc7cmxG5531gca1xU4YJp97ppbHD8IjvZNJuaPse0G56d1D3U-MK346Fp9s-TTmIvUQ_p63gOa7gfoEMfI9_DVqjvIjXGbp65ojSsPAsRP-F_xUUdvLW",
+//                 "https://lh3.googleusercontent.com/aida-public/AB6AXuB1P6ExcCmjp97zxC64Iwt-LPrwVd5JJJDEM2dapUn4ZfscdgxpLQVQv-w2ddLyE9ZsL5hYvuzrlDOcZATzm00DQZdqeKlJcoj-e1KKyem-aE7xVd5yN45jpWai31OGnYMRRwccsR3DRaKvet80yrAA_hGuOcjCIJ_FXnihOz1b8FIT6nYYiqa5g4PleP0L3n0aJQZTqaCyr6a9ZGPUAeETUxEk-tb4X3CUGFHnQ7nDpHGaV0jLWHvRhLd2ixiBsBUEOAmVhzqc-ES_",
+//                 "https://lh3.googleusercontent.com/aida-public/AB6AXuCBUY6RXIs3YLtW_5Bpw-7maErqTszv69tDwB28FCw8jhNRotpHBrQKyzbZ2bbURpCiaOeKBnPIV9foaLIfZjfNu1wt-gmjsrThtxQpeXrmqr-wBzSQ0JCn-JEJVnffCrMzRtsQ9CNCaLcefO9OtS1K29BvkU1pkYlarC9pf5U2vdOBHgumTx9wEvcDK9PNZnfqMEWesNisqCEgcr4mFKcfl_yaItcPw5bKLy0SGNVMGSP5I0v9hfCijCie3vhe4X70JQSBRCiH55NA",
+//             ],
+//             category: "Milk",
+//             inStock: true,
+//             badge: "Farm-To-Table",
+//             features: [
+//                 {
+//                     icon: "eco",
+//                     label: "100% Organic",
+//                     description: "Certified grass-fed",
+//                 },
+//                 {
+//                     icon: "local_shipping",
+//                     label: "Cold-Chain",
+//                     description: "Delivered under 4°C",
+//                 },
+//                 {
+//                     icon: "recycling",
+//                     label: "Sustainable",
+//                     description: "Reusable glass bottles",
+//                 },
+//                 {
+//                     icon: "nutrition",
+//                     label: "High Protein",
+//                     description: "8g per serving",
+//                 },
+//             ],
+//             nutritionalInfo: {
+//                 servingSize: "1 cup (240ml)",
+//                 calories: 150,
+//                 totalFat: "8g",
+//                 protein: "8g",
+//                 calcium: "30%",
+//             },
+//         },
+//     };
+
+//     return products[id as keyof typeof products] || products["1"];
+// };
 
 // Related products
 const relatedProducts = [
@@ -136,9 +159,11 @@ const ProductFeatures: React.FC<{
 };
 
 // Main Product Detail Page
-export default function ProductShow() {
+export default function ProductShow({product}) {
+
+    console.log(product.category);
     const { id } = usePage().props as { id: string };
-    const product = getProductData(id);
+    
     const [quantity, setQuantity] = useState(1);
     const [isWishlisted, setIsWishlisted] = useState(false);
 
@@ -204,7 +229,7 @@ export default function ProductShow() {
                                 />
 
                                 <div className="text-3xl font-bold text-primary mb-8 tracking-tight">
-                                    ${product.price}
+                                    Ksh {product.price}
                                     <span className="text-sm font-normal text-on-surface-variant">
                                         {" "}
                                         / {product.unit}
@@ -278,7 +303,7 @@ export default function ProductShow() {
                                 </div>
 
                                 {/* Product Features */}
-                                <ProductFeatures features={product.features} />
+                                <ProductFeatures features={features} />
                             </div>
                         </div>
 
@@ -286,10 +311,7 @@ export default function ProductShow() {
                         <RelatedProducts products={relatedProducts} />
                     </Container>
                 </main>
-
                 <Footer />
-                <FloatingActionButton />
-                <MobileNav />
             </div>
         </>
     );
