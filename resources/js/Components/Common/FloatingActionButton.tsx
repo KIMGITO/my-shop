@@ -22,7 +22,7 @@ export const FloatingActionButton = ({
             onClick={action}
             disabled={disabled}
             className={`
-                fixed bottom-10 right-10 
+                fixed bottom-5 right-10 
                 bg-primary text-on-primary 
                 p-6 rounded-full shadow-2xl 
                 transition-all z-100

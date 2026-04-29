@@ -13,6 +13,7 @@ import Rating from "@/Components/UI/Rating";
 import QuantitySelector from "@/Components/UI/QuantitySelector";
 import ProductImageGallery from "@/Components/Product/ProductImageGallery";
 import RelatedProducts from "@/Components/Product/RelatedProducts";
+import { cn } from "@/lib/utils";
 
 const  features =  [
                 {
@@ -247,61 +248,50 @@ export default function ProductShow({product}) {
                                     </span>
                                     <QuantitySelector
                                         quantity={quantity}
-                                        onIncrease={() =>
-                                            setQuantity(quantity + 1)
-                                        }
-                                        onDecrease={() =>
-                                            setQuantity(quantity - 1)
-                                        }
+                                        onUpdate={()=>{}}
+                                      
                                     />
                                 </div>
 
                                 {/* Action Buttons */}
-                                <div className="flex flex-col gap-4">
-                                    <div className="flex gap-4">
+                                <div className="flex flex-col gap-3">
+                                    {/* Primary Action */}
+                                    <Button
+                                        variant="primary" 
+                                        size="lg"
+                                        className="w-full bg-[#5a31f4] hover:bg-[#4b29cc] text-white border-none py-6 shadow-md"
+                                    >
+                                        Buy with ShopPay
+                                    </Button>
+
+                                    {/* Secondary Actions */}
+                                    <div className="flex gap-3 h-[60px]"> {/* Fixed height keeps them perfectly aligned */}
                                         <Button
                                             variant="primary"
                                             onClick={handleAddToCart}
-                                            size="lg"
-                                            className="flex-1"
+                                            className="flex-[5] h-full font-bold tracking-wide"
                                         >
-                                            <span className="material-symbols-outlined mr-2">
-                                                shopping_bag
-                                            </span>
+                                            <span className="material-symbols-outlined mr-2">shopping_bag</span>
                                             ADD TO CART
                                         </Button>
+                                        
                                         <Button
                                             onClick={handleWishlist}
                                             variant="outline"
-                                            size="lg"
-                                            className={`p-4 ${
-                                                isWishlisted
-                                                    ? "bg-primary/20"
-                                                    : ""
-                                            } `}
+                                            className={cn(
+                                                "h-full aspect-square p-0 flex items-center justify-center transition-all",
+                                                isWishlisted ? "bg-red-50 border-red-200 text-red-500" : "text-gray-500"
+                                            )}
                                         >
                                             <span
-                                                className="material-symbols-outlined "
-                                                style={{
-                                                    fontVariationSettings:
-                                                        isWishlisted
-                                                            ? "'FILL' 1"
-                                                            : "'FILL' 0",
-                                                }}
+                                                className="material-symbols-outlined !text-[28px]" 
+                                                style={{ fontVariationSettings: isWishlisted ? "'FILL' 1" : "'FILL' 0" }}
                                             >
                                                 favorite
                                             </span>
                                         </Button>
                                     </div>
-                                    <Button
-                                        variant="outline"
-                                        className="flex "
-                                        size="lg"
-                                    >
-                                        Buy with ShopPay
-                                    </Button>
                                 </div>
-
                                 {/* Product Features */}
                                 <ProductFeatures features={features} />
                             </div>
