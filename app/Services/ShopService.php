@@ -31,9 +31,6 @@ class ShopService
             ];
         })->toArray();
 
-      
-
-       
         $allProducts = $this->productRepository->all();
         $products = $this->productService->formatProductForUI($allProducts);
 
@@ -41,7 +38,21 @@ class ShopService
             'categories' =>$categories,
             'products' => toCamel($products),
         ];
+    }
+
+    public function shopItem(int $id){
+        $product = $this->productRepository->find($id)->load(['images:product_id,id,url','batches']);
+        return  ([
+            'name' => $product['name'],
+            'ratting' => $product['ratting'],
+            'reviews'=> $product['reviews'],
+            'price' => $product['price'],
+            'unit'=> $product['unit'],
+            'description' => $product['description'],
+            'images' => $product->images->toArray(),
+        ]);
 
         
     }
+
 }

@@ -39,7 +39,7 @@ Route::get('/', function () {
 Route::prefix('shop')->name('shop.')->group(function () {
     // Route::get('/', fn() => Inertia::render('Shop/Index'))->name('index');
     Route::get('/', [ShopController::class, 'index'])->name('index');
-    Route::get('/product/{id}', fn($id) => Inertia::render('Product/Show', ['id' => $id]))->name('show');
+    Route::get('/product/{product}', [ShopController::class, 'product'])->name('product');
 });
 
 // ============================================================================

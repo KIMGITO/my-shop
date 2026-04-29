@@ -46,7 +46,7 @@ class Product extends Model
         return $this->hasMany(ProductImage::class);
     }
 
-    public function bathes (){
+    public function batches (){
         return  $this->hasMany(Batch::class);
     }
 

@@ -37,7 +37,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
     const handleAction = (e: React.MouseEvent, type: 'view' | 'add') => {
         e.stopPropagation();
-        if (type === 'view') router.visit(`/product/${product.id}`);
+        if (type === 'view') router.get(route('shop.product',product.id));
         else onAddToCart?.(product);
     };
 

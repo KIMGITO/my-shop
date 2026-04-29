@@ -54,13 +54,13 @@ class BaseRepository
         return $this->model->create(to_snake($data));
     }
 
-    public function update($id, array $data)
+    public function update(int $id, array $data)
     {
         $record = $this->model->findOrFail($id);
         $record->update(to_snake($data));
         return $record;
     }
-    public function delete($id)
+    public function delete(int $id)
     {
         return $this->model->find($id)->delete();
     }
