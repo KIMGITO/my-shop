@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\IdentifierRequest;
+use App\Services\OTPService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -14,6 +15,9 @@ use Inertia\Response;
 
 class AuthenticatedSessionController extends Controller
 {
+    public function __construct(
+        protected OTPService $otpService,
+    ){}
     /**
      * Display the login view.
      */
@@ -29,7 +33,14 @@ class AuthenticatedSessionController extends Controller
 
     public function sendOTP(IdentifierRequest  $request){
        $validated =  $request->validated();
-       
+
+       $otp = $this->otpService->generate($validated['identifier']);
+
+       if($otp == 'cooldown'){
+        // rate limiting
+       }
+       dd($otp);
+
     }
 
     /**
