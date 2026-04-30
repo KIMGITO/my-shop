@@ -21,7 +21,8 @@ export const Navbar: React.FC = () => {
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     const navLinks = [
-        { name: "Shop", path: "/shop" },
+        { name: "Welcome", path: "/welcome" },
+        { name: "Shop", path: "/" },
         { name: "Subscriptions", path: "/subscriptions" },
         { name: "Our Story", path: "/story" },
         { name: "Wholesale", path: "/wholesale" },

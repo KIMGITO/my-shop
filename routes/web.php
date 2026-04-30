@@ -23,14 +23,17 @@ use Inertia\Inertia;
 // Public Routes
 // ============================================================================
 
-Route::get('/', function () {
+Route::get('/', [ShopController::class, 'index']
+)->name('home');
+Route::get('/welcome',
+function () {
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
         'canRegister' => Route::has('register'),
         'laravelVersion' => Application::VERSION,
         'phpVersion' => PHP_VERSION,
     ]);
-})->name('home');
+} );
 
 // ============================================================================
 // Shop Routes

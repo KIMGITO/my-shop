@@ -102,7 +102,8 @@ const ProductCard: React.FC<ProductCardProps> = ({
                 {getBadgeType() && (
     <SmartBadge
         text={product.badge || (product.isPopular ? "Popular" : "")}
-        type={getBadgeType()!}
+        type={'ribbon'}
+        variant="red"
     />
 )}
                 <img 
