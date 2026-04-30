@@ -5,7 +5,7 @@ import Button from "@/Components/UI/Button";
 import Input from "@/Components/UI/Input";
 import SmartBadge from "@/Components/UI/SmartBadge";
 
-const RegisterCustomerDiscovered: React.FC = () => {
+const RegisterCustomerDiscovered: React.FC<{setPage:()=>void}> = (setPage) => {
     const { data, setData, post, processing, errors } = useForm({
         name: "",
     });

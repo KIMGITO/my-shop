@@ -6,7 +6,7 @@ import Input from "@/Components/UI/Input";
 import SmartBadge from "@/Components/UI/SmartBadge";
 import { HiArrowRight } from "react-icons/hi";
 
-const RegisterIdentifier: React.FC = () => {
+const RegisterIdentifier = (setPage:()=>void) => {
     const { data, setData, post, processing, errors } = useForm({
         identifier: "", // phone or email
     });

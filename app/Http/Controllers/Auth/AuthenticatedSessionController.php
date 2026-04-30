@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Http\Requests\IdentifierRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -23,7 +24,12 @@ class AuthenticatedSessionController extends Controller
         //     'status' => session('status'),
         // ]);
 
-        return Inertia::render('Auth/Login');
+        return Inertia::render('Auth/Login', ['page' => 'identifier']);
+    }
+
+    public function sendOTP(IdentifierRequest  $request){
+       $validated =  $request->validated();
+       
     }
 
     /**

@@ -1,5 +1,5 @@
 // resources/js/Pages/Auth/Login.tsx
-import React from "react";
+import React, { useState } from "react";
 import { Head, Link } from "@inertiajs/react";
 import LoginForm from "@/Components/Auth/LoginForm";
 import GuestLayout from "@/Components/Layout/GuestLayout";
@@ -12,10 +12,18 @@ import RegisterCustomerDiscoverd from "@/Components/Auth/RegisterCustomerDiscove
 interface LoginProps {
     status?: string;
     canResetPassword?: boolean;
-    form: 'identifier' | 'otp' | 'discovered'
+    page: 'identifier' | 'otp' | 'discovered'
 }
 
-export default function Login({ status, canResetPassword, form = 'discovered' }: LoginProps) {
+export default function Login({ status, canResetPassword, page = 'discovered' }: LoginProps) {
+
+    const [form, setForm] = useState<'identifier'|'otp'|'discovered'>(page);
+
+    const setPage = (page: 'identifier' | 'otp' | 'discovered' ) => {
+        setForm(page);
+    }
+
+
     return (
         <GuestLayout>
             <Head title="Login - Kaykay's Dairy" />
@@ -49,7 +57,7 @@ export default function Login({ status, canResetPassword, form = 'discovered' }:
                         /> */}
 
                         {
-                            form == 'identifier'?<RegisterIdentifier/>: form =='otp'?<RegisterOTP/>:<RegisterCustomerDiscoverd/>
+                            form == 'identifier'?<RegisterIdentifier />: form =='otp'?<RegisterOTP/>:<RegisterCustomerDiscoverd/>
                         }
                         
                     </div>

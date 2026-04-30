@@ -4,7 +4,7 @@ import { useForm, Link, Head } from "@inertiajs/react";
 import Button from "@/Components/UI/Button";
 import SmartBadge from "@/Components/UI/SmartBadge";
 
-const RegisterOTP: React.FC<{ phone?: string; email?: string }> = ({ phone, email }) => {
+const RegisterOTP: React.FC<{ phone?: string; email?: string, setPage:()=>void }> = ({ phone, email, setPage }) => {
     const [otp, setOtp] = useState(["", "", "", ""]);
     const inputRefs = useRef<(HTMLInputElement | null)[]>([null, null, null, null]);
     
