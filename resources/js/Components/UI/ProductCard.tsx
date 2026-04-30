@@ -55,8 +55,8 @@ const ProductCard: React.FC<ProductCardProps> = ({
         if (hideRating || size === "xs") return null;
         return (
             <div className="flex items-center gap-0.5 text-amber-500">
-                <Star size={size === "sm" ? 10 : 14} className="fill-current" />
-                <span className="text-[10px] font-bold text-on-surface-variant">{product.rating}</span>
+                <Star size={size === "sm" ? 10 : 14} className={`${product.rating > 0 ? 'fill-current':''}`} />
+                <span className="text-[10px] font-bold text-on-surface-variant">{Number(product.rating).toFixed(0)}</span>
             </div>
         );
     };

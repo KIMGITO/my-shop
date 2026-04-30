@@ -84,7 +84,6 @@ export default function ShopIndex({categories, products}: {categories:any[], pro
                 </main>
 
                 <Footer />
-                <FloatingActionButton />
                 {/* <MobileNav /> */}
             </div>
         </>

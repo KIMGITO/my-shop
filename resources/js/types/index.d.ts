@@ -24,8 +24,8 @@ export interface BaseProduct {
 // ========== STORE / CUSTOMER FACING PRODUCT ==========
 export interface Product extends BaseProduct {
     unit?: string;
-    rating?: number;
-    reviews?: number;
+    rating: number;
+    reviews: number;
     inStock?: boolean;
     isPopular?: boolean;
     isFeatured?: boolean;
