@@ -8,9 +8,9 @@ export const RegisterForm: React.FC = () => {
     const { data, setData, post, processing, errors, reset } = useForm({
         name: "",
         email: "",
+        phone: "",
         password: "",
-        password_confirmation: "", 
-
+        password_confirmation: "",
     });
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -51,6 +51,15 @@ export const RegisterForm: React.FC = () => {
                     error={errors.email}
                     onChange={(e) => setData("email", e.target.value)}
                     placeholder="jane@example.com"
+                />
+
+                <Input
+                    label="Phone Number"
+                    type="tel"
+                    value={data.phone}
+                    error={errors.phone}
+                    onChange={(e) => setData("phone", e.target.value)}
+                    placeholder="07XXXXXXXX"
                 />
 
                 <Input
