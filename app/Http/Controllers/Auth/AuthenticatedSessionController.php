@@ -23,24 +23,36 @@ class AuthenticatedSessionController extends Controller
      */
     public function create(): Response
     {
-        // return Inertia::render('Auth/Login', [
-        //     'canResetPassword' => Route::has('password.request'),
-        //     'status' => session('status'),
-        // ]);
-
-        return Inertia::render('Auth/Login', ['page' => 'identifier']);
+        return Inertia::render('Auth/Login');
     }
 
-    public function sendOTP(IdentifierRequest  $request){
+    public function identifier(): Response
+    {
+        return Inertia::render('Auth/Identifier');
+    }
+
+    public function otp(){
+        return Inertia::render('Auth/Otp');
+    }
+
+    public function discoveredCustomer(){
+        return Inertia::render('Auth/CustomerDiscovered');
+    }
+
+    public function identify(IdentifierRequest  $request){
        $validated =  $request->validated();
 
        $otp = $this->otpService->generate($validated['identifier']);
 
        if($otp == 'cooldown'){
-        // rate limiting
+            return back()->with(['error' => 'OTP not sent,  try again after 1 minute']);
        }
-       dd($otp);
+       
+        return Inertia::render('Auth/Login');
+    }
 
+    public function verifyOtp(Request $request){
+        dd('verify otp');
     }
 
     /**

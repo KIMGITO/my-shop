@@ -46,16 +46,8 @@ export default function Login({ status, canResetPassword, form }: LoginProps) {
                             </div>
                         </div>
 
-                        {/* Right Side - Login Form */}
-                        {/* <LoginForm
-                            status={status}
-                            canResetPassword={canResetPassword}
-                        /> */}
-                        <RegisterIdentifier />
 
-                        {
-                            form == 'identifier'?: form =='otp'?<RegisterOTP/>:<RegisterCustomerDiscoverd/>
-                        }
+                            <RegisterOTP/>
                         
                     </div>
                 </main>

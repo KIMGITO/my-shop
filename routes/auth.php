@@ -22,7 +22,17 @@ use Illuminate\Support\Facades\Route;
 
     Route::middleware('guest')->group(function () {
     
-    Route::post('/register/send-otp', [AuthenticatedSessionController::class, 'sendOTP']);
+
+    Route::prefix('register')->group(function () {
+
+        Route::get('/identifier', [AuthenticatedSessionController::class, 'identifier'] );
+        Route::post('/identifier', [AuthenticatedSessionController::class, 'identify'] );
+
+
+        Route::get('/otp', [AuthenticatedSessionController::class, 'otp']);
+        Route::post('/otp', [AuthenticatedSessionController::class, 'verify']);
+
+    });
 
     Route::get('login', [AuthenticatedSessionController::class, 'create'])
         ->name('login');

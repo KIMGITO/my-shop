@@ -12,10 +12,9 @@ import RegisterCustomerDiscoverd from "@/Components/Auth/RegisterCustomerDiscove
 interface LoginProps {
     status?: string;
     canResetPassword?: boolean;
-    form: 'identifier' | 'otp' | 'discovered'
 }
 
-export default function Login({ status, canResetPassword, form }: LoginProps) {
+export default function Login({ status, canResetPassword }: LoginProps) {
 
 
 
@@ -52,10 +51,6 @@ export default function Login({ status, canResetPassword, form }: LoginProps) {
                             canResetPassword={canResetPassword}
                         /> */}
                         <RegisterIdentifier />
-
-                        {
-                            form == 'identifier'?: form =='otp'?<RegisterOTP/>:<RegisterCustomerDiscoverd/>
-                        }
                         
                     </div>
                 </main>
