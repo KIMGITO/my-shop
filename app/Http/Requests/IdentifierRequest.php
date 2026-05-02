@@ -24,7 +24,7 @@ class IdentifierRequest extends FormRequest
                     ['regex:/^(?:254|\+254|0)?(7|1)[0-9]{8}$/']
                 ),
             ],
-            'identifier_type' => ['required', 'in:email,phone'],
+            'identifier_type' => ['required','in:email,phone'],
         ];
     }
 
@@ -33,7 +33,7 @@ class IdentifierRequest extends FormRequest
         return [
             'identifier.required' => 'Please enter your email or phone number.',
             'identifier.email' => 'The email address provided is invalid.',
-            'identifier.regex' => 'Enter a valid Kenyan phone number (starting with 07, 01, or 254  ).',
+            'identifier.regex' => 'Enter a valid Email or Kenyan phone number (starting with 07, 01, or 254  ).',
             'identifier_type.required' => 'We could not identify if this is an email or phone number.',
         ];
     }
@@ -58,10 +58,12 @@ class IdentifierRequest extends FormRequest
     protected function prepareForValidation()
     {
         $identifier = trim($this->identifier ?? '');
+        $type = ($this->detectIdentifierType($identifier));
 
         $this->merge([
-            'identifier' => $identifier,
-            'identifier_type' => $this->detectIdentifierType($identifier),
-        ]);
+                'identifier' => $identifier,
+                'identifier_type' => $type,
+            ]);
+
     }
 }

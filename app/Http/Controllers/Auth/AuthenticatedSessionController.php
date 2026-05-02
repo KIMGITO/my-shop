@@ -49,6 +49,8 @@ class AuthenticatedSessionController extends Controller
 
     public function identify(IdentifierRequest $request)
     {
+
+
         try {
             $validated = $request->validated();
             $otp = $this->otpService->generate($validated['identifier']);
@@ -58,7 +60,7 @@ class AuthenticatedSessionController extends Controller
             }
 
             // Store the identifier in session for verification
-            session(['otp_identifier' => $validated['identifier'], 'otp_type' => $request->input('type', 'phone')]);
+            session(['otp_identifier' => $validated['identifier'], 'otp_type' => $request->input('identifier_type', 'phone')]);
             return redirect()->to('/register/otp');
 
         }catch(Throwable $th){
@@ -113,6 +115,7 @@ class AuthenticatedSessionController extends Controller
         $identifier = session('temp_identifier');
         $type = session('temp_identifier_type');
 
+
         if (!$identifier || !$type) {
             return redirect()->route('login')->withErrors(['name' => 'Registration Session expired.']);
         }
@@ -124,7 +127,7 @@ class AuthenticatedSessionController extends Controller
             Auth::login($user);
             session()->forget(['temp_identifier', 'temp_identifier_type']);
 
-            return $this->redirectBasedOnRole($user);
+            return redirect()->intended('/dashboard');
         }catch(Throwable $th){
             report($th);
             return redirect()->route('login')->withErrors(['name' => 'Registration could not complete, Please try again.']);

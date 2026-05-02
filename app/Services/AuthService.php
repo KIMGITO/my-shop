@@ -42,10 +42,12 @@ class AuthService
         return DB::transaction(function () use ($data, $identifier, $type) {
             $verifiedAtColumn = "{$type}_verified_at";
 
+
             // 1. Create User
             $user = User::create([
                 'name' => $data['name'],
-                $type  => $identifier,
+                'email'  =>($type == 'email')? $identifier: null,
+                'phone'  => ($type == 'phone')? $identifier: null,
                 $verifiedAtColumn => now(),
             ]);
 
