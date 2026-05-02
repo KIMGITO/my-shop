@@ -13,7 +13,9 @@ return new class extends Migration
     {
         Schema::create('customers', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')->nullable()->constrained()->onDelete('cascade');
+            $table->string('name')->nullable();
+            $table->string('phone')->nullable();
             $table->text('notes')->nullable();
             $table->decimal('balance', 10, 2)->default(0);
             $table->integer('priority')->default(0);

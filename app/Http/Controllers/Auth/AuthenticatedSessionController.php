@@ -120,7 +120,7 @@ class AuthenticatedSessionController extends Controller
        
     ]);
 
-    dd($user);
+    
 
     }
 
