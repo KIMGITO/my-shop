@@ -14,6 +14,8 @@ Route::get('/user', function (Request $request) {
 Route::get('/products/search', [SearchController::class,  'products']);
 Route::get('/suppliers/search', [SearchController::class,  'suppliers']);
 Route::get('/categories/search', [SearchController::class,  'categories']);
+Route::get('/customers/search', [SearchController::class,  'customers']);
+
 
 
 Route::prefix('pos') -> middleware('auth:sanctum')->group(function () {
