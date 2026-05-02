@@ -14,11 +14,19 @@ interface ProductFormModalProps {
     initialData?: Product | null;  // Keep it simple - just use Product type
 }
 
+interface Category{
+    id:number,
+    value:string,
+    label:string
+}
+
 export const ProductFormModal: React.FC<ProductFormModalProps> = ({
     isOpen,
     onClose,
     initialData,
 }) => {
+
+    const  [categories,setCategories]  =  useState<Category[]>([]);
     const { data, setData, processing, errors, reset, clearErrors, setError } =
         useForm({
             name: "",
@@ -33,6 +41,16 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
             isFeatured: false,
             badge: "",
         });
+    
+        useEffect(()=>{
+                const  fetchInitialData   = async () =>{
+                const response = await axios.get('/api/v1/categories/search');
+                    setCategories(response.data)
+                }
+                fetchInitialData();
+
+            },[])
+        
 
     useEffect(() => {
         if (isOpen) {
@@ -66,20 +84,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
         }
     }, [initialData, isOpen]);
 
-     const  [categories,setCategories]  =  useState([]);
-    
-        useEffect(()=>{
-            const  fetchInitialData   = async () =>{
-            const response = await axios.get('/api/v1/categories/search');
-            console.log('response', response)
-                setCategories(response.data)
-            }
-    
-            console.log(categories)
-            if(isOpen){
-                fetchInitialData();
-            }
-        },[isOpen])
+     
 
     const handleSubmit = (e?: React.FormEvent) => {
         if (e) e.preventDefault();

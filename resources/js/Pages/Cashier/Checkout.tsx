@@ -14,7 +14,7 @@ interface Props {
 
 export default function CashierCheckout({ order, taxRate }: Props) {
 
-
+console.log(order);
     const { clearCart } = usePOSCartStore();
     const [isProcessing, setIsProcessing] = useState(false);
 
@@ -83,7 +83,7 @@ export default function CashierCheckout({ order, taxRate }: Props) {
                     <PaymentTerminal
                         total={total}
                         customer={order.customer}
-                        allowedPaymentMethods={['mpesa','cash','split']}
+                        allowedPaymentMethods={['mpesa','cash','split','credit']}
                         onComplete={handleCompletePayment}
                     />
                 </div>

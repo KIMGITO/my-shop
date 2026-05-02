@@ -45,7 +45,6 @@ export const MultipleImagesUpload: React.FC<MultiImageUploadProps> = ({
     showUrlInput = true,
     showMainImageControl = true,
 }) => {
-    console.log("images", value);
     const [isUploading, setIsUploading] = useState(false);
     const [uploadError, setUploadError] = useState<string | null>(null);
     const [urlInput, setUrlInput] = useState("");

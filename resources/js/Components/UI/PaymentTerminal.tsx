@@ -33,6 +33,9 @@ export default function PaymentTerminal({
     onComplete,
     allowedPaymentMethods = ["mpesa", "cash", "credit", "split"],
 }: PaymentTerminalProps) {
+
+    console.log('payment customer', customer);
+    
     const roundedTotal = useMemo(() => roundToWholeNumber(total), [total]);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const completeButtonRef = useRef<HTMLDivElement>(null);
@@ -50,7 +53,7 @@ export default function PaymentTerminal({
     const currentBalance = Math.max(0, roundedTotal - paidTotal);
     const changeGiven = paidTotal > roundedTotal ? paidTotal - roundedTotal : 0;
     
-    const canComplete = paidTotal >= roundedTotal && roundedTotal > 0 && (customer!== null && creditAmount <= 0 ) ;
+    const canComplete = paidTotal >= roundedTotal && roundedTotal > 0 && (customer== null ? creditAmount<=0 : true) ;
 
     // 1. AUTO-SCROLL LOGIC: Scroll to bottom when balance is 0
     useEffect(() => {
