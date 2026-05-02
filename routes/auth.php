@@ -25,16 +25,19 @@ use Illuminate\Support\Facades\Route;
 
     Route::prefix('register')->group(function () {
 
-        Route::get('/identifier', [AuthenticatedSessionController::class, 'identifier'] );
+        Route::get('/identifier', [AuthenticatedSessionController::class, 'identifier'] )->name('register.identifier');
         Route::post('/identifier', [AuthenticatedSessionController::class, 'identify'] );
 
 
         Route::get('/otp', [AuthenticatedSessionController::class, 'otp']);
         Route::post('/otp', [AuthenticatedSessionController::class, 'verify']);
 
+        Route::get('/identified', [AuthenticatedSessionController::class, 'discoveredCustomer']);
+        Route::post('/complete',[AuthenticatedSessionController::class, 'registerNewCustomer']);
+
     });
 
-    Route::get('login', [AuthenticatedSessionController::class, 'create'])
+    Route::get('login', [AuthenticatedSessionController::class, 'identifier'])
         ->name('login');
 
     Route::post('login', [AuthenticatedSessionController::class, 'store']);

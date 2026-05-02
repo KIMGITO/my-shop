@@ -28,6 +28,7 @@ return new class extends Migration
             $table->timestamps();
             $table->timestamp('blocked_at')->nullable();
 
+            $table->check('email IS NOT NULL OR phone IS NOT NULL');
            
         });
 

@@ -8,12 +8,12 @@ import { HiArrowRight } from "react-icons/hi";
 
 const RegisterIdentifier = () => {
     const { data, setData, post, processing, errors } = useForm({
-        identifier: "", // phone or email
+        identifier: "",
     });
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post("/register/send-otp", {
+        post("/register/identifier", {
             onSuccess: () => {
                 // Will redirect to OTP page via Inertia
             },

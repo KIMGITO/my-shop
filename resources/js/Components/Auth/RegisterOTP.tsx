@@ -1,17 +1,14 @@
-// Pages/Auth/RegisterOTP.tsx
 import React, { useState, useRef, useEffect } from "react";
-import { useForm, Link, Head } from "@inertiajs/react";
+import { useForm, Link, Head, router } from "@inertiajs/react"; // Added router
 import Button from "@/Components/UI/Button";
-import SmartBadge from "@/Components/UI/SmartBadge";
 
-const RegisterOTP: React.FC<{ phone?: string; email?: string}> = ({ phone, email }) => {
+const RegisterOTP: React.FC<{ phone?: string; email?: string }> = ({ phone, email }) => {
     const [otp, setOtp] = useState(["", "", "", ""]);
     const inputRefs = useRef<(HTMLInputElement | null)[]>([null, null, null, null]);
     
-    const { post, processing, errors } = useForm({
-        otp: "",
-        identifier: phone || email || "",
-    });
+    // We initialize the form, but since your inputs are "uncontrolled" (using an array)
+    // we will handle the submission manually to ensure the data is fresh.
+    const { processing, errors, setError } = useForm();
 
     useEffect(() => {
         inputRefs.current[0]?.focus();
@@ -50,10 +47,24 @@ const RegisterOTP: React.FC<{ phone?: string; email?: string}> = ({ phone, email
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         const otpValue = otp.join("");
-        if (otpValue.length !== 4) return;
         
-        post("/register/verify-otp", {
-            data: { otp: otpValue, identifier: phone || email },
+        if (otpValue.length !== 4) return;
+
+        // FIX: Use 'router.post' instead of 'useForm.post' for manual data mapping
+        // OR use useForm's post but pass the data in an object if you don't use setData
+        router.post("/register/otp", {
+            otp: otpValue,
+            identifier: phone || email,
+        },{
+            onError: (errors )=>{
+                setError('otp',errors.otp);
+            }
+        });
+    };
+
+    const handleResend = () => {
+        router.post("/register/resend-otp", {
+            identifier: phone || email
         });
     };
 
@@ -68,21 +79,16 @@ const RegisterOTP: React.FC<{ phone?: string; email?: string}> = ({ phone, email
             <Head title="Verify OTP" />
             <div className="min-h-screen flex items-center justify-center p-4">
                 <div className="w-full max-w-md space-y-10">
-                    {/* Header Section */}
                     <div className="space-y-2">
-                        <div className="flex items-center gap-3">
-                          
-                            <h2 className="text-3xl font-play md:text-4xl font-extrabold tracking-tight text-on-background">
-                                Verify Code
-                            </h2>
-                        </div>
+                        <h2 className="text-3xl font-headline md:text-4xl font-extrabold tracking-tight text-on-surface">
+                            Verify Code
+                        </h2>
                         <p className="text-on-surface-variant font-body">
                             We sent a 4-digit code to{" "}
-                            <span className="font-bold text-on-background">{maskedIdentifier}</span>
+                            <span className="font-bold text-on-surface">{maskedIdentifier}</span>
                         </p>
                     </div>
 
-                    {/* OTP Input Section */}
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <div className="flex justify-center gap-4">
                             {otp.map((digit, index) => (
@@ -96,20 +102,20 @@ const RegisterOTP: React.FC<{ phone?: string; email?: string}> = ({ phone, email
                                     onChange={(e) => handleOtpChange(index, e.target.value)}
                                     onKeyDown={(e) => handleKeyDown(index, e)}
                                     onPaste={handlePaste}
-                                    className="w-16 h-16 text-center text-2xl font-bold border-2 border-outline rounded-xl focus:border-primary focus:ring-4 focus:ring-primary/20 outline-none transition-all duration-200 text-on-background"
-                                    aria-label={`Digit ${index + 1}`}
+                                    className="w-16 h-16 text-center text-2xl font-bold border-2 border-outline rounded-xl bg-surface-container-low focus:border-primary focus:ring-4 focus:ring-primary/20 outline-none transition-all duration-200 text-on-surface"
                                 />
                             ))}
                         </div>
 
                         {errors.otp && (
-                            <p className="text-error text-sm text-center">
+                            <p className="text-error text-sm text-center animate-shake">
                                 {errors.otp}
                             </p>
                         )}
 
                         <Button 
                             type="submit" 
+                            className="btn-press editorial-gradient"
                             size="lg" 
                             fullWidth 
                             disabled={processing || otp.some(d => !d)}
@@ -122,15 +128,15 @@ const RegisterOTP: React.FC<{ phone?: string; email?: string}> = ({ phone, email
                                 Didn't receive the code?{" "}
                                 <button
                                     type="button"
-                                    className="text-primary font-bold hover:underline"
-                                    onClick={() => post("/register/resend-otp")}
+                                    className="text-primary font-bold hover:underline cursor-pointer"
+                                    onClick={handleResend}
                                 >
                                     Resend
                                 </button>
                             </p>
                             <Link
                                 href="/register"
-                                className="text-sm text-on-surface-variant hover:text-primary transition-colors inline-block"
+                                className="text-sm text-on-surface-variant hover:text-primary transition-colors"
                             >
                                 ← Change phone/email
                             </Link>
