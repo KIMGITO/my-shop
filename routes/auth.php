@@ -31,6 +31,8 @@ use Illuminate\Support\Facades\Route;
 
         Route::get('/otp', [AuthenticatedSessionController::class, 'otp']);
         Route::post('/otp', [AuthenticatedSessionController::class, 'verify']);
+        Route::post('/resend-otp', [AuthenticatedSessionController::class, 'resendOtp']);
+
 
         Route::get('/identified', [AuthenticatedSessionController::class, 'discoveredCustomer']);
         Route::post('/complete',[AuthenticatedSessionController::class, 'registerNewCustomer']);

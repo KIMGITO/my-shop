@@ -23,6 +23,8 @@ class AuthenticatedSessionController extends Controller
     public function __construct(
         protected OTPService $otpService,
     ){}
+
+
     /**
      * Display the login view.
      */
@@ -49,7 +51,6 @@ class AuthenticatedSessionController extends Controller
 
     public function identify(IdentifierRequest $request)
     {
-
         try {
             $validated = $request->validated();
             $otp = $this->otpService->generate($validated['identifier']);
@@ -67,6 +68,34 @@ class AuthenticatedSessionController extends Controller
         }   
     }
 
+    /**
+     * Resend the OTP to the user.
+     */
+    public function resendOtp(Request $request)
+    {
+        $identifier = session('otp_identifier');
+
+        if (!$identifier) {
+            return redirect()->route('register.identifier')
+                ->withErrors(['identifier' => 'Session expired. Please re-enter your details.']);
+        }
+
+        try {
+            $otp = $this->otpService->regenerate($identifier);
+
+            if ($otp === 'cooldown') {
+                return back()->withErrors(['otp' => 'Please wait a minute before requesting another code.']);
+            }
+
+            // Return with a success flash message for Inertia to display
+            return back()->with('status', 'A new OTP has been sent to your ' . session('otp_type') . '.');
+
+        } catch (Throwable $th) {
+            report($th);
+            return back()->withErrors(['otp' => 'Failed to resend OTP. Please try again.']);
+        }
+    }
+
     public function verify(Request $request, AuthService $authService)
     {
         try{
@@ -78,7 +107,7 @@ class AuthenticatedSessionController extends Controller
             $type = session('otp_type');
 
             if (!$identifier) {
-                return redirect()->route('register.identifier')->withErrors(['identifier' => 'Session expired.']);
+                return redirect()->route('register.identifier')->withErrors(['identifier' => 'invalid details.']);
             }
 
             if ($this->otpService->verify($identifier, $validated['otp'])) {
@@ -96,6 +125,9 @@ class AuthenticatedSessionController extends Controller
                 // New customer flow
                 session(['temp_identifier' => $identifier, 'temp_identifier_type' => $type]);
                 return redirect()->to('register/identified');
+            }else{
+                return back()->withErrors(['otp' => 'OTP expired. Request a new OTP.']);
+
             }
 
             return back()->withErrors(['otp' => 'Invalid OTP. Please try again.']);
