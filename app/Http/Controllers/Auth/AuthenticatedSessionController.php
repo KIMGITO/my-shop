@@ -113,6 +113,8 @@ class AuthenticatedSessionController extends Controller
             if ($this->otpService->verify($identifier, $validated['otp'])) {
                 session()->forget(['otp_identifier', 'otp_type']);
 
+                
+
                 // Use the service to find or create the user
                 $user = $authService->handleVerifiedIdentifier($identifier, $type);
 
