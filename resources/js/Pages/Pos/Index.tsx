@@ -1,5 +1,5 @@
 // pages/pos/index.tsx
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Head, router, usePage } from "@inertiajs/react";
 import { Product } from "@/types/pos";
 import { HiOutlineSearch, HiOutlineUser } from "react-icons/hi";
@@ -12,6 +12,12 @@ import { ParkedCartsModal } from "./ParkedCartsModal";
 import Button from "@/Components/UI/Button";
 import Input from "@/Components/UI/Input";
 import Select from "@/Components/UI/Select";
+import axios from "axios";
+type Customer = {
+  id: number;
+  value: string,
+  label: string;
+};
 
 const categories = [
     { id: "all", name: "All Items" },
@@ -55,6 +61,7 @@ export default function PosIndex({
     const [parkCartName, setParkCartName] = useState("");
     const [showParkConfirmation, setShowParkConfirmation] = useState(false);
     const [isProcessing, setIsProcessing] = useState(false);
+    const [customers, setCustomers] = useState<Customer[]>([]);
 
 
     const {props} = usePage();
@@ -66,6 +73,14 @@ export default function PosIndex({
     const total = getTotal(Number(taxRate));
     const itemCount = getItemCount();
 
+
+    useEffect(()=>{
+        const  fetchCustomers = async() =>{
+        const res = await axios.get('/api/v1/customers/search');
+        setCustomers(res.data)
+        }
+        fetchCustomers();
+    },[]);
 
     
     const filteredProducts = useMemo(() => {
@@ -150,11 +165,7 @@ export default function PosIndex({
                                 label="Select Customer"
                                 value={customerId}
                                 onChange={(value) => setCustomerId(value?.toString() || "")}
-                                options={[
-                                    { id: 1, value: 1, label: "Martin Mukundi (Interlocking Blocks)" },
-                                    { id: 2, value: 2, label: "Silvia Nyakio" },
-                                    { id: 3, value: 3, label: "Daniel Simiyu" },
-                                ]}
+                                options={customers}
                                 placeholder="Search for customer..."
                                 Icon={HiOutlineUser}
                                 size="sm"

@@ -31,7 +31,8 @@ class SearchService
         return  Customer::query()
             ->when($term, fn($q) => $q->where('name', 'like', "%{$term}%"))
             ->orWhere('phone','like',"%{$term}")
-            ->select('id', 'name', '')
+            ->orWhere('email','like',"%{$term}")
+            ->select('id','id as value', 'name as label')
             ->limit($limit)
             ->get();
     }
