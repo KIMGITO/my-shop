@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -28,10 +29,13 @@ return new class extends Migration
             $table->timestamps();
             $table->timestamp('blocked_at')->nullable();
 
-            $table->check('email IS NOT NULL OR phone IS NOT NULL');
-           
         });
 
+        DB::statement("
+            ALTER TABLE users 
+            ADD CONSTRAINT users_email_or_phone_check 
+            CHECK (email IS NOT NULL OR phone IS NOT NULL)
+        ");
         Schema::create('password_reset_tokens', function (Blueprint $table) {
             $table->string('email')->primary();
             $table->string('token');

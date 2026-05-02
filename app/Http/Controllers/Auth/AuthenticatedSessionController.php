@@ -10,6 +10,7 @@ use App\Services\OTPService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -106,21 +107,29 @@ class AuthenticatedSessionController extends Controller
 
     public function registerNewCustomer(Request $request){
 
-    $validated = $request->validate([
-        'name'=> ['required','string','min:3'],
-    ]);
+    DB::transaction(function () use($request) {
+
+            $validated = $request->validate([
+                'name'=> ['required','string','min:3'],
+            ]);
 
 
-    // register user and customer
-    $verifiedAtColumn = session('temp_identifier_type') . '_verified_at';
-    $user = User::create([
-        'name'=> $validated['name'],
-        session('temp_identifier_type') => session('temp_identifier'),
-         $verifiedAtColumn => now(),
-       
-    ]);
+            // register user and customer
+            $verifiedAtColumn = session('temp_identifier_type') . '_verified_at';
+            $identifierType = session('temp_identifier_type');
+            $identifier = session('temp_identifier');
+            $user = User::create([
+                'name'=> $validated['name'],
+                $identifierType => $identifier,
+                $verifiedAtColumn => now(),
+            ]);
 
-    
+            $user->customer()->create([
+                'name' => $validated['name'],
+                'phone' => $identifierType == 'phone' ? $identifier :  null,
+            ]);
+        return $user;
+    });
 
     }
 
