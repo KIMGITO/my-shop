@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\IdentifierRequest;
+use App\Models\Customer;
 use App\Models\User;
+use App\Services\AuthService;
 use App\Services\OTPService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -60,81 +62,74 @@ class AuthenticatedSessionController extends Controller
         return redirect()->to('/register/otp');
     }
 
-    public function verify(Request $request)
+    public function verify(Request $request, AuthService $authService)
     {
-        
         $validated = $request->validate([
-            'otp' => ['required', 'numeric', 'digits:4'], // Assuming 6-digit OTP
+            'otp' => ['required', 'numeric', 'digits:4'],
         ]);
 
-        // Get identifier from session
         $identifier = session('otp_identifier');
-        $identifierType = session('otp_type');
+        $type = session('otp_type');
 
         if (!$identifier) {
-            return redirect()->route('register.identifier')->withErrors(['identifier' => 'Session expired. Please try again.']);
+            return redirect()->route('register.identifier')->withErrors(['identifier' => 'Session expired.']);
         }
 
-        // Verify the OTP
-        $verified = $this->otpService->verify($identifier, $validated['otp']);
-
-        if ($verified) {
-            // Clear session data
+        if ($this->otpService->verify($identifier, $validated['otp'])) {
             session()->forget(['otp_identifier', 'otp_type']);
 
-            // Check if user exists
-            $user = \App\Models\User::where('email', $identifier)
-                ->orWhere('phone', $identifier)
-                ->first();
+            // Use the service to find or create the user
+            $user = $authService->handleVerifiedIdentifier($identifier, $type);
 
             if ($user) {
-                // Login existing user
                 Auth::login($user);
                 $request->session()->regenerate();
-
-                // Redirect based on role
                 return $this->redirectBasedOnRole($user);
-            } else {
-                // new customer
-                // New user - store in session and redirect to registration
-                session(['temp_identifier' => $identifier, 'temp_identifier_type' => $identifierType]);
-                return redirect()->to('register/identified');
             }
+
+            // New customer flow
+            session(['temp_identifier' => $identifier, 'temp_identifier_type' => $type]);
+            return redirect()->to('register/identified');
         }
 
         return back()->withErrors(['otp' => 'Invalid OTP. Please try again.']);
     }
 
-    public function registerNewCustomer(Request $request){
+    public function registerNewCustomer(Request $request, AuthService $authService)
+    {
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'min:3'],
+        ]);
 
-    DB::transaction(function () use($request) {
+        $identifier = session('temp_identifier');
+        $type = session('temp_identifier_type');
 
-            $validated = $request->validate([
-                'name'=> ['required','string','min:3'],
-            ]);
+        if (!$identifier || !$type) {
+            return redirect()->route('login')->withErrors(['error' => 'Session expired.']);
+        }
 
+        // Call the service
+        $user = $authService->registerNewCustomer($validated, $identifier, $type);
 
-            // register user and customer
-            $verifiedAtColumn = session('temp_identifier_type') . '_verified_at';
-            $identifierType = session('temp_identifier_type');
-            $identifier = session('temp_identifier');
-            $user = User::create([
-                'name'=> $validated['name'],
-                $identifierType => $identifier,
-                $verifiedAtColumn => now(),
-            ]);
+        // Login and cleanup
+        Auth::login($user);
+        session()->forget(['temp_identifier', 'temp_identifier_type']);
 
-            $user->customer()->create([
-                'name' => $validated['name'],
-                'phone' => $identifierType == 'phone' ? $identifier :  null,
-            ]);
-        return $user;
-    });
-
+        return $this->redirectBasedOnRole($user);
     }
 
+    public function destroy(Request $request)
+{
+    Auth::guard('web')->logout();
+
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
+
+    return redirect('/');
+}
+
     // Helper method for role-based redirects
-    private function redirectBasedOnRole($user)
+    private function redirectBasedOnRole(User $user)
     {
         if ($user->hasRole('admin')) {
             return redirect()->intended(route('admin.dashboard'));
