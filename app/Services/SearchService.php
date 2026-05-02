@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Inventory\Product;
 use App\Models\Supplier;
+use App\Models\Customer;
 
 class SearchService
 {
@@ -21,6 +22,15 @@ class SearchService
         return Supplier::query()
             ->when($term, fn($q) => $q->where('name', 'like', "%{$term}%"))
             ->select('id', 'name', 'logo_url as image')
+            ->limit($limit)
+            ->get();
+    }
+
+    public function searchCustomers(?string $term, int $limit = 10){
+        return  Customer::query()
+            ->when($term, fn($q) => $q->where('name', 'like', "%{$term}%"))
+            ->orWhere('phone','like',"%{$term}")
+            ->select('id', 'name', '')
             ->limit($limit)
             ->get();
     }
