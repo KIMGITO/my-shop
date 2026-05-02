@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Inertia\Response;
+use Throwable;
 
 class AuthenticatedSessionController extends Controller
 {
@@ -48,51 +49,59 @@ class AuthenticatedSessionController extends Controller
 
     public function identify(IdentifierRequest $request)
     {
-        $validated = $request->validated();
+        try {
+            $validated = $request->validated();
+            $otp = $this->otpService->generate($validated['identifier']);
 
-        $otp = $this->otpService->generate($validated['identifier']);
+            if ($otp == 'cooldown') {
+                return back()->with(['identifier' => 'OTP not sent, try again after 1 minute']);
+            }
 
-        if ($otp == 'cooldown') {
-            return back()->with(['error' => 'OTP not sent, try again after 1 minute']);
-        }
+            // Store the identifier in session for verification
+            session(['otp_identifier' => $validated['identifier'], 'otp_type' => $request->input('type', 'phone')]);
+            return redirect()->to('/register/otp');
 
-        // Store the identifier in session for verification
-        session(['otp_identifier' => $validated['identifier'], 'otp_type' => $request->input('type', 'phone')]);
-
-        return redirect()->to('/register/otp');
+        }catch(Throwable $th){
+            return back()->with(['identifier' => 'Failed to get OTP,  please try again.']);
+        }   
     }
 
     public function verify(Request $request, AuthService $authService)
     {
-        $validated = $request->validate([
-            'otp' => ['required', 'numeric', 'digits:4'],
-        ]);
+        try{
+            $validated = $request->validate([
+                'otp' => ['required', 'numeric', 'digits:4'],
+            ]);
 
-        $identifier = session('otp_identifier');
-        $type = session('otp_type');
+            $identifier = session('otp_identifier');
+            $type = session('otp_type');
 
-        if (!$identifier) {
-            return redirect()->route('register.identifier')->withErrors(['identifier' => 'Session expired.']);
-        }
-
-        if ($this->otpService->verify($identifier, $validated['otp'])) {
-            session()->forget(['otp_identifier', 'otp_type']);
-
-            // Use the service to find or create the user
-            $user = $authService->handleVerifiedIdentifier($identifier, $type);
-
-            if ($user) {
-                Auth::login($user);
-                $request->session()->regenerate();
-                return $this->redirectBasedOnRole($user);
+            if (!$identifier) {
+                return redirect()->route('register.identifier')->withErrors(['identifier' => 'Session expired.']);
             }
 
-            // New customer flow
-            session(['temp_identifier' => $identifier, 'temp_identifier_type' => $type]);
-            return redirect()->to('register/identified');
-        }
+            if ($this->otpService->verify($identifier, $validated['otp'])) {
+                session()->forget(['otp_identifier', 'otp_type']);
 
-        return back()->withErrors(['otp' => 'Invalid OTP. Please try again.']);
+                // Use the service to find or create the user
+                $user = $authService->handleVerifiedIdentifier($identifier, $type);
+
+                if ($user) {
+                    Auth::login($user);
+                    $request->session()->regenerate();
+                    return $this->redirectBasedOnRole($user);
+                }
+
+                // New customer flow
+                session(['temp_identifier' => $identifier, 'temp_identifier_type' => $type]);
+                return redirect()->to('register/identified');
+            }
+
+            return back()->withErrors(['otp' => 'Invalid OTP. Please try again.']);
+        }catch(Throwable $th){
+            return back()->withErrors(['otp' => 'Failed to verify OTP,  try again.']);
+            
+        }
     }
 
     public function registerNewCustomer(Request $request, AuthService $authService)
@@ -105,28 +114,32 @@ class AuthenticatedSessionController extends Controller
         $type = session('temp_identifier_type');
 
         if (!$identifier || !$type) {
-            return redirect()->route('login')->withErrors(['error' => 'Session expired.']);
+            return redirect()->route('login')->withErrors(['name' => 'Registration Session expired.']);
         }
+        try{
+            // Call the service
+            $user = $authService->registerNewCustomer($validated, $identifier, $type);
 
-        // Call the service
-        $user = $authService->registerNewCustomer($validated, $identifier, $type);
+            // Login and cleanup
+            Auth::login($user);
+            session()->forget(['temp_identifier', 'temp_identifier_type']);
 
-        // Login and cleanup
-        Auth::login($user);
-        session()->forget(['temp_identifier', 'temp_identifier_type']);
-
-        return $this->redirectBasedOnRole($user);
+            return $this->redirectBasedOnRole($user);
+        }catch(Throwable $th){
+            report($th);
+            return redirect()->route('login')->withErrors(['name' => 'Registration could not complete, Please try again.']);
+        }
     }
 
     public function destroy(Request $request)
-{
-    Auth::guard('web')->logout();
+    {
+        Auth::guard('web')->logout();
 
-    $request->session()->invalidate();
-    $request->session()->regenerateToken();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
 
-    return redirect('/');
-}
+        return redirect('/');
+    }
 
     // Helper method for role-based redirects
     private function redirectBasedOnRole(User $user)

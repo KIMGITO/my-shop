@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('user_id')->nullable()->constrained()->onDelete('cascade');
             $table->string('name')->nullable();
             $table->string('phone')->nullable();
+            $table->string('email')->nullable();
             $table->text('notes')->nullable();
             $table->decimal('balance', 10, 2)->default(0);
             $table->integer('priority')->default(0);
