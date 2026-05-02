@@ -11,13 +11,35 @@ use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware('guest')->group(function () {
-    Route::get('register', [RegisteredUserController::class, 'create'])
+    
+    Route::middleware(['auth','role:admin'])->group(function () {
+        Route::get('register', [RegisteredUserController::class, 'create'])
         ->name('register');
+         Route::post('register', [RegisteredUserController::class, 'store']);
+    });
 
-    Route::post('register', [RegisteredUserController::class, 'store']);
 
-    Route::get('login', [AuthenticatedSessionController::class, 'create'])
+
+    Route::middleware('guest')->group(function () {
+    
+
+    Route::prefix('register')->group(function () {
+
+        Route::get('/identifier', [AuthenticatedSessionController::class, 'identifier'] )->name('register.identifier');
+        Route::post('/identifier', [AuthenticatedSessionController::class, 'identify'] );
+
+
+        Route::get('/otp', [AuthenticatedSessionController::class, 'otp']);
+        Route::post('/otp', [AuthenticatedSessionController::class, 'verify']);
+        Route::post('/resend-otp', [AuthenticatedSessionController::class, 'resendOtp']);
+
+
+        Route::get('/identified', [AuthenticatedSessionController::class, 'discoveredCustomer']);
+        Route::post('/complete',[AuthenticatedSessionController::class, 'registerNewCustomer']);
+
+    });
+
+    Route::get('login', [AuthenticatedSessionController::class, 'identifier'])
         ->name('login');
 
     Route::post('login', [AuthenticatedSessionController::class, 'store']);

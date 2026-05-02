@@ -3,18 +3,20 @@ import ImageUpload from "@/Components/UI/MultipleImagesUpload";
 import { Input } from "@/Components/UI/Input";
 import { Select } from "@/Components/UI/Select";
 import ToggleSwitch from "@/Components/UI/ToggleSwitch";
-import { categories } from "@/Data/ProductData";
+// import { categories } from "@/Data/ProductData";
 import { GiPriceTag } from "react-icons/gi";
 import { HiOutlineShoppingBag, HiTag } from "react-icons/hi";
 import { MdCategory } from "react-icons/md";
 import { TbChartBarPopular, TbRulerMeasure2 } from "react-icons/tb";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { FaHeartbeat } from "react-icons/fa";
+import axios from "axios";
 
 interface ProductFormWidgetProps {
     data: any;
     setData: Function;
     errors: any;
+    categories:any[],
     processing: boolean;
     onSave: (e: React.FormEvent) => void;
     onClose: () => void;
@@ -22,13 +24,17 @@ interface ProductFormWidgetProps {
 
 export const ProductFormWidget: React.FC<ProductFormWidgetProps> = ({
     data,
+    categories,
     setData,
     errors,
     processing,
     onSave,
     onClose,
 }) => {
-    console.log("data for por", data);
+
+
+   
+
     useEffect(() => {
         // When in edit mode and images exist, make sure they have the right structure
         if (data.id && data.images && data.images.length > 0) {
@@ -73,16 +79,16 @@ export const ProductFormWidget: React.FC<ProductFormWidgetProps> = ({
                     <Select
                         size="sm"
                         label="Category"
-                        value={data.category}
-                        onChange={(value) => setData("category", value)}
+                        value={data.categoryId}
+                        onChange={(value) => setData("categoryId", value)}
                         options={categories.map((cat) => ({
-                            id: cat.slug,
-                            value: cat.slug,
+                            id: cat.id,
+                            value: cat.id,
                             label: cat.name,
                         }))}
                         placeholder="Select Category"
                         Icon={MdCategory}
-                        error={errors.category}
+                        error={errors.categoryId}
                         disabled={processing}
                     />
                     <Input

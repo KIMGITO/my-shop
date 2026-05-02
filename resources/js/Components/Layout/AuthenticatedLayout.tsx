@@ -211,7 +211,7 @@ export default function Authenticated({
                         ref={scrollContainerRef}
                         className="flex-1 bg-surface-container-low/40  overflow-y-auto scroll-smooth scrollbar-hidden"
                     >
-                        <div className=" mx-auto py-6 md:py-12">{children}</div>
+                        <div className=" mx-auto py-15 md:py-12">{children}</div>
                     </div>
                 </main>
             </div>

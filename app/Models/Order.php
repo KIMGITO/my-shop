@@ -12,7 +12,7 @@ class Order extends Model
         'expires_at' => 'datetime',
     ];
 
-    protected $with = ['items:id,order_id,batch_id,quantity,price,subtotal','customer:id,name','user:id,name'];
+    protected $with = ['items'];
     
     public function items()
     {

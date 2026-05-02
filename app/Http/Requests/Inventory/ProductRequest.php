@@ -33,12 +33,13 @@ class ProductRequest extends FormRequest
     public function rules(): array
     {
         $isUpdate = $this->isMethod('PUT') || $this->isMethod('PATCH');
+        
 
         return [
             'name' => ['required', 'string', 'max:255'],
             'price' => ['required', 'numeric', 'min:0'],
             'unit' => ['required', 'string'],
-            'category' => ['required', 'string'],
+            'categoryId' => ['required', 'exists:categories,id'],
             'description' => ['nullable', 'string'],
             'isPopular' => ['boolean'],
             'isFeatured' => ['boolean'],

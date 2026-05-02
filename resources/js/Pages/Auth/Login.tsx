@@ -1,17 +1,25 @@
 // resources/js/Pages/Auth/Login.tsx
-import React from "react";
+import React, { useState } from "react";
 import { Head, Link } from "@inertiajs/react";
 import LoginForm from "@/Components/Auth/LoginForm";
 import GuestLayout from "@/Components/Layout/GuestLayout";
 import SimpleFooter from "@/Components/Layout/SimpleFooter";
 import SimpleHeader from "@/Components/Layout/SimpleHeader";
+import RegisterIdentifier from "@/Components/Auth/RegisterIdentifier";
+import RegisterOTP from "@/Components/Auth/RegisterOTP";
+import RegisterCustomerDiscoverd from "@/Components/Auth/RegisterCustomerDiscoverd";
 
 interface LoginProps {
     status?: string;
     canResetPassword?: boolean;
+    form: 'identifier' | 'otp' | 'discovered'
 }
 
-export default function Login({ status, canResetPassword }: LoginProps) {
+export default function Login({ status, canResetPassword, form }: LoginProps) {
+
+
+
+
     return (
         <GuestLayout>
             <Head title="Login - Kaykay's Dairy" />
@@ -39,10 +47,13 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                         </div>
 
                         {/* Right Side - Login Form */}
-                        <LoginForm
+                        {/* <LoginForm
                             status={status}
                             canResetPassword={canResetPassword}
-                        />
+                        /> */}
+                        <RegisterIdentifier />
+
+                        
                     </div>
                 </main>
                 <SimpleFooter />

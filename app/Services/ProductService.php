@@ -37,6 +37,7 @@ class ProductService
                 ...$product->toArray(),
                 'status' => $stockStatus['status'],
                 'inStockCount' => $stockStatus['quantity'],
+                'category' => $product->category->name ?? 'Uncategorized',
                 'images' => $product->images->map(fn($img) => [
                     'id' => $img->id,
                     'isMain' => $img->is_main,

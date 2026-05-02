@@ -5,6 +5,7 @@ namespace App\Services;
 use App\DTOs\CreateOrderData;
 use App\Enums\OrderStatus;
 use App\Enums\TransactionType;
+use App\Jobs\ReleaseProducts;
 use App\Models\Order;
 use App\Repositories\Inventory\BatchRepository;
 use App\Repositories\OrderRepository;
@@ -75,7 +76,7 @@ class OrderService
 
     public function createOrder(CreateOrderData $data, ?string $orderNumber = null)
     {
-        return $this->orderRepository->create([
+        $order =  $this->orderRepository->create([
             'order_number' => $orderNumber ?? $this->getOrderNumber(),
             'type'         => $data->type,
             'source'       => $data->source,
@@ -90,6 +91,12 @@ class OrderService
             'expires_at'   => $data->expires_at,
             'notes'        => $data->notes,
         ]);
+
+        // dd($order);
+
+        ReleaseProducts::dispatch($order->order_number )->delay( now()->addSeconds(5));
+
+        return $order;
     }
 
     public function getOrderNumber(): string
@@ -138,14 +145,69 @@ class OrderService
     public function voidOrder(string $orderNumber): void
     {
         $order = $this->orderRepository->findByOrderNumber($orderNumber);
+
+        if(!$order){
+            throw new \Exception("Order with number {$orderNumber} not found");
+        }
+        if($order->status === OrderStatus::CANCELLED->value){
+            throw new \Exception("Order with number {$orderNumber} is already cancelled");
+        }
+        if($order->status === OrderStatus::COMPLETED->value){
+            throw new \Exception("Order with number {$orderNumber} cannot be cancelled as it is already completed");
+        }
+        
         DB::transaction(function () use ($order) {
             foreach ($order->items as $item) {
                 $this->batchRepository->releaseStock($item->batch_id, $item->quantity);
+                $item->delete();
             }
-
-            // 2. Delete the order (or soft delete/mark as voided)
-            $order->items()->delete();
             $order->delete();
         });
+    }
+
+    /**
+     * Complete and order
+     */
+
+    public function completeOrder(string $orderId): Order{
+        // check if order exists,
+        $order = $this->orderRepository->find($orderId);
+        if(!$order){
+            throw new \Exception("Order with number {$order->order_number} not found");
+        }
+        // check if order is already completed and return error if yes
+        if($order->status === OrderStatus::COMPLETED->value ){
+            throw new \Exception("Order with number {$order->order_number} is already completed");
+        }
+        // see if it cant be complete (eg marked as cancelled or voided) and return error if yes
+        if($order->status === OrderStatus::CANCELLED->value || $order->status === OrderStatus::EXPIRED->value){
+            throw new \Exception("Order with number {$order->order_number} cannot be completed as it is marked as cancelled or voided");
+        }
+       
+        // mark order as completed
+        $this->orderRepository->update($orderId, [
+            'status' => OrderStatus::COMPLETED->value
+        ]);
+
+        return $order;
+    }
+
+    public function deleteByOrderNumber(string  $orderNumber):bool {
+        return DB::transaction(function() use ($orderNumber){
+        $packedOrder = $this->orderRepository->findByOrderNumber($orderNumber);
+        if(!$packedOrder){
+            throw new \Exception("Parked order with number {$orderNumber} not found");
+        }
+        if($packedOrder->status !== OrderStatus::PARKED->value){
+            throw new \Exception("Order with number {$orderNumber} cannot be deleted as it is not parked");
+        }
+
+        $packedOrder->items->each(function($item){
+            $this->batchRepository->releaseStock($item->batch_id, $item->quantity);
+            $item->delete();
+        });
+        return $packedOrder->delete();
+        });
+        
     }
 }

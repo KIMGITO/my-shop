@@ -11,9 +11,9 @@ import {
 } from "react-icons/hi2";
 import { HiOutlineLogout } from "react-icons/hi";
 
-const Navbar: React.FC = () => {
+export const Navbar: React.FC = () => {
     const { url } = usePage();
-    const { auth } = usePage().props as any; // Using 'as any' if types aren't globally defined yet
+    const { auth } = usePage().props as any; 
     const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
     // Scroll & Visibility State
@@ -21,7 +21,8 @@ const Navbar: React.FC = () => {
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     const navLinks = [
-        { name: "Shop", path: "/shop" },
+        { name: "Welcome", path: "/welcome" },
+        { name: "Shop", path: "/" },
         { name: "Subscriptions", path: "/subscriptions" },
         { name: "Our Story", path: "/story" },
         { name: "Wholesale", path: "/wholesale" },

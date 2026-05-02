@@ -23,7 +23,7 @@ const ProductGrid: React.FC<ProductGridProps> = ({
                         product={featuredProduct}
                         size="lg"
                         variant="featured"
-                        showAddButton={false}
+                        showAddButton={true}
                     />
                 </div>
             )}
@@ -33,12 +33,12 @@ const ProductGrid: React.FC<ProductGridProps> = ({
                     <ProductCard
                         key={product.id}
                         product={product}
-                        hideRating
                         onAddToCart={() => { }}
                         hideUnit
                         size="md"
                         variant="default"
-                        showAddButton={true}
+                        showAddButton={false}
+                        
                     />
                 ))}
             </div>

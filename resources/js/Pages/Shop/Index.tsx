@@ -12,7 +12,7 @@ import { categories, products } from "@/Data/ProductData";
 // Mock products data
 
 
-export default function ShopIndex() {
+export default function ShopIndex({categories, products}: {categories:any[], products:any[]}) {
     const [selectedCategory, setSelectedCategory] = useState("");
 
     const filteredProducts = selectedCategory
@@ -43,10 +43,10 @@ export default function ShopIndex() {
                                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-10 gap-4">
                                     <div>
                                         <h1 className="font-play text-4xl font-extrabold tracking-tight text-on-surface mb-2">
-                                            The Milk Ledger
+                                            KayKay's Shop
                                         </h1>
                                         <p className="text-on-surface-variant">
-                                            Handpicked artisanal dairy,
+                                            Handpicked   dairy,
                                             delivered from Kaykay's farm.
                                         </p>
                                     </div>
@@ -84,8 +84,7 @@ export default function ShopIndex() {
                 </main>
 
                 <Footer />
-                <FloatingActionButton />
-                <MobileNav />
+                {/* <MobileNav /> */}
             </div>
         </>
     );

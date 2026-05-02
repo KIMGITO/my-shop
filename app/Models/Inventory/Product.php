@@ -3,6 +3,7 @@
 namespace App\Models\Inventory;
 
 use App\Models\Batch;
+use App\Models\Category;
 use App\Models\ProductImage;
 use App\Models\Traits\HasSkuByCategoryName;
 use App\Services\CloudinaryService;
@@ -17,7 +18,7 @@ use Illuminate\Database\Eloquent\Model;
         'description',
         'rating',
         'reviews',  
-        'category',
+        'category_id',
         'in_stock',
         'is_popular',
         'is_featured',
@@ -36,12 +37,16 @@ class Product extends Model
 
     protected $appends = ['main_product_image'];
 
+    public function category(){
+        return $this->belongsTo(Category::class);
+    }
+
     public function images()
     {
         return $this->hasMany(ProductImage::class);
     }
 
-    public function bathes (){
+    public function batches (){
         return  $this->hasMany(Batch::class);
     }
 

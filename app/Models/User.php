@@ -12,7 +12,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Cache;
 use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Traits\HasRoles;
-#[Fillable(['name', 'email', 'password', 'phone', 'address', 'avatar', 'role_tag'])]
+#[Fillable(['name', 'email', 'password', 'phone', 'address', 'avatar', 'phone_verified_at','email_verified_at'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -28,6 +28,7 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
+            'phone_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
     }
@@ -48,5 +49,15 @@ class User extends Authenticatable
     public function scopeIsCustomer($query)
     {
         return $query->role('customer');
+    }
+
+    public function customer()
+    {
+        return $this->hasOne(Customer::class);
+    }
+
+    public function addresses()
+    {
+        return $this->hasMany(Address::class);
     }
 }

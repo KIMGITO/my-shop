@@ -28,12 +28,14 @@ class POSService
                     'name' => $product->name ?? '',
                     'price' => (int) $product->price ?? 0,
                     'unit' => $product->unit ?? '',
-                    'available' => $batch->balance,
+                    'received' => $batch->balance,
                     'category' => $product->category ?? '',
                     'image' => $product->main_product_image ?? '',
                     'isPopular' => $product->is_popular ?? false,
                     'isOrganic' => $product->is_organic ?? false,
                     'frequency' => $product->frequency ?? 0, 
+                    'availableQuantity' => $batch->available_quantity,
+                    'reservedQuantity' => $batch->reserved_quantity,
 
                 ];
         });

@@ -2,9 +2,11 @@
 
 use App\Http\Controllers\AddressController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\POSController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ShopController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UserController;
 use Illuminate\Foundation\Application;
@@ -21,22 +23,26 @@ use Inertia\Inertia;
 // Public Routes
 // ============================================================================
 
-Route::get('/', function () {
+Route::get('/', [ShopController::class, 'index']
+)->name('home');
+Route::get('/welcome',
+function () {
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
         'canRegister' => Route::has('register'),
         'laravelVersion' => Application::VERSION,
         'phpVersion' => PHP_VERSION,
     ]);
-})->name('home');
+} );
 
 // ============================================================================
 // Shop Routes
 // ============================================================================
 
 Route::prefix('shop')->name('shop.')->group(function () {
-    Route::get('/', fn() => Inertia::render('Shop/Index'))->name('index');
-    Route::get('/product/{id}', fn($id) => Inertia::render('Product/Show', ['id' => $id]))->name('show');
+    // Route::get('/', fn() => Inertia::render('Shop/Index'))->name('index');
+    Route::get('/', [ShopController::class, 'index'])->name('index');
+    Route::get('/product/{product}', [ShopController::class, 'product'])->name('product');
 });
 
 // ============================================================================
@@ -172,10 +178,17 @@ Route::middleware(['auth'])->group(function () {
     });
 
     Route::prefix('orders')->name('orders.')->group(function () {
-        Route::patch('/checkout', [OrderController::class, 'checkout'])->name('checkout');
+        Route::post('/checkout', [OrderController::class, 'checkout'])->name('checkout');
+        Route::get('/{order}/payment', [OrderController::class, 'showPayment'])->name('payment');
         Route::patch('/{orderNumber}/unpark', [OrderController::class, 'unpark'])->name('unpark');
         Route::delete('/{orderNumber}/void', [OrderController::class, 'void'])->name('void');
-        Route::patch('/park', [OrderController::class, 'parkOrder'])->name('park');
+        Route::patch('/pack', [OrderController::class, 'parkOrder'])->name('pack');
+        Route::delete('/pack/{orderNumber}', [OrderController::class, 'deletePack'])->name('packed.delete');
+    });
+
+
+    Route::prefix('payments')->name('payments.')->group(function () {
+        Route::post('/process/{order}', [PaymentController::class, 'store'])->name('process');
     });
 
     // ============================================================================

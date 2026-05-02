@@ -14,6 +14,16 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
     selectedCategory,
     onCategoryChange,
 }) => {
+
+    const displayCategories = [
+        {
+            name: "All Products",
+            count: categories.reduce((sum, c) => sum + c.count, 0),
+            slug: "all",
+        },
+        ...categories,
+    ];
+
     return (
         <aside className="w-full md:w-64 space-y-10">
             <section>
@@ -21,7 +31,7 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
                     Categories
                 </h3>
                 <CategoryList
-                    categories={categories}
+                    categories={displayCategories}
                     selectedCategory={selectedCategory}
                     onSelect={onCategoryChange}
                 />

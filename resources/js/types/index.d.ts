@@ -15,6 +15,7 @@ export interface BaseProduct {
     name: string;
     price: number;
     image: string;
+    mainProductImage: string;
     description?: string;
     category?: string;
     sku?: string;
@@ -23,8 +24,8 @@ export interface BaseProduct {
 // ========== STORE / CUSTOMER FACING PRODUCT ==========
 export interface Product extends BaseProduct {
     unit?: string;
-    rating?: number;
-    reviews?: number;
+    rating: number;
+    reviews: number;
     inStock?: boolean;
     isPopular?: boolean;
     isFeatured?: boolean;

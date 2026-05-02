@@ -1,11 +1,12 @@
 // ProductFormModal.tsx
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm, router } from "@inertiajs/react";
 import Button from "@/Components/UI/Button";
 import { RiCloseLargeLine } from "react-icons/ri";
 import { Product } from "@/types";
 import { ProductFormWidget } from "@/Widgets/ProductFormWidget";
 import { ImageItem } from "@/Components/UI/MultipleImagesUpload";
+import axios from "axios";
 
 interface ProductFormModalProps {
     isOpen: boolean;
@@ -26,7 +27,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
             shelfLife: 6,
             images: [] as ImageItem[],
             description: "",
-            category: "",
+            categoryId: null,
             inStock: true,
             isPopular: false,
             isFeatured: false,
@@ -51,7 +52,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
                     unit: initialData.unit || "",
                     images: transformedImages,
                     description: initialData.description || "",
-                    category: initialData.category || "",
+                    categoryId: initialData.categoryId || null,
                     inStock: initialData.inStock ?? true,
                     isPopular: initialData.isPopular ?? false,
                     isFeatured: initialData.isFeatured ?? false,
@@ -64,6 +65,21 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
             clearErrors();
         }
     }, [initialData, isOpen]);
+
+     const  [categories,setCategories]  =  useState([]);
+    
+        useEffect(()=>{
+            const  fetchInitialData   = async () =>{
+            const response = await axios.get('/api/v1/categories/search');
+            console.log('response', response)
+                setCategories(response.data)
+            }
+    
+            console.log(categories)
+            if(isOpen){
+                fetchInitialData();
+            }
+        },[isOpen])
 
     const handleSubmit = (e?: React.FormEvent) => {
         if (e) e.preventDefault();
@@ -89,7 +105,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
             price: data.price,
             unit: data.unit,
             description: data.description,
-            category: data.category,
+            categoryId: data.categoryId,
             inStock: data.inStock ? 1 : 0,
             isPopular: data.isPopular ? 1 : 0,
             isFeatured: data.isFeatured ? 1 : 0,
@@ -145,6 +161,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
                         data={data}
                         setData={setData}
                         errors={errors}
+                        categories={categories}
                         processing={processing}
                         onSave={handleSubmit}
                         onClose={onClose}

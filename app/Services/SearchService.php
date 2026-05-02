@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Category;
 use App\Models\Inventory\Product;
 use App\Models\Supplier;
 use App\Models\Customer;

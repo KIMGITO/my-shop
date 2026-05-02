@@ -12,7 +12,6 @@ use App\Repositories\Inventory\BatchRepository;
 use App\Repositories\OrderRepository;
 use App\Services\OrderService;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class OrderController extends Controller
@@ -34,21 +33,42 @@ class OrderController extends Controller
             status: OrderStatus::INITIATED,
             userId: Auth::id(),
             customerId:null,
-            expires_at: now()->addHours(24),
+            expires_at: now()->addSecond(5),
         );
-        $orderNumber = $this->orderService->createOrder($orderData);
+        $order = $this->orderService->createOrder($orderData);
 
-        return response()->json(['orderNumber' => $orderNumber->order_number]);
+        return response()->json(['orderNumber' => $order->order_number]);
     }
 
 
-    public function checkout(OrderRequest $request){
+    // public function checkout(OrderRequest $request){
 
+    //     $payload = $request->validated();
+
+    //     $order = $this->orderService->checkout($payload);
+
+    //     return Inertia::render('Cashier/Checkout', ['order' => $order->load('items'), 'taxRate' => /*config('shop.tax_rate') || */ 0.08]);
+    // }
+    
+
+    public function checkout(OrderRequest $request)
+    {
         $payload = $request->validated();
 
+        // 1. Save the order basics (items, total, etc.)
         $order = $this->orderService->checkout($payload);
 
-        return Inertia::render('Cashier/Checkout', ['order' => $order->load('items'), 'taxRate' => /*config('shop.tax_rate') || */ 0.08]);
+        // 2. Redirect to the payment page for this specific order
+        return redirect()->route('orders.payment', $order->id);
+    }
+
+    public function showPayment(Order $order)
+    {
+        // This loads the "another page" you mentioned
+        return Inertia::render('Cashier/Checkout', [
+            'order' => $order->load('items'),
+            'taxRate' => config('finance.tax.vat'),
+        ]);
     }
 
     public function parkOrder(OrderRequest $request)
@@ -76,5 +96,14 @@ class OrderController extends Controller
         $this->orderRepository->updateByOrderNumber($orderNumber, ['status'=> OrderStatus::INITIATED]);
 
         return back()->with(['message' => 'Order unpacked successfully']);
+    }
+
+    public function  deletePack($orderNumber)
+    {
+        if ($this->orderService->deleteByOrderNumber($orderNumber)) {
+            return back()->with(['message' => 'Parked order deleted successfully']);
+        }
+        return back()->with(['error' => 'Failed to delete parked order.']);
+
     }
 }
