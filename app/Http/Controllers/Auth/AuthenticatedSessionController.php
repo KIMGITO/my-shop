@@ -37,7 +37,7 @@ class AuthenticatedSessionController extends Controller
     }
 
     public function otp(){
-        return Inertia::render('Auth/Otp');
+        return Inertia::render('Auth/Otp',[session('otp_type') => session('otp_identifier')]);
     }
 
     public function discoveredCustomer(){
@@ -49,7 +49,6 @@ class AuthenticatedSessionController extends Controller
 
     public function identify(IdentifierRequest $request)
     {
-
 
         try {
             $validated = $request->validated();

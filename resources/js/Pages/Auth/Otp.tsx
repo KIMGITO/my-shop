@@ -9,13 +9,9 @@ import RegisterIdentifier from "@/Components/Auth/RegisterIdentifier";
 import RegisterOTP from "@/Components/Auth/RegisterOTP";
 import RegisterCustomerDiscoverd from "@/Components/Auth/RegisterCustomerDiscoverd";
 
-interface LoginProps {
-    status?: string;
-    canResetPassword?: boolean;
-    form: 'identifier' | 'otp' | 'discovered'
-}
 
-export default function Login({ status, canResetPassword, form }: LoginProps) {
+
+export default function Login({phone,email}:{phone?:string, email?:string}) {
 
 
 
@@ -47,7 +43,7 @@ export default function Login({ status, canResetPassword, form }: LoginProps) {
                         </div>
 
 
-                            <RegisterOTP/>
+                            <RegisterOTP phone={phone} email={email}/>
                         
                     </div>
                 </main>

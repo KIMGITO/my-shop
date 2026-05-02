@@ -69,9 +69,9 @@ const RegisterOTP: React.FC<{ phone?: string; email?: string }> = ({ phone, emai
     };
 
     const maskedIdentifier = phone 
-        ? `****${phone.slice(-4)}` 
+        ? `${phone.slice(0,2)}******${phone.slice(-2)}` 
         : email 
-            ? email.replace(/(.{2}).*(@.*)/, "$1***$2")
+            ? email.replace(/(.{2}).*(@.*)/, "$1*********$2")
             : "";
 
     return (
