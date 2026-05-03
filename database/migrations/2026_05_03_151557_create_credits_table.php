@@ -21,10 +21,10 @@ return new class extends Migration
             $table->decimal('paid_amount',10,2)->default(0);
             $table->decimal('balance',10,2)->default(0);
             $table->enum('status', array_column(CreditStatus::cases(), 'value'))->default(CreditStatus::UNPAID->value);
-            $table->timestamp('issued_at');
-            $table->timestamp('due_date');
-            $table->timestamp('last_payment');
-            $table->text('notes');
+            $table->timestamp('issued_at')->default(now());
+            $table->timestamp('due_date')->default(now()->addHours(24));
+            $table->timestamp('last_payment')->nullable();
+            $table->text('notes')->nullable();
             $table->timestamps();
         });
     }

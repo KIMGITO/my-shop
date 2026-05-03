@@ -70,16 +70,12 @@ class PaymentService
         // Handle credit logic
         if ($creditAmount > 0) {
             if(!Customer::where('id',$customer_id)->exists() || $customer_id === null){
-                dd('erorr');
                 throw new Exception ("Customer not found.");
             }
-            $data = [
-                'amount_due' => $totalAmount,
-                'status' =>  ($finalMpesaAmount > 0 || $finalCashAmount > 0) ? PaymentStatus::PARTIALLY_PAID: PaymentStatus::UNPAID,
-            ];
-
-            $this->processCredit($orderId, $customer_id, $data);
+            if ($this->processCredit($orderId, $customer_id)){
             // handle credit recording logic here
+
+            }
             // Example: $this->recordCredit($orderId, $customer_id, $creditAmount);
         }
         
@@ -102,6 +98,8 @@ class PaymentService
                 $order_payment_status = OrderPaymentStatus::PAID;
             }else{
                 $payment_status = PaymentStatus::PENDING;
+                $order_payment_status = OrderPaymentStatus::PARTIALLY_PAID;
+
             }
 
             $results['mpesa'] = $this->processMpesa($orderId, $order_payment_status, [
@@ -115,10 +113,13 @@ class PaymentService
         if ($finalCashAmount > 0) {
             if($finalCashAmount + $finalMpesaAmount >= $totalAmount){
                 $payment_status = PaymentStatus::PAID->value;
+                $order_payment_status = OrderPaymentStatus::PAID;
             }else{
-                $payment_status = PaymentStatus::PARTIALLY_PAID->value;
+                $payment_status = PaymentStatus::PAID->value;
+                $order_payment_status = OrderPaymentStatus::PARTIALLY_PAID;
+
             }
-            $results['cash'] = $this->processCash($orderId, [
+            $results['cash'] = $this->processCash($orderId, $order_payment_status, [
                 'amount_due' => $totalAmount - $finalMpesaAmount,
                 'amount_paid' => $finalCashAmount,
                 'change_given' => $changeGiven , 
@@ -212,7 +213,7 @@ class PaymentService
 
     }
 
-    public function  processCredit(int $orderId, int $customerId, array $data){
+    public function  processCredit(int $orderId, int $customerId){
         
         if(!$this->orderRepository->find($orderId)){
             
@@ -221,7 +222,7 @@ class PaymentService
         if(!$this->customerRepository->find($customerId)){
             throw new  Exception('Customer not found');
         }
-        $this->orderService->completeOrder($orderId);
+        return $this->orderService->completeOrder($orderId);
         // Record credit 
     }
 }
