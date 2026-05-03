@@ -1,6 +1,8 @@
 <?php
 
+use App\Enums\OrderPaymentStatus;
 use App\Enums\OrderStatus;
+use App\Enums\PaymentStatus;
 use App\Enums\TransactionSource;
 use App\Enums\TransactionType;
 use Illuminate\Database\Migrations\Migration;
@@ -20,6 +22,7 @@ return new class extends Migration
             $table->enum('type', array_column(TransactionType::cases(),'value'))->default(TransactionType::POS->value);
             $table->enum('source',array_column(TransactionSource::cases(),'value'))->default(TransactionSource::POS->value);
             $table->enum('status', array_column(OrderStatus::cases(),'value'))->default(OrderStatus::INITIATED->value);
+            $table->enum('payment_status', array_column(OrderPaymentStatus::cases(),'value'))->default(OrderPaymentStatus::UNPAID->value);
             $table->foreignId('customer_id')->nullable()->constrained('users');
             $table->foreignId('user_id')->constrained();
             $table->decimal('total_amount', 12, 2)->default(0);

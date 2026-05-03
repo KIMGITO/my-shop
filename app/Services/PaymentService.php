@@ -2,9 +2,12 @@
 
 namespace App\Services;
 
+use App\Enums\OrderPaymentStatus;
 use App\Enums\PaymentMethods;
 use App\Enums\PaymentStatus;
+use App\Models\Customer;
 use App\Models\Payment;
+use App\Repositories\CustomerRepository;
 use App\Repositories\Inventory\BatchRepository;
 use App\Repositories\OrderRepository;
 use App\Repositories\PaymentRepository;
@@ -20,6 +23,7 @@ class PaymentService
         protected OrderRepository $orderRepository,
         protected OrderService $orderService,
         protected BatchRepository $batchRepository,
+        protected CustomerRepository $customerRepository,
     ) {}
 
     /**
@@ -65,9 +69,16 @@ class PaymentService
         
         // Handle credit logic
         if ($creditAmount > 0) {
-            if ($customer_id === null) {
-                throw new Exception("No customer selected for credit recording.");
+            if(!Customer::where('id',$customer_id)->exists() || $customer_id === null){
+                dd('erorr');
+                throw new Exception ("Customer not found.");
             }
+            $data = [
+                'amount_due' => $totalAmount,
+                'status' =>  ($finalMpesaAmount > 0 || $finalCashAmount > 0) ? PaymentStatus::PARTIALLY_PAID: PaymentStatus::UNPAID,
+            ];
+
+            $this->processCredit($orderId, $customer_id, $data);
             // handle credit recording logic here
             // Example: $this->recordCredit($orderId, $customer_id, $creditAmount);
         }
@@ -86,12 +97,14 @@ class PaymentService
         if ($finalMpesaAmount > 0) {
 
             if($finalMpesaAmount >= $totalAmount){
+                // update payment to be paid and order payment status be paid
                 $payment_status = PaymentStatus::PENDING->value;
+                $order_payment_status = OrderPaymentStatus::PAID;
             }else{
-                $payment_status = PaymentStatus::PARTIALLY_PAID->value;
+                $payment_status = PaymentStatus::PENDING;
             }
 
-            $results['mpesa'] = $this->processMpesa($orderId, [
+            $results['mpesa'] = $this->processMpesa($orderId, $order_payment_status, [
                 'amount_paid' => $finalMpesaAmount, 
                 'amount_due' => $totalAmount,
                 'status' => $payment_status,
@@ -141,36 +154,42 @@ class PaymentService
         return $results;
     }
 
-    public function processMpesa(int $orderId, array $data): Payment 
+    public function processMpesa(int $orderId, OrderPaymentStatus $order_payment_status,  array $data): Payment 
     {
-        $payload = array_merge($data, [
-            'order_id' => $orderId,
-            'method' => PaymentMethods::MPESA,
-            'status' => $data['status'] ?? PaymentStatus::DRAFT->value,
-        ]);
+       return  DB::transaction(function () use($orderId, $order_payment_status,  $data){
 
-        return $this->registerPayment($payload);
+            $payload = array_merge($data, [
+                'order_id' => $orderId,
+                'method' => PaymentMethods::MPESA,
+                'status' => $data['status'] ?? PaymentStatus::DRAFT->value,
+            ]);
+
+            $this->orderRepository->update($orderId, ['payment_status' => $order_payment_status]);
+            return $this->registerPayment($payload);
+        });
     }
 
-    public function processCash(int $orderId, array $data): Payment 
+    public function processCash(int $orderId, OrderPaymentStatus $order_payment_status, array $data): Payment 
     {
-        $amountPaid = $data['amount_paid'] ?? 0; 
-        $totalDue = $data['amount_due']  ?? 0;    
-        $changeGiven = $data['change_given'] ?? 0;
-        $status = $data['status'] ?? PaymentStatus::DRAFT->value;
 
-       
-       
-        $payment =  $this->registerPayment([
-            'order_id' => $orderId,
-            'method'   => PaymentMethods::CASH,
-            'amount_due'   => $totalDue, 
-            'amount_paid' => $amountPaid,
-            'change_given' => (int)$changeGiven,
-            'status' => $status,
-        ]);
+    return DB::transaction(function () use($orderId, $order_payment_status,  $data){
+            $amountPaid = $data['amount_paid'] ?? 0; 
+            $totalDue = $data['amount_due']  ?? 0;    
+            $changeGiven = $data['change_given'] ?? 0;
+            $status = $data['status'] ?? PaymentStatus::DRAFT->value;
 
-        return $payment;
+            $payment =  $this->registerPayment([
+                'order_id' => $orderId,
+                'method'   => PaymentMethods::CASH,
+                'amount_due'   => $totalDue, 
+                'amount_paid' => $amountPaid,
+                'change_given' => (int)$changeGiven,
+                'status' => $status,
+            ]);
+
+            $this->orderRepository->update($orderId, ['payment_status' => $order_payment_status]);
+            return $payment;
+       });
     }
 
     /**
@@ -191,5 +210,18 @@ class PaymentService
         return $this->paymentRepository->create($payload);
 
 
+    }
+
+    public function  processCredit(int $orderId, int $customerId, array $data){
+        
+        if(!$this->orderRepository->find($orderId)){
+            
+            throw new  Exception('Order not found');
+        }
+        if(!$this->customerRepository->find($customerId)){
+            throw new  Exception('Customer not found');
+        }
+        $this->orderService->completeOrder($orderId);
+        // Record credit 
     }
 }

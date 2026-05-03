@@ -169,7 +169,7 @@ class OrderService
      * Complete and order
      */
 
-    public function completeOrder(string $orderId): Order{
+    public function completeOrder(string $orderId): Order | bool{
         // check if order exists,
         $order = $this->orderRepository->find($orderId);
         if(!$order){
@@ -177,7 +177,7 @@ class OrderService
         }
         // check if order is already completed and return error if yes
         if($order->status === OrderStatus::COMPLETED->value ){
-            throw new \Exception("Order with number {$order->order_number} is already completed");
+            return false;
         }
         // see if it cant be complete (eg marked as cancelled or voided) and return error if yes
         if($order->status === OrderStatus::CANCELLED->value || $order->status === OrderStatus::EXPIRED->value){
@@ -189,7 +189,7 @@ class OrderService
             'status' => OrderStatus::COMPLETED->value
         ]);
 
-        return $order;
+        return true;
     }
 
     public function deleteByOrderNumber(string  $orderNumber):bool {
