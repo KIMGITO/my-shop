@@ -12,4 +12,8 @@ class CustomerService
     public function __construct(
         protected CustomerRepository $customerRepository,
     ){}
+
+    public function showCustomerData(int $customerId){
+        // fetchCustomerData 
+    }
 }

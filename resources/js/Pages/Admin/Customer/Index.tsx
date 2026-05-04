@@ -26,6 +26,7 @@ import { HiMail } from "react-icons/hi";
 import { toast } from "sonner";
 import { CustomerModal } from "./CustomerModal";
 import FloatingActionButton from "@/Components/Common/FloatingActionButton";
+import { Button } from "@/Components/UI/Button";
 
 // Aligned with Laravel Customer Model
 export interface Customer {
@@ -175,9 +176,9 @@ export default function CustomersPage({ customers = [], errors }: { customers?: 
                                                         <button onClick={() => handleEdit(customer)} className="p-2 hover:bg-primary/10 text-primary rounded-lg transition-colors">
                                                             <HiOutlinePencilSquare className="w-5 h-5" />
                                                         </button>
-                                                        <button className="p-2 hover:bg-secondary/10 text-secondary rounded-lg transition-colors">
+                                                        <Button className=" p-1  hover:bg-secondary/30  rounded-lg transition-colors" variant="ghost" onClick={()=>{router.get(`/admin/customers/${customer.id}`)}}>
                                                             <HiOutlineEye className="w-5 h-5" />
-                                                        </button>
+                                                        </Button>
                                                     </div>
                                                 </td>
                                             </tr>

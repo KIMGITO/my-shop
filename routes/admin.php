@@ -87,6 +87,7 @@ use Inertia\Inertia;
         Route::prefix('customers')->name('customers.')->group(function () {
             Route::get('/', [CustomerController::class, 'index'])->name('index');
             Route::post('/',[CustomerController::class, 'store'])->name('store');
+            Route::get('/{customer}', [CustomerController::class, 'show'])->name('show');
         });
 
         // Feedbacks
