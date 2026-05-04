@@ -15,9 +15,7 @@ trait HandlesExceptionResponse
     ): JsonResponse|RedirectResponse {
 
         if ($request->header('X-Inertia')) {
-            return redirect()->back()->with([
-                'error' => $message,
-            ]);
+            return redirect()->back()->withErrors( ['error' => $this->getMessage()]);
         }
 
         return response()->json([
