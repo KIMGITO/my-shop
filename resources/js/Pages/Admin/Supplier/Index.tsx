@@ -47,7 +47,6 @@ export default function SuppliersPage({
                 // loading state
             },
             onSuccess: () => {
-                console.log("Supplier deleted successfully");
             },
             onError: (errors) => {
                 // Handle any server-side errors

@@ -176,7 +176,6 @@ export default function FeedbackManagement() {
     );
 
     const handleRespond = (feedbackId: string) => {
-        console.log("Responding to feedback:", feedbackId, responseMessage);
         setSelectedFeedback(null);
         setResponseMessage("");
     };

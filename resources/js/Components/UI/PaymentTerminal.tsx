@@ -34,7 +34,6 @@ export default function PaymentTerminal({
     allowedPaymentMethods = ["mpesa", "cash", "credit", "split"],
 }: PaymentTerminalProps) {
 
-    console.log('payment customer', customer);
     
     const roundedTotal = useMemo(() => roundToWholeNumber(total), [total]);
     const scrollContainerRef = useRef<HTMLDivElement>(null);

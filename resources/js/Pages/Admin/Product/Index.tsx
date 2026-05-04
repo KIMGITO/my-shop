@@ -71,7 +71,6 @@ export default function ProductsPage({
             router.delete(route("admin.inventory.products.destroy", id), {
                 onStart: () => {},
                 onSuccess: () => {
-                    console.log("Product deleted successfully");
                 },
                     onError: (errors) => {
                     alert(

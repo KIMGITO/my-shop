@@ -49,6 +49,11 @@ export default function Authenticated({
     const handleLogout = () => {
         router.post("/logout");
     };
+
+    const  {errors} = usePage().props;
+    
+    console.log(errors);
+
     return (
         <div className="min-h-screen bg-surface-container-lowest flex flex-col h-screen overflow-hidden">
             <AuthenticatedNavbar  scrollContainerRef={scrollContainerRef}>

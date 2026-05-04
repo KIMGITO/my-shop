@@ -18,7 +18,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     variant = "grid",
 }) => {
 
-    console.log(product)
 
 
     const [added, setAdded] = useState(false);

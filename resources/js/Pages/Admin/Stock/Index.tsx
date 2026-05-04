@@ -115,7 +115,6 @@ const stats = [
 ];
 
 export default function BatchesPage({batches,isModalOpen = false} : {batches: Batch[], isModalOpen:boolean} ) {
-    console.log(batches)
     const [searchQuery, setSearchQuery] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
     const [isIntakeModalOpen, setIsIntakeModalOpen] = useState(isModalOpen);
