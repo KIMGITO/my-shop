@@ -25,7 +25,7 @@ class CreditService
     }
 
 
-    public function  registerCredit(int $orderId, int $customerId, float $creditAmount,  ?string $notes): Credit {
+    public function  registerCredit(int $orderId, int $customerId, float $creditAmount,  ?string $notes = null): Credit {
 
         $order =  $this->orderRepository->find($orderId);
         $customer =  $this->customerRepository->find($customerId);

@@ -21,16 +21,21 @@ class PaymentService
     public function __construct(
         protected PaymentRepository $paymentRepository,
         protected OrderRepository $orderRepository,
-        protected OrderService $orderService,
         protected BatchRepository $batchRepository,
         protected CustomerRepository $customerRepository,
+
+        protected OrderService $orderService,
+        protected CreditService $creditService,
+
+
     ) {}
 
     /**
      * Smartly splits an amount between Mpesa and Cash.
      */
-    public function processSplitPayment(int $orderId, float $totalAmount, array $splitData, ?int $customer_id): array|float
+    public function processSplitPayment(int $orderId, float $totalAmount, array $splitData, ?int $customerId): array|float
     {
+       return DB::transaction(function ()  use($orderId, $totalAmount,$splitData, $customerId ) {
         // Extract amounts with proper validation
         $mpesaAmount = isset($splitData['mpesaAmount']) ? (float)$splitData['mpesaAmount'] : 0;
         $cashAmount = isset($splitData['cashAmount']) ? (float)$splitData['cashAmount'] : 0;
@@ -69,14 +74,16 @@ class PaymentService
         
         // Handle credit logic
         if ($creditAmount > 0) {
-            if(!Customer::where('id',$customer_id)->exists() || $customer_id === null){
+            if(!Customer::where('id',$customerId)->exists() || $customerId === null){
                 throw new Exception ("Customer not found.");
             }
-            if ($this->processCredit($orderId, $customer_id)){
-            // handle credit recording logic here
-
-            }
-            // Example: $this->recordCredit($orderId, $customer_id, $creditAmount);
+            DB::transaction(function () use($orderId,  $customerId, $creditAmount) {
+                if ($this->processCredit($orderId, $customerId)){
+                // handle credit recording 
+                    $credit =  $this->creditService->registerCredit($orderId, $customerId, $creditAmount);
+                }
+            });
+            // Example: $this->recordCredit($orderId, $customerId, $creditAmount);
         }
         
         // Validate amounts are not negative
@@ -153,6 +160,7 @@ class PaymentService
        
         
         return $results;
+        });
     }
 
     public function processMpesa(int $orderId, OrderPaymentStatus $order_payment_status,  array $data): Payment 
