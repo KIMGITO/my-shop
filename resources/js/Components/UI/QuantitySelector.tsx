@@ -8,7 +8,7 @@ interface QuantitySelectorProps {
     quantity: number;
     onUpdate: (newQuantity: string) => void;
     min?: number;
-    max?: number;
+    max: number;
     size?: "sm" | "md" | "lg";
     disabled?: boolean;
     flyX?: number; 
@@ -18,8 +18,8 @@ interface QuantitySelectorProps {
 export const QuantitySelector: React.FC<QuantitySelectorProps> = ({
     quantity,
     onUpdate,
-    min = 0,
-    max = 99,
+    min = 0,    
+    max,
     size = "md",
     disabled = false,
     flyX = 0,
@@ -32,6 +32,12 @@ export const QuantitySelector: React.FC<QuantitySelectorProps> = ({
     useEffect(() => {
         setLocalValue(String(quantity));
     }, [quantity]);
+
+    useEffect(()=>{
+        if(Number(localValue) > max){
+            setLocalValue(max.toString())
+        }
+    },[localValue])
 
     const sizeClasses = {
         sm: "w-7 h-7",

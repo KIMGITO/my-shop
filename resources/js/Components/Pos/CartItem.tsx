@@ -14,6 +14,7 @@ export const CartItem: React.FC<CartItemProps> = ({
     onUpdateQuantity,
     onRemove,
 }) => {
+    console.log('cart item', item.availableQuantity)
     return (
         <div className="flex items-center gap-3 bg-surface-container-lowest p-3 rounded-xl">
             <div className="w-12 h-12 rounded-lg overflow-hidden shrink-0">
@@ -33,12 +34,13 @@ export const CartItem: React.FC<CartItemProps> = ({
             </div>
             <div className="flex items-center gap-2">
                 <QuantitySelector
+                    disabled={item.quantity >= item.availableQuantity}
                     quantity={item.quantity}
+                    max={item.availableQuantity}
                     onUpdate={(quantity) => onUpdateQuantity(item.id, quantity)}
                     size="sm"
                     flyX={-90}
                     flyY={200}
-                
                 />
                 <button
                     onClick={() => onRemove(item.id)}

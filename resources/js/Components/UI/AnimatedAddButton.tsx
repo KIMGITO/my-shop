@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { MdOutlinePlusOne, MdAddShoppingCart } from "react-icons/md";
 
@@ -8,34 +9,36 @@ interface AnimatedAddButtonProps {
   flyX?: number;
   flyY?: number;
   glowColor?: string;
+  disabled?:boolean;
 }
 const AnimatedAddButton: React.FC<AnimatedAddButtonProps> = ({ 
   added, 
   onClick, 
   flyX = 5,  
   flyY = -150, 
+  disabled,
   glowColor = "rgb(34 197 94)" 
 }) => {
   return (
     <motion.button
       whileTap={{ scale: 0.9 }}
-      onClick={onClick}
+      onClick={ disabled ? ()=>{} : onClick}
       className="p-2 rounded-lg relative flex items-center justify-center"
     >
       <AnimatePresence mode="wait">
-        {added ? (
+        {added && !disabled ? (
           <motion.span
             key="added"
             initial={{ scale: 0.5, opacity: 0, x: 0, y: 0 }}
-            animate={{ 
+            animate={!disabled ? { 
               scale: [0.5, 1.5, 1.8], 
               opacity: [0, 1, 0.8,0.4, 0], 
               x: flyX, 
               y: flyY, 
               filter: `drop-shadow(0px 0px 8px ${glowColor})` 
-            }}
+            }:{}}
             transition={{ 
-              duration: 0.7, 
+              duration: 0.4, 
               ease: "easeOut" 
             }}
             className="text-green-500 flex absolute pointer-events-none"
@@ -51,7 +54,7 @@ const AnimatedAddButton: React.FC<AnimatedAddButtonProps> = ({
             transition={{ duration: 0 }}
             className="flex"
           >
-            <MdAddShoppingCart className="text-lg" />
+            <MdAddShoppingCart className={cn(disabled?'text-gray-400 brightness-75':'', "text-lg")} />
           </motion.span>
         )}
           </AnimatePresence>

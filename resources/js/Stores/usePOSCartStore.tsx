@@ -4,6 +4,7 @@ import { persist } from "zustand/middleware";
 import { CartItem, Product } from "@/types/pos";
 import axios from "axios";
 import { router, usePage } from "@inertiajs/react";
+import { toast } from "sonner";
 
 export interface ParkedCart {
     id: string;
@@ -60,6 +61,12 @@ export const usePOSCartStore = create<POSCartStore>()(
     const existingItem = cart.find((item) => String(item.id) === String(product.id));
     
     if (existingItem) {
+        if (existingItem.quantity + 1 > product.availableQuantity) {
+                        toast.error(`Only ${product.availableQuantity} items available in stock`, {
+                            duration: 3000
+                        });
+                        return;
+                    }
         set({
             cart: cart.map((item) =>
                 String(item.id) === String(product.id) 
@@ -68,6 +75,10 @@ export const usePOSCartStore = create<POSCartStore>()(
             ),
         });
     } else {
+        if (product.availableQuantity < 1) {
+            toast.error("Product is out of stock", { duration: 3000 });
+            return;
+        }
         set({ cart: [...cart, { ...product, quantity: 1 }] });
     }
 },

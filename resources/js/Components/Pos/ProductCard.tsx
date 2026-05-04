@@ -38,14 +38,16 @@ export const ProductCard: React.FC<ProductCardProps> = ({
                 <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                         <h4 className="font-bold text-on-surface truncate">{product.name}</h4>
+                        <p className="text-xs text-on-surface-variant">{product.availableQuantity} {product.unit}{product.availableQuantity == 1 ? '':'s'}</p>
+
                         {product.isOrganic && (
                             <span className="text-[8px] bg-tertiary-container text-on-tertiary-container px-1.5 py-0.5 rounded-full">Organic</span>
                         )}
                     </div>
-                    <p className="text-xs text-on-surface-variant">{product.unit}</p>
+                    {/* <p className="text-xs text-on-surface-variant">{product.unit}</p> */}
                     <p className="text-sm font-bold text-primary">Ksh{product.price.toFixed(2)}</p>
                 </div>
-                    <AnimatedAddButton flyX={-120} flyY={500} added={added} onClick={() => handleClick()} />
+                    <AnimatedAddButton disabled flyX={-120} flyY={500} added={added} onClick={() => handleClick()} />
 
             </div>
         );
@@ -72,11 +74,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             </div>
             <div>
                 <h3 className="font-bold text-on-surface">{product.name}</h3>
-                <p className="text-xs text-on-surface-variant">{product.availableQuantity} {product.unit}</p>
+                <p className="text-xs text-on-surface-variant">{product.availableQuantity} {product.unit}{product.availableQuantity == 1 ? '':'s'}</p>
+
             </div>
             <div className="flex items-center justify-between mt-auto">
                 <span className="text-base font-black text-primary">Ksh{product.price.toFixed(2)}</span>
-                <AnimatedAddButton added={added} onClick={() => handleClick()} />
+                <AnimatedAddButton disabled={product.availableQuantity <= 0} added={added} onClick={() => handleClick()} />
             </div>
         </div>
     );
