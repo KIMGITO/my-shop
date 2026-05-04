@@ -36,130 +36,124 @@ class PaymentService
     public function processSplitPayment(int $orderId, float $totalAmount, array $splitData, ?int $customerId): array|float
     {
        return DB::transaction(function ()  use($orderId, $totalAmount,$splitData, $customerId ) {
-        // Extract amounts with proper validation
-        $mpesaAmount = isset($splitData['mpesaAmount']) ? (float)$splitData['mpesaAmount'] : 0;
-        $cashAmount = isset($splitData['cashAmount']) ? (float)$splitData['cashAmount'] : 0;
-        
-        // Calculate total paid and change
-        $totalPaid = $mpesaAmount + $cashAmount;
-        $changeGiven = 0;
-        $creditAmount = 0;
-        
-        // Store original values for adjustment
-        $finalMpesaAmount = $mpesaAmount;
-        $finalCashAmount = $cashAmount;
-        
-        if ($totalPaid > $totalAmount) {
-            // Customer overpaid - calculate change
-            $overpayment = $totalPaid - $totalAmount;
-            $changeGiven = $overpayment;
-            $totalPaid = $totalAmount; 
+            // Extract amounts with proper validation
+            $mpesaAmount = isset($splitData['mpesaAmount']) ? (float)$splitData['mpesaAmount'] : 0;
+            $cashAmount = isset($splitData['cashAmount']) ? (float)$splitData['cashAmount'] : 0;
+            
+            // Calculate total paid and change
+            $totalPaid = $mpesaAmount + $cashAmount;
+            $changeGiven = 0;
             $creditAmount = 0;
             
-            // Adjust the payment amounts - change comes from cash first
-            if ($cashAmount >= $overpayment) {
-                $finalCashAmount = $cashAmount - $overpayment;
-                $finalMpesaAmount = $mpesaAmount;
-            } else {
-                // Not enough cash, take remaining from M-Pesa
-                $remainingChange = $overpayment - $cashAmount;
-                $finalCashAmount = 0;
-                $finalMpesaAmount = $mpesaAmount - $remainingChange;
-            }
-        } elseif ($totalPaid < $totalAmount) {
-            // Customer underpaid - remaining becomes credit
-            $creditAmount = $totalAmount - $totalPaid;
-            $changeGiven = 0;
-        }
-        
-        // Handle credit logic
-        if ($creditAmount > 0) {
-            if(!Customer::where('id',$customerId)->exists() || $customerId === null){
-                throw new Exception ("Customer not found.");
-            }
-            DB::transaction(function () use($orderId,  $customerId, $creditAmount) {
-                if ($this->processCredit($orderId, $customerId)){
-                // handle credit recording 
-                    $credit =  $this->creditService->registerCredit($orderId, $customerId, $creditAmount);
-                }
-            });
-            // Example: $this->recordCredit($orderId, $customerId, $creditAmount);
-        }
-        
-        // Validate amounts are not negative
-        if ($finalMpesaAmount < 0 || $finalCashAmount < 0) {
-            throw new Exception("Invalid payment adjustment: negative payment amounts detected.");
-        }
-
-        $results = [];
-
-        $payment_status = PaymentStatus::DRAFT->value;
-
-        
-        // Process M-Pesa payment
-        if ($finalMpesaAmount > 0) {
-
-            if($finalMpesaAmount >= $totalAmount){
-                // update payment to be paid and order payment status be paid
-                $payment_status = PaymentStatus::PENDING->value;
-                $order_payment_status = OrderPaymentStatus::PAID;
-            }else{
-                $payment_status = PaymentStatus::PENDING;
-                $order_payment_status = OrderPaymentStatus::PARTIALLY_PAID;
-
-            }
-
-            $results['mpesa'] = $this->processMpesa($orderId, $order_payment_status, [
-                'amount_paid' => $finalMpesaAmount, 
-                'amount_due' => $totalAmount,
-                'status' => $payment_status,
-            ]);
-        }
-        
-        // Process Cash payment (after change adjustment)
-        if ($finalCashAmount > 0) {
-            if($finalCashAmount + $finalMpesaAmount >= $totalAmount){
-                $payment_status = PaymentStatus::PAID->value;
-                $order_payment_status = OrderPaymentStatus::PAID;
-            }else{
-                $payment_status = PaymentStatus::PAID->value;
-                $order_payment_status = OrderPaymentStatus::PARTIALLY_PAID;
-
-            }
-            $results['cash'] = $this->processCash($orderId, $order_payment_status, [
-                'amount_due' => $totalAmount - $finalMpesaAmount,
-                'amount_paid' => $finalCashAmount,
-                'change_given' => $changeGiven , 
-                'status' => $payment_status,
-            ]);
-        }
-
-        DB::transaction(function () use ($orderId) {
-            $order = $this->orderRepository->find($orderId);
-            if($order->balance == 0){
-                $this->orderService->completeOrder($orderId);
+            // Store original values for adjustment
+            $finalMpesaAmount = $mpesaAmount;
+            $finalCashAmount = $cashAmount;
+            
+            if ($totalPaid > $totalAmount) {
+                // Customer overpaid - calculate change
+                $overpayment = $totalPaid - $totalAmount;
+                $changeGiven = $overpayment;
+                $totalPaid = $totalAmount; 
+                $creditAmount = 0;
                 
-                $order->items->each(function($item) {
-                    $this->batchRepository->confirmSale($item->batch_id, $item->quantity);
-                });
+                // Adjust the payment amounts - change comes from cash first
+                if ($cashAmount >= $overpayment) {
+                    $finalCashAmount = $cashAmount - $overpayment;
+                    $finalMpesaAmount = $mpesaAmount;
+                } else {
+                    // Not enough cash, take remaining from M-Pesa
+                    $remainingChange = $overpayment - $cashAmount;
+                    $finalCashAmount = 0;
+                    $finalMpesaAmount = $mpesaAmount - $remainingChange;
+                }
+            } elseif ($totalPaid < $totalAmount) {
+                // Customer underpaid - remaining becomes credit
+                $creditAmount = $totalAmount - $totalPaid;
+                $changeGiven = 0;
             }
-        });
+            
         
+            
+            // Validate amounts are not negative
+            if ($finalMpesaAmount < 0 || $finalCashAmount < 0) {
+                throw new Exception("Invalid payment adjustment: negative payment amounts detected.");
+            }
 
-        
-        // Add summary to results (keeping your original keys)
-        $results['summary'] = [
-            'total_amount' => $totalAmount,
-            'mpesa_amount' => $mpesaAmount,
-            'cash_amount' => $cashAmount,
-            'total_paid' => $finalMpesaAmount + $finalCashAmount,
-            'credit_amount' => $creditAmount,
-            'change_given' => $changeGiven
-        ];
+            $results = [];
 
-       
-        
-        return $results;
+            $payment_status = PaymentStatus::DRAFT->value;
+
+            
+            // Process M-Pesa payment
+            if ($finalMpesaAmount > 0) {
+
+                if($finalMpesaAmount >= $totalAmount){
+                    // update payment to be paid and order payment status be paid
+                    $payment_status = PaymentStatus::PENDING->value;
+                    $order_payment_status = OrderPaymentStatus::PAID;
+                }else{
+                    $payment_status = PaymentStatus::PENDING;
+                    $order_payment_status = OrderPaymentStatus::PARTIALLY_PAID;
+
+                }
+
+                $results['mpesa'] = $this->processMpesa($orderId, $order_payment_status, [
+                    'amount_paid' => $finalMpesaAmount, 
+                    'amount_due' => $totalAmount,
+                    'status' => $payment_status,
+                ]);
+            }
+            
+            // Process Cash payment (after change adjustment)
+            if ($finalCashAmount > 0) {
+                if($finalCashAmount + $finalMpesaAmount >= $totalAmount){
+                    $payment_status = PaymentStatus::PAID->value;
+                    $order_payment_status = OrderPaymentStatus::PAID;
+                }else{
+                    $payment_status = PaymentStatus::PAID->value;
+                    $order_payment_status = OrderPaymentStatus::PARTIALLY_PAID;
+
+                }
+                $results['cash'] = $this->processCash($orderId, $order_payment_status, [
+                    'amount_due' => $totalAmount - $finalMpesaAmount,
+                    'amount_paid' => $finalCashAmount,
+                    'change_given' => $changeGiven , 
+                    'status' => $payment_status,
+                ]);
+            }
+
+            // Process Credit
+            if ($creditAmount > 0) {
+                if(!Customer::where('id',$customerId)->exists() || $customerId === null){
+                    throw new Exception ("Customer not found.");
+                }
+                    if ($this->processCredit($orderId, $customerId)){
+                    // handle credit recording 
+                        $credit =  $this->creditService->registerCredit($orderId, $customerId, $creditAmount);
+                        // Send as invoice.
+                    }
+            }
+
+                $order = $this->orderRepository->find($orderId);
+                if($order->balance == 0){
+                    $this->orderService->completeOrder($orderId);
+                    
+                    $order->items->each(function($item) {
+                        $this->batchRepository->confirmSale($item->batch_id, $item->quantity);
+                    });
+                }
+            
+            // Add summary to results (keeping your original keys)
+            $results['summary'] = [
+                'total_amount' => $totalAmount,
+                'mpesa_amount' => $mpesaAmount,
+                'cash_amount' => $cashAmount,
+                'total_paid' => $finalMpesaAmount + $finalCashAmount,
+                'credit_amount' => $creditAmount,
+                'change_given' => $changeGiven
+            ];
+
+            return $results;
         });
     }
 

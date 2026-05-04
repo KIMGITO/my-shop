@@ -2,6 +2,7 @@
 
 namespace App\Repositories\Inventory;
 
+use App\Exceptions\StockException;
 use App\Models\Batch;
 use App\Repositories\BaseRepository;
 use Exception;
@@ -27,7 +28,7 @@ class BatchRepository extends BaseRepository
 
         // Optional: Check if enough stock is actually available before reserving
         if ($batch->available_quantity < $quantity) {
-            throw new Exception("Insufficient stock for product: {$batch->product->name} ");
+            throw new StockException("Insufficient stock for product: {$batch->product->name} ");
         }
 
         //  update to prevent race conditions

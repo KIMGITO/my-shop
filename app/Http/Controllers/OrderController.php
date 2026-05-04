@@ -91,14 +91,14 @@ class OrderController extends Controller
     /**
      * UNPARK: Mark as active so it disappears from the "Parked" list.
      */
-    public function unpark( $orderNumber)
+    public function unpark(string $orderNumber)
     {
         $this->orderRepository->updateByOrderNumber($orderNumber, ['status'=> OrderStatus::INITIATED]);
 
         return back()->with(['message' => 'Order unpacked successfully']);
     }
 
-    public function  deletePack($orderNumber)
+    public function  deletePack(string $orderNumber)
     {
         if ($this->orderService->deleteByOrderNumber($orderNumber)) {
             return back()->with(['message' => 'Parked order deleted successfully']);

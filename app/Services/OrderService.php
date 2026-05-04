@@ -92,7 +92,6 @@ class OrderService
             'notes'        => $data->notes,
         ]);
 
-        // dd($order);
 
         ReleaseProducts::dispatch($order->order_number )->delay( now()->addSeconds(5));
 
@@ -105,8 +104,6 @@ class OrderService
     }
 
     // processOrderData and mapPayloadToUpdateData remain unchanged...
-
-
     public function processOrderData(array $payload, OrderStatus $status): CreateOrderData
     {
         return new CreateOrderData(
