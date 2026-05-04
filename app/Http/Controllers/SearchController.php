@@ -21,6 +21,11 @@ class SearchController extends Controller
         return response()->json($results);
     }
 
+     public function categories(Request  $request){
+        $results = $this->search->searchCategories($request->query('q'));
+        return response()->json($results);
+    }
+
     public function customers(Request  $request){
         $results = $this->search->searchCustomers($request->query('q'));
         return response()->json($results);

@@ -68,11 +68,12 @@ export const Select: React.FC<SelectProps> = ({
     const containerRef = useRef<HTMLDivElement>(null);
     const searchInputRef = useRef<HTMLInputElement>(null);
 
+
     const selectedOption = options.find(
         (opt) => String(opt.value) === String(value)
     );
     const filteredOptions = options.filter((opt) =>
-        opt.label.toLowerCase().includes(searchTerm.toLowerCase())
+        opt.label?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     useEffect(() => {

@@ -134,7 +134,7 @@ class AuthenticatedSessionController extends Controller
 
             return back()->withErrors(['otp' => 'Invalid OTP. Please try again.']);
         }catch(Throwable $th){
-            return back()->withErrors(['otp' => 'Failed to verify OTP,  try again.']);
+            return back()->withErrors(['otp' => 'Failed to verify OTP,  try again.' . $th->getMEssage()]);
             
         }
     }

@@ -14,7 +14,7 @@ interface Props {
 
 export default function CashierCheckout({ order, taxRate }: Props) {
 
-
+console.log(order);
     const { clearCart } = usePOSCartStore();
     const [isProcessing, setIsProcessing] = useState(false);
 

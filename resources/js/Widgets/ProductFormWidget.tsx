@@ -16,7 +16,11 @@ interface ProductFormWidgetProps {
     data: any;
     setData: Function;
     errors: any;
-    categories:any[],
+    categories:{
+        id:number,
+        value:string,
+        label:string
+    }[],
     processing: boolean;
     onSave: (e: React.FormEvent) => void;
     onClose: () => void;
@@ -81,11 +85,7 @@ export const ProductFormWidget: React.FC<ProductFormWidgetProps> = ({
                         label="Category"
                         value={data.categoryId}
                         onChange={(value) => setData("categoryId", value)}
-                        options={categories.map((cat) => ({
-                            id: cat.id,
-                            value: cat.id,
-                            label: cat.name,
-                        }))}
+                        options={categories}
                         placeholder="Select Category"
                         Icon={MdCategory}
                         error={errors.categoryId}
