@@ -22,6 +22,7 @@ import {
     HiOutlineClipboardDocumentList,
     HiOutlineShoppingBag,
     HiOutlineCube,
+    HiUsers,
 } from "react-icons/hi2";
 import { LuBellDot } from "react-icons/lu";
 import {
@@ -94,6 +95,8 @@ export const adminNav: NavItem[] = [
         icon: AiFillProduct,
     },
     { label: "POS", path: "/pos", icon: MdPointOfSale },
+    { label: "Customers", path: "/admin/customers", icon: HiUsers },
+
     {
         label: "Stock Adjustment",
         path: "/admin/inventory/adjustment",
