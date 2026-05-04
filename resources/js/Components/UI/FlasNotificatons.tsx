@@ -10,11 +10,8 @@ export function FlashNotifications() {
 
   useEffect(() => {
     // 1. Handle Validation Errors
-    if (errors && Object.keys(errors).length > 0) {
-      // Loop through errors or just show the first one
-      Object.values(errors).forEach((error: any) => {
-        toast.error(error, { duration: 3000 })
-      })
+    if (errors && errors != undefined) {
+        toast.error(errors.error, { duration: 3000 })
     }
 
     // 2. Handle Success Messages
@@ -28,5 +25,5 @@ export function FlashNotifications() {
     }
   }, [errors, flash])
 
-  return null // This component doesn't render anything visually
+  return null 
 }

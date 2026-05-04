@@ -13,6 +13,8 @@ import AuthenticatedNavbar from "./AuthenticatedNavbar/AuthenticatedNavBar";
 import { useThemeStore } from "@/Stores/useThemeStore";
 import Breadcrumb, { BreadcrumbItem } from "../Common/Breadcrumb";
 import { UserAvatar } from "../UI/UserAvatar";
+import { FlashNotifications } from "../UI/FlasNotificatons";
+import { Toaster } from "@/components/ui/sonner";
 
 export default function Authenticated({
     children,
@@ -49,10 +51,7 @@ export default function Authenticated({
     const handleLogout = () => {
         router.post("/logout");
     };
-
-    const  {errors} = usePage().props;
     
-    console.log(errors);
 
     return (
         <div className="min-h-screen bg-surface-container-lowest flex flex-col h-screen overflow-hidden">
@@ -216,6 +215,8 @@ export default function Authenticated({
                         ref={scrollContainerRef}
                         className="flex-1 bg-surface-container-low/40  overflow-y-auto scroll-smooth scrollbar-hidden"
                     >
+                        <FlashNotifications/>
+                        <Toaster richColors closeButton position='top-center'/>
                         <div className=" mx-auto py-15 md:py-12">{children}</div>
                     </div>
                 </main>
