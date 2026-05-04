@@ -10,6 +10,7 @@
 
 use App\Http\Controllers\BatchController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UserController;
@@ -79,6 +80,13 @@ use Inertia\Inertia;
             // Route::get('/{id}/edit', fn($id) => Inertia::render('Admin/SupplierEdit', ['id' => $id]))->name('edit');
             // Route::get('/orders/create', fn() => Inertia::render('Admin/POCreate'))->name('po.create');
             // Route::get('/orders/{id}', fn($id) => Inertia::render('Admin/POShow', ['id' => $id]))->name('po.show');
+        });
+
+        // Customers
+
+        Route::prefix('customers')->name('customers.')->group(function () {
+            Route::get('/', [CustomerController::class, 'index'])->name('index');
+            Route::post('/',[CustomerController::class, 'store'])->name('store');
         });
 
         // Feedbacks
