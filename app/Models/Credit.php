@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
-#[Fillable(['order_id','total_amount','customer_id','paid_amount','balance','status','due_date','issued_at','last_payment_at','notes','crated_by'])]
+#[Fillable(['order_id','total_amount','customer_id','paid_amount','balance','status','due_date','issued_at','last_payment_at','notes','created_by'])]
 
 
 class Credit extends Model

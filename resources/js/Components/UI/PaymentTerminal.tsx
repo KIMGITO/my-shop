@@ -53,12 +53,7 @@ export default function PaymentTerminal({
     const currentBalance = Math.max(0, roundedTotal - paidTotal);
     const changeGiven = paidTotal > roundedTotal ? paidTotal - roundedTotal : 0;
     
-<<<<<<< HEAD
-    console.log('canComplete', creditAmount > 0 ? customer !== null : true);
     const canComplete = paidTotal >= roundedTotal && roundedTotal > 0 && ( creditAmount > 0 ? customer !== null : true) ;
-=======
-    const canComplete = paidTotal >= roundedTotal && roundedTotal > 0 && (customer== null ? creditAmount<=0 : true) ;
->>>>>>> fix/product
 
     // 1. AUTO-SCROLL LOGIC: Scroll to bottom when balance is 0
     useEffect(() => {
