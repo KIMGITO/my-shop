@@ -13,8 +13,15 @@ interface CustomerDebt {
     outstandingBalance: number;
 }
 
+interface TransactionHistory{
+    method: string,
+    date:string,
+    amount: number
+}
+
 export default function CreditPaymentPage({ customerId }: { customerId: number}) {
     const [customer, setCustomer] = useState<CustomerDebt | null>(null);
+    const [history, setHistory] = useState<TransactionHistory [] | null >(null);
     const [loading, setLoading] = useState(true);
 
     const onBack = () => {
@@ -24,14 +31,10 @@ export default function CreditPaymentPage({ customerId }: { customerId: number})
     useEffect(() => {
         // Replace with your actual API call
         const fetchCustomerDebt = async () => {
-            const data = await axios.get(`/api/v1/customers/${customerId}/debt`);
-            const mockData: CustomerDebt = {
-                id: customerId,
-                name: "John Doe",
-                phone: "0712345678",
-                outstandingBalance: 4500 
-            };
-            setCustomer(mockData);
+            const response = await axios.get(`/api/v1/customers/${customerId}/debt`);
+            setCustomer(response.data.data);
+            setHistory(response.data.history)
+
             setLoading(false);
         };
         fetchCustomerDebt();
@@ -78,15 +81,15 @@ export default function CreditPaymentPage({ customerId }: { customerId: number})
             <h3 className="text-[10px] font-black uppercase text-on-surface-variant mb-4 tracking-widest">Recent Payments</h3>
             <div className="space-y-3">
                 {/* Map your history here */}
-                {[1, 2, 3, 4, 5, 6].map((i) => (
-                    <div key={i} className="flex justify-between items-center p-3 rounded-2xl bg-surface-container-highest/50 border border-outline-variant/5">
+                {history !== null ? history.map((transaction, index) => (
+                    <div key={`${index}`} className="flex justify-between items-center p-3 rounded-2xl bg-surface-container-highest/50 border border-outline-variant/5">
                         <div>
-                            <p className="text-xs font-bold text-on-surface">Cash Payment</p>
-                            <p className="text-[10px] text-on-surface-variant">May {i}, 2024</p>
+                            <p className="text-xs font-bold text-on-surface capitalize">{transaction.method} Payment</p>
+                            <p className="text-[10px] text-on-surface-variant">{transaction.date}</p>
                         </div>
-                        <p className="text-sm font-black text-success">+ 500</p>
+                        <p className="text-sm font-black text-success">+ {transaction.amount}</p>
                     </div>
-                ))}
+                )) : <></>}
             </div>
         </div>
     </div>

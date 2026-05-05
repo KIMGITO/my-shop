@@ -240,7 +240,7 @@ export default function PaymentTerminal({
                     disabled={!canComplete}
                     onClick={() => onComplete({ cashAmount, mpesaAmount, creditAmount, changeGiven, phoneNumber })}
                 >
-                    {currentBalance > 0 ? `Pay KES ${currentBalance.toLocaleString()}` : "Complete Sale"}
+                    {currentBalance > 0 ? `Pay KES ${currentBalance.toLocaleString()}` : "Complete Payment"}
                 </Button>
             </div>
         </div>

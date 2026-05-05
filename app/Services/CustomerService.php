@@ -20,7 +20,14 @@ class CustomerService
     public function transactions(int $limit = 5){
         $payments = $this->customerRepository->latestPayments($limit);
 
-        dd($payments);
+        return  collect($payments)->map(function ($payment){
+            return [
+                'method' => $payment->method,
+                'date' => $payment->created_at->format('F j Y'),
+                'amount' => $payment->amount_paid
+            ];
+        })->toArray();
+
 
     }
 }
