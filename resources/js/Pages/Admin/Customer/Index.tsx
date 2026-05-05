@@ -27,11 +27,13 @@ import { toast } from "sonner";
 import { CustomerModal } from "./CustomerModal";
 import FloatingActionButton from "@/Components/Common/FloatingActionButton";
 import { Button } from "@/Components/UI/Button";
+import { FaRegAddressCard } from "react-icons/fa";
 
 // Aligned with Laravel Customer Model
 export interface Customer {
     id: number;
     user_id?: number | null;
+    customer_number: string;
     name: string | null;
     phone: string | null;
     email: string | null;
@@ -144,6 +146,9 @@ export default function CustomersPage({ customers = [], errors }: { customers?: 
                                                             </span>
                                                             <span className="text-xs text-on-surface-variant flex items-center gap-1">
                                                                 <HiOutlinePhone className="w-3 h-3" /> {customer.phone || "No Phone"}
+                                                            </span>
+                                                            <span className="text-xs text-on-surface-variant flex items-center gap-1">
+                                                                <FaRegAddressCard className="w-3 h-3" /> {customer.customer_number || "Undefined"}
                                                             </span>
                                                         </div>
                                                     </div>

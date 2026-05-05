@@ -36,7 +36,7 @@ export default function CustomerShowPage({ customer }: { customer: any }) {
                                     {customer.is_active ? "Active" : "Inactive"}
                                 </span>
                             </div>
-                            <p className="text-on-surface-variant text-xs font-bold uppercase tracking-widest mt-1 opacity-60">System ID: CR-{customer.id}</p>
+                            <p className="text-on-surface-variant text-xs font-bold uppercase tracking-widest mt-1 opacity-60">Customer ID:{customer.customer_number || 'Undefined'}</p>
                         </div>
                     </div>
                     <div className="flex gap-3 w-full md:w-auto">
