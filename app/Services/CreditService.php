@@ -56,6 +56,10 @@ class CreditService
                 ]
             );
 
+            // add credit to customer table
+            $newBalance = $customer->balance + $creditAmount;
+            $this->customerRepository->update($customerId,['balance' => $newBalance] );
+
             $order->items->each(function($item) {
                     $this->batchRepository->confirmSale($item->batch_id, $item->quantity);
             });

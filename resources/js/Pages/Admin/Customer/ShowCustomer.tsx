@@ -55,8 +55,8 @@ export default function CustomerShowPage({ customer }: { customer: any }) {
                                 <HiOutlineCurrencyDollar className="w-10 h-10" />
                             </div>
                             <span className="text-[11px] font-black uppercase tracking-[0.2em] text-on-surface-variant opacity-60">{isIndebted ? "Outstanding Debt" : "Account Credit"}</span>
-                            <h2 className={cn("text-5xl font-black mt-2 font-mono tracking-tighter", isIndebted ? "text-error" : "text-success")}>
-                                {isIndebted ? "+" : ""}{customer.balance.toLocaleString()}
+                            <h2 className={cn("text-4xl font-black mt-2 font-mono tracking-tighter", isIndebted ? "text-error" : "text-success")}>
+                                {"Ksh "}{customer.balance.toLocaleString()}
                             </h2>
                             <div className="mt-8 grid grid-cols-2 gap-4">
                                 <div className="p-4 bg-surface-container-high rounded-3xl">
@@ -65,7 +65,7 @@ export default function CustomerShowPage({ customer }: { customer: any }) {
                                 </div>
                                 <div className="p-4 bg-surface-container-high rounded-3xl">
                                     <p className="text-[10px] font-black text-on-surface-variant uppercase mb-1">Priority</p>
-                                    <p className="text-lg font-black text-on-surface">{customer.priority < 5 ? 'Low':customer.priority <10? 'Medium' : 'High'}</p>
+                                    <p className="text-lg font-black text-on-surface">{customer.priority < 5 ? 'Standard':customer.priority <10? 'High' : 'Vip'}</p>
                                 </div>
                             </div>
                         </InfoCard>
