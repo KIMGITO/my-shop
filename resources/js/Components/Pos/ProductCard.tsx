@@ -47,7 +47,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
                     {/* <p className="text-xs text-on-surface-variant">{product.unit}</p> */}
                     <p className="text-sm font-bold text-primary">Ksh{product.price.toFixed(2)}</p>
                 </div>
-                    <AnimatedAddButton disabled flyX={-120} flyY={500} added={added} onClick={() => handleClick()} />
+                    <AnimatedAddButton disabled={product.availableQuantity <= 0}  flyX={-120} flyY={500} added={added} onClick={() => handleClick()} />
 
             </div>
         );

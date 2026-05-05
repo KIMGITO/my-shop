@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Enums\CreditStatus;
+use App\Exceptions\CustomerExceptions;
 use App\Models\Credit;
 use App\Repositories\CreditRepository;
 use App\Repositories\CustomerRepository;
@@ -66,5 +68,51 @@ class CreditService
             return $credit;
         });
         
+    }
+
+    public function payCredits(int $customerId, float $amount)
+    {
+        return DB::transaction(function () use ($customerId, $amount) {
+
+            $customer = $this->customerRepository->find($customerId);
+
+            if (!$customer) {
+                throw new CustomerExceptions('Customer Not Found!');
+            }
+
+            $credits = $customer->credits()
+                ->where('status', '!=', CreditStatus::PAID->value)
+                ->orderBy('created_at', 'asc')
+                ->get();
+
+            $remainingAmount = $amount;
+
+            foreach ($credits as $credit) {
+
+                if ($remainingAmount <= 0) break;
+
+                $balance = $credit->balance;
+
+                if ($remainingAmount >= $balance) {
+                    // FULLY PAY THIS CREDIT
+                    $credit->paid_amount = $credit->amount;
+                    $credit->status = CreditStatus::PAID;
+
+                    $remainingAmount -= $balance;
+                } else {
+                    // PARTIAL PAYMENT
+                    $credit->amount_paid += $remainingAmount;
+                    $credit->status = CreditStatus::PARTIAL;
+
+                    $remainingAmount = 0;
+                }
+
+                $credit->save();
+            }
+            return [
+                'paid_amount' => $amount - $remainingAmount,
+                'remaining_amount' => $remainingAmount,
+            ];
+        });
     }
 }

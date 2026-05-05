@@ -10,7 +10,7 @@ export function FlashNotifications() {
 
   useEffect(() => {
     // 1. Handle Validation Errors
-    if (errors && errors != undefined) {
+    if (errors && Object.keys(errors).length > 0 && errors.error) {
         toast.error(errors.error, { duration: 3000 })
     }
 
