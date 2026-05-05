@@ -19,6 +19,7 @@ interface PaymentTerminalProps {
     total: number;
     customer?: { id: number; name: string; phone?: string };
     onBack?: () => void;
+    canCompleteTransaction?:boolean;
     onComplete: (data: any) => void;
     allowedPaymentMethods?: PaymentMethod[];
 }
@@ -31,6 +32,7 @@ export default function PaymentTerminal({
     customer,
     onBack,
     onComplete,
+    canCompleteTransaction,
     allowedPaymentMethods = ["mpesa", "cash", "credit", "split"],
 }: PaymentTerminalProps) {
 
@@ -52,14 +54,14 @@ export default function PaymentTerminal({
     const currentBalance = Math.max(0, roundedTotal - paidTotal);
     const changeGiven = paidTotal > roundedTotal ? paidTotal - roundedTotal : 0;
     
-    const canComplete = paidTotal >= roundedTotal && roundedTotal > 0 && ( creditAmount > 0 ? customer !== null : true) ;
+    const canComplete = (canCompleteTransaction ? paidTotal > 0 : false) || (paidTotal >= roundedTotal && roundedTotal > 0 && ( creditAmount > 0 ? customer !== null : true))
 
     // 1. AUTO-SCROLL LOGIC: Scroll to bottom when balance is 0
     useEffect(() => {
-        if (currentBalance === 0 && canComplete) {
+        if ( canComplete) {
             completeButtonRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
         }
-    }, [currentBalance, canComplete]);
+    }, [canComplete]);
 
     useEffect(()=>{
         if(activeTab == 'split'){
@@ -265,7 +267,6 @@ function PaymentInput({ label, value, onChange, maximum = 100000, disabled = fal
         <div className={cn("space-y-1 w-full transition-opacity", disabled && "opacity-50 pointer-events-none")}>
             <div className="flex justify-between px-2">
                 <label className="text-[10px] font-black uppercase text-on-surface-variant tracking-tighter">{label}</label>
-                <span className="text-[8px] text-on-surface-variant/40 font-bold">MAX: {maximum.toLocaleString()}</span>
             </div>
             <input
                 type="text"

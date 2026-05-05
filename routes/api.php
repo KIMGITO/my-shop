@@ -1,7 +1,8 @@
 <?php
 
-use App\Http\Controllers\ProductController;
+use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SearchController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -15,6 +16,8 @@ Route::get('/products/search', [SearchController::class,  'products']);
 Route::get('/suppliers/search', [SearchController::class,  'suppliers']);
 Route::get('/categories/search', [SearchController::class,  'categories']);
 Route::get('/customers/search', [SearchController::class,  'customers']);
+Route::get('/customers/{customer}/debt', [CustomerController::class,  'debt']);
+
 
 
 

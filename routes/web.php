@@ -187,7 +187,10 @@ Route::middleware(['auth'])->group(function () {
     });
 
 
+
+
     Route::prefix('payments')->name('payments.')->group(function () {
+        Route::get('/{customer}',[ PaymentController::class, 'index'])->name('index');
         Route::post('/process/{order}', [PaymentController::class, 'store'])->name('process');
     });
 

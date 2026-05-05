@@ -1,7 +1,7 @@
 "use client"
 
 import React from "react";
-import { Head } from "@inertiajs/react";
+import { Head, router } from "@inertiajs/react";
 import AuthenticatedLayout from "@/Components/Layout/AuthenticatedLayout";
 import { 
     HiOutlinePhone, HiOutlineEnvelope, HiOutlineCalendarDays, 
@@ -63,11 +63,19 @@ export default function CustomerShowPage({ customer }: { customer: any }) {
                                     <p className="text-[10px] font-black text-on-surface-variant uppercase mb-1">Loyalty</p>
                                     <p className="text-lg font-black text-on-surface flex items-center justify-center gap-1"><HiOutlineStar className="text-warning" /> {customer.loyalty_points}</p>
                                 </div>
-                                <div className="p-4 bg-surface-container-high rounded-3xl">
+                                <div className="p-4 bg-surface-container-high text-center rounded-3xl truncate">
                                     <p className="text-[10px] font-black text-on-surface-variant uppercase mb-1">Priority</p>
-                                    <p className="text-lg font-black text-on-surface">{customer.priority < 5 ? 'Standard':customer.priority <10? 'High' : 'Vip'}</p>
+                                    <p className="text-lg font-black text-on-surface">{customer.priority < 5 ? 'Std':customer.priority <10? 'High' : 'Vip'}</p>
                                 </div>
                             </div>
+                           {
+                            !isIndebted &&  <div  className="mt-8 grid grid-cols-1 gap-4">
+                                <Button variant="danger" className="p-2 brightness-120  truncate" onClick={()=>{router.get(`/payments/${customer.id}`)}}>
+                                    <p className="text-lg font-black">Register Payment</p>
+                                </Button>
+                            </div>
+                           }
+
                         </InfoCard>
 
                         <InfoCard className="p-6 rounded-[2.5rem] space-y-4">

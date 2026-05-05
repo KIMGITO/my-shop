@@ -2,17 +2,29 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\CustomerExceptions;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PaymentRequest;
+use App\Models\Customer;
 use App\Models\Order;
 use App\Services\PaymentService;
 use Illuminate\Support\Arr;
+use Inertia\Inertia;
 
 class PaymentController extends Controller
 {
     public function __construct(protected PaymentService $paymentService)
     {
         $this->paymentService = $paymentService;
+    }
+
+
+    public function index (Customer $customer){
+
+        if(!$customer){
+            throw new CustomerExceptions('Customer not found!');
+        }
+        return Inertia::render('Payments/PaymentPage', ['customerId' =>$customer->id]);
     }
 
     public function  store(PaymentRequest  $request, Order $order){

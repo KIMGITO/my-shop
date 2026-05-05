@@ -16,4 +16,11 @@ class CustomerService
     public function showCustomerData(int $customerId){
         // fetchCustomerData 
     }
+
+    public function transactions(int $limit = 5){
+        $payments = $this->customerRepository->latestPayments($limit);
+
+        dd($payments);
+
+    }
 }

@@ -163,7 +163,7 @@ export default function CustomersPage({ customers = [], errors }: { customers?: 
                                                     "px-4 py-4 text-right font-mono font-bold text-sm",
                                                     customer.balance > 0 ? "text-error" : "text-success"
                                                 )}>
-                                                    {customer.balance > 0 ? `+${customer.balance}` : customer.balance}
+                                                    {customer.balance > 0 ? `+${customer.balance}` : customer.balance}{' ksh'}
                                                 </td>
                                                 <td className="px-4 py-4 text-center">
                                                     <div className="inline-flex items-center gap-1 px-2 py-1 bg-warning/10 text-warning-700 rounded-lg text-xs font-bold">

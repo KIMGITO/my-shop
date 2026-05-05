@@ -14,4 +14,8 @@ class CustomerRepository extends BaseRepository
     {
         parent::__construct($model);
     }
+
+    public function latestPayments(?int $limit = 5){
+        return $this->model->getLatestPayments($limit);
+    }
 }

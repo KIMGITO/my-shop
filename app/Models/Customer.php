@@ -24,6 +24,22 @@ use HasCustomerNumber;
     public function credits(){
         return $this->hasMany(Credit::class);
     }
+    
 
+    public function orderPayments(){
+            return $this->hasManyThrough(Payment::class,  Order::class);
+    }
+
+    public function creditPayments(){
+        return $this->hasManyThrough(Payment::class, Credit::class);
+    }
+
+
+    public function getLatestPayments ($limit = 5){
+        $orders = $this->orderPayments()->latest()->take($limit)->get();    
+        $credits = $this->creditPayments()->latest()->take($limit)->get();
+
+        return $orders->concat($credits) -> sortByDesc('created_at')->take($limit);
+    }
 
 }
