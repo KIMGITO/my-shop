@@ -32,7 +32,7 @@ export const SupplierFormModal: React.FC<SupplierFormModalProps> = ({
             contact: "",
             phone: "",
             type: "",
-            logo: null as File | null | '',
+            logo: null,
             removeExistingLogo: false,
         });
 
@@ -45,7 +45,7 @@ export const SupplierFormModal: React.FC<SupplierFormModalProps> = ({
                     phone: initialData.phone || "",
                     contact: initialData.contact || "",
                     type: initialData.type || "",
-                    logo: initialData.logo || null,
+                    logo: initialData.logo,
                     removeExistingLogo: false,
                 });
             } else {

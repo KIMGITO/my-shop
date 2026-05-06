@@ -38,7 +38,7 @@ const CartItem: React.FC<CartItemProps> = ({
                     </span>
                 </div>
                 <div className="flex flex-wrap justify-between items-center gap-4 mt-4">
-                    <div className="flex items-center bg-surface-container-low rounded-lg p-1">
+                    {/* <div className="flex items-center bg-surface-container-low rounded-lg p-1">
                         <button
                             onClick={() =>
                                 onUpdateQuantity(item.id, item.quantity - 1)
@@ -66,7 +66,8 @@ const CartItem: React.FC<CartItemProps> = ({
                     >
                         <Trash2 size={14} />
                         Remove
-                    </button>
+                    </button> */}
+                    <div>Implement quantity selector</div>
                 </div>
             </div>
         </div>

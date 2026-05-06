@@ -161,12 +161,12 @@ export const ParkedCartsModal: React.FC<ParkedCartsModalProps> = ({
                                     {/* Footer / Pricing */}
                                     <div className="mt-2 pt-4 border-t border-outline-variant/10 flex justify-between items-end">
                                         <div>
-                                            {cart.customerName && (
+                                            {cart.name && (
                                                 <div className="text-xs font-medium text-primary mb-1 flex items-center gap-1">
                                                     <span className="material-symbols-outlined text-[14px]">
                                                         person
                                                     </span>
-                                                    {cart.customerName}
+                                                    {cart.name}
                                                 </div>
                                             )}
                                             <div className="text-[10px] text-on-surface-variant uppercase">

@@ -1,8 +1,11 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
+export type Interval = "weekly" | "daily" | "weekends"| "biweekly" | "monthly" | "custom";
+
+
 export interface DaySchedule {
-    dayId: string;
+    id: string;
     dayName: string;
     enabled: boolean;
     volume: string;
@@ -24,6 +27,9 @@ export interface Frequency {
     icon: string;
     description?: string;
     customDays?: DaySchedule[];
+    dayQuantities?: Record<string, number>;
+    interval:Interval;
+    intervalValue?: number;
 }
 
 export interface SubscriptionState {
@@ -90,30 +96,38 @@ const defaultFrequencies: Frequency[] = [
         label: "Daily",
         icon: "calendar_today",
         description: "Every day delivery",
+        interval:'daily'
     },
     {
         id: "weekdays",
         label: "Mon - Fri",
         icon: "work",
         description: "Weekday deliveries only",
+        interval:'weekly'
+
     },
     {
         id: "weekends",
         label: "Weekends",
         icon: "weekend",
         description: "Saturday & Sunday",
+        interval:'weekends'
+
     },
     {
         id: "per_day",
         label: "Per Day",
         icon: "tune",
         description: "Custom volume per day",
+        interval: 'daily'
     },
     {
         id: "custom",
         label: "Custom",
         icon: "schedule",
         description: "Set your own schedule",
+        interval: 'custom'
+
     },
 ];
 
@@ -132,43 +146,43 @@ export const useDeliverySubscriptionStore = create<SubscriptionState>()(
 
             perDaySchedules: [
                 {
-                    dayId: "mon",
+                    id: "mon",
                     dayName: "Monday",
                     enabled: true,
                     volume: "1l",
                 },
                 {
-                    dayId: "tue",
+                    id: "tue",
                     dayName: "Tuesday",
                     enabled: true,
                     volume: "1l",
                 },
                 {
-                    dayId: "wed",
+                    id: "wed",
                     dayName: "Wednesday",
                     enabled: true,
                     volume: "1l",
                 },
                 {
-                    dayId: "thu",
+                    id: "thu",
                     dayName: "Thursday",
                     enabled: true,
                     volume: "1l",
                 },
                 {
-                    dayId: "fri",
+                    id: "fri",
                     dayName: "Friday",
                     enabled: true,
                     volume: "1l",
                 },
                 {
-                    dayId: "sat",
+                    id: "sat",
                     dayName: "Saturday",
                     enabled: false,
                     volume: "1l",
                 },
                 {
-                    dayId: "sun",
+                    id: "sun",
                     dayName: "Sunday",
                     enabled: false,
                     volume: "1l",
@@ -189,7 +203,7 @@ export const useDeliverySubscriptionStore = create<SubscriptionState>()(
             updatePerDaySchedule: (dayId, updates) =>
                 set((state) => ({
                     perDaySchedules: state.perDaySchedules.map((day) =>
-                        day.dayId === dayId ? { ...day, ...updates } : day
+                        day.id === dayId ? { ...day, ...updates } : day
                     ),
                 })),
 
@@ -206,43 +220,43 @@ export const useDeliverySubscriptionStore = create<SubscriptionState>()(
                     customFrequency: null,
                     perDaySchedules: [
                         {
-                            dayId: "mon",
+                            id: "mon",
                             dayName: "Monday",
                             enabled: true,
                             volume: "1l",
                         },
                         {
-                            dayId: "tue",
+                            id: "tue",
                             dayName: "Tuesday",
                             enabled: true,
                             volume: "1l",
                         },
                         {
-                            dayId: "wed",
+                            id: "wed",
                             dayName: "Wednesday",
                             enabled: true,
                             volume: "1l",
                         },
                         {
-                            dayId: "thu",
+                            id: "thu",
                             dayName: "Thursday",
                             enabled: true,
                             volume: "1l",
                         },
                         {
-                            dayId: "fri",
+                            id: "fri",
                             dayName: "Friday",
                             enabled: true,
                             volume: "1l",
                         },
                         {
-                            dayId: "sat",
+                            id: "sat",
                             dayName: "Saturday",
                             enabled: false,
                             volume: "1l",
                         },
                         {
-                            dayId: "sun",
+                            id: "sun",
                             dayName: "Sunday",
                             enabled: false,
                             volume: "1l",

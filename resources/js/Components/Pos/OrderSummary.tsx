@@ -3,9 +3,10 @@ import { CartItem } from "./CartItem";
 import Button from "../UI/Button";
 import { MdOutlineShoppingCartCheckout } from "react-icons/md";
 import { AnimatePresence, motion } from "framer-motion";
+import { CartItem as CartItems } from "@/types/pos";
 
 interface OrderSummaryProps {
-    items: CartItem[];
+    items: CartItems[];
     subtotal: number;
     tax: number;
     total: number;

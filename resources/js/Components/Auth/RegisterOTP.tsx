@@ -2,13 +2,19 @@ import React, { useState, useRef, useEffect } from "react";
 import { useForm, Link, Head, router } from "@inertiajs/react"; // Added router
 import Button from "@/Components/UI/Button";
 
+type OtpForm = {
+  otp: string;
+  identifier: string;
+};
+
 const RegisterOTP: React.FC<{ phone?: string; email?: string }> = ({ phone, email }) => {
     const [otp, setOtp] = useState(["", "", "", ""]);
     const inputRefs = useRef<(HTMLInputElement | null)[]>([null, null, null, null]);
+
     
     // We initialize the form, but since your inputs are "uncontrolled" (using an array)
     // we will handle the submission manually to ensure the data is fresh.
-    const { processing, errors, setError } = useForm();
+    const { processing, errors, setError } = useForm<OtpForm>();
 
     useEffect(() => {
         inputRefs.current[0]?.focus();
@@ -94,7 +100,7 @@ const RegisterOTP: React.FC<{ phone?: string; email?: string }> = ({ phone, emai
                             {otp.map((digit, index) => (
                                 <input
                                     key={index}
-                                    ref={(el) => (inputRefs.current[index] = el)}
+                                    ref={(el) => {inputRefs.current[index] = el}}
                                     type="text"
                                     inputMode="numeric"
                                     maxLength={1}

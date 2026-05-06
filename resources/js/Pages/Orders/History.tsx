@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Head, router } from "@inertiajs/react";
 import AuthenticatedLayout from "@/Components/Layout/AuthenticatedLayout";
 import Container from "@/Components/UI/Container";
-import Pagination from "@/Components/UI/Pagination";
+import {Pagination} from "@/Components/UI/Pagination";
 import FeaturedOrderCard from "@/Components/Order/FeaturedOrderCard";
 import OrderFilters from "@/Components/Order/OrderFilter";
 import OrderHistoryHeader from "@/Components/Order/OrderHistoryHeader";

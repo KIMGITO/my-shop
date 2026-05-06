@@ -22,7 +22,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post("/login", data);
+        post("/login");
     };
 
     return (
@@ -53,7 +53,6 @@ export const LoginForm: React.FC<LoginFormProps> = ({
                         }
                         error={errors.email}
                         placeholder="name@example.com"
-                        icon="mail"
                     />
 
                     <div className="space-y-1.5">
@@ -71,7 +70,6 @@ export const LoginForm: React.FC<LoginFormProps> = ({
                             )}
                         </div>
                         <Input
-                            icon="lock"
                             type="password"
                             value={data.password}
                             onChange={(e) =>

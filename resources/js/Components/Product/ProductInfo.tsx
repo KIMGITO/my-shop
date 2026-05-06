@@ -20,7 +20,7 @@ interface ProductInfoProps {
 }
 
 const ProductInfo: React.FC<ProductInfoProps> = ({ product }) => {
-    const [quantity, setQuantity] = useState(1);
+    const [quantity, setQuantity] = useState<number>(1);
     const [isWishlisted, setIsWishlisted] = useState(false);
 
     const handleAddToCart = () => {
@@ -73,8 +73,10 @@ const ProductInfo: React.FC<ProductInfoProps> = ({ product }) => {
                         </span>
                         <QuantitySelector
                             quantity={quantity}
-                            onIncrease={() => setQuantity(quantity + 1)}
-                            onDecrease={() => setQuantity(quantity - 1)}
+                            onUpdate={(quantity) => {
+                                setQuantity(Number(quantity));
+                            }}
+                            max={99}
                         />
                     </div>
 

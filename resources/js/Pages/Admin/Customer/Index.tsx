@@ -110,8 +110,8 @@ export default function CustomersPage({ customers = [], errors }: { customers?: 
                             />
                         </div>
                         <div className="flex gap-2 w-full md:w-auto">
-                            <ActionButton icon={HiOutlineArrowUpTray} label="Import" variant="secondary" outline />
-                            <ActionButton icon={IoMdDownload} label="Export" variant="secondary" outline />
+                            <ActionButton icon={HiOutlineArrowUpTray} label="Import" variant="secondary"  />
+                            <ActionButton icon={IoMdDownload} label="Export" variant="secondary"  />
                             
                         </div>
                     </div>

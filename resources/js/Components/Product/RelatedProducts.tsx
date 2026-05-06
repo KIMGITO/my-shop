@@ -4,11 +4,9 @@ import { ShopProduct } from "../Shop/type";
 import ProductCard from "../UI/ProductCard";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
-interface RelatedProductsProps {
-    products: Array<ShopProduct>;
-}
 
-const RelatedProducts: React.FC<RelatedProductsProps> = ({ products }) => {
+
+const RelatedProducts = ({ products}:{ products: ShopProduct[];}) => {
     return (
         <section>
             <div className="flex justify-between items-end mb-8">

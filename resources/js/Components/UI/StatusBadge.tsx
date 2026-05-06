@@ -7,9 +7,8 @@ import { FcExpired } from "react-icons/fc";
 import { FaCheckCircle, FaBoxOpen, FaPaperPlane, FaFileAlt, FaClipboardCheck, FaChartPie, FaSpinner, FaHourglassHalf, FaTimesCircle } from "react-icons/fa";
 import { MdDoneAll } from "react-icons/md";
 
-interface StatusBadgeProps {
-    status:
-        | "fresh"
+export type Status = 
+    "fresh"
         | "expiring_soon"
         | "expiring_today"
         | "expired"
@@ -23,6 +22,9 @@ interface StatusBadgeProps {
         | "completed"
         | "pending"
         | "cancelled";
+
+export interface StatusBadgeProps {
+    status: Status
     size?: "sm" | "md";
     showDot?: boolean;
     Icon?: IconType;

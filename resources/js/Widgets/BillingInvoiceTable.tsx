@@ -1,7 +1,8 @@
 import React from "react";
-import { Invoice } from "@/types/billing";
+// import { Invoice } from "@/types/billing";
 import { cn } from "@/Utils/helpers";
 import Button from "@/Components/UI/Button";
+import { Invoice } from "@/types";
 
 interface InvoiceTableProps {
     invoices: Invoice[];
@@ -18,6 +19,8 @@ export const InvoiceTable: React.FC<InvoiceTableProps> = ({
                 color: "bg-primary",
                 text: "Paid",
                 bgClass: "bg-surface-container-high",
+                textClass: "text-primary",
+
             },
             refunded: {
                 color: "bg-error",

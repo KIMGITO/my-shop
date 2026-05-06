@@ -139,9 +139,9 @@ const ProductDetailsPage: React.FC = () => {
                                 Quantity
                             </span>
                             <QuantitySelector
+                                max ={99}
                                 quantity={quantity}
-                                onIncrease={() => setQuantity(quantity + 1)}
-                                onDecrease={() => setQuantity(quantity - 1)}
+                                onUpdate={(quantity) => {setQuantity(Number(quantity))}}
                             />
                         </div>
 

@@ -19,6 +19,16 @@ interface StaffMember {
     twoFactor: boolean;
 }
 
+export interface Staff {
+    id: string;
+    name: string;
+    role: string; // 👈 make REQUIRED
+    avatar: string;
+    roleType: "admin" | "cashier" | "rider" | "manager";
+    permissions: string[];
+    twoFactor: boolean;
+}
+
 const staffMembers: StaffMember[] = [
     {
         id: "1",
@@ -71,7 +81,7 @@ export default function StaffManagement({
     roleMatrix,
     roles,
 }: {
-    staffMembers: User[];
+    staffMembers: Staff [];
         roleMatrix: any[];
     roles: string[],
     }) {

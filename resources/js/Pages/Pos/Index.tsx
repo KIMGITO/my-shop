@@ -235,9 +235,8 @@ export default function PosIndex({
                             onVoid={handleVoid}
                             onPark={handlePark}
                             orderNumber={orderNumber}
-                            onUpdateQuantity={updateQuantity}
+                            onUpdateQuantity={(id, quantity) => {updateQuantity(id, Number(quantity))}}
                             onRemove={removeItem}
-                            isProcessing={isProcessing}
                         />
                     </div>
                 </div>

@@ -1,5 +1,5 @@
 // resources/js/Pages/Cart/Index.tsx
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { Head, Link } from "@inertiajs/react";
 import { Navbar } from "@/Components/Layout/Navbar";
 import { Footer } from "@/Components/Layout/Footer";
@@ -84,10 +84,12 @@ export default function CartIndex() {
     const total = subtotal + shipping + tax;
     const itemCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
+
+    const scrollContainerRef = useRef<HTMLDivElement>(null);
     return (
         <>
             <Head title="Cart - Kaykay's Dairy" />
-            <div className="min-h-screen bg-background text-on-surface">
+            <div ref={scrollContainerRef}  className="min-h-screen bg-background text-on-surface">
                 <Navbar />
 
                 <main className="py-12">
@@ -195,8 +197,8 @@ export default function CartIndex() {
                 </main>
 
                 <Footer />
-                <FloatingActionButton />
-                <MobileNav />
+                {/* <FloatingActionButton /> */}
+                <MobileNav scrollContainerRef={scrollContainerRef}  />
             </div>
         </>
     );

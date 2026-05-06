@@ -2,7 +2,7 @@ import React from "react";
 import { cn } from "@/lib/utils";
 import Button from "../UI/Button";
 
-interface StaffCardProps {
+export interface StaffCardProps {
     staff: {
         id: string;
         name: string;

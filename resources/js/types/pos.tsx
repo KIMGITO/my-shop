@@ -8,8 +8,8 @@ export interface Product {
     isOrganic?: boolean;
     isPopular?: boolean;
     frequency?: number;
-    availableQuantity: number;
-    reservedQuantity: number;
+    availableQuantity?: number;
+    reservedQuantity?: number;
 }
 
 export interface CartItem extends Product {

@@ -149,7 +149,7 @@ export default function SupplierOrdersPage() {
                             icon={HiOutlinePlusCircle}
                             label="Create New PO"
                             variant="primary"
-                            size="lg"
+                            size="sm"
                         />
                     </div>
 

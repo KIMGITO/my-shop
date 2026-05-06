@@ -7,28 +7,8 @@ import Footer from "@/Components/Layout/Footer";
 import Navbar from "@/Components/Layout/Navbar";
 
 const mockCartItems: CartItemType[] = [
-    {
-        id: "1",
-        name: "Whole Cream Heritage Milk",
-        price: 12.5,
-        unit: "1 Gallon • Glass Bottle",
-        image: "https://via.placeholder.com/128x128",
-        rating: 4.8,
-        category: "Milk",
-        quantity: 1,
-    },
-    {
-        id: "2",
-        name: "Cultured Sea Salt Butter",
-        price: 8.0,
-        unit: "250g • Hand Churned",
-        image: "https://via.placeholder.com/128x128",
-        rating: 5.0,
-        category: "Butter",
-        quantity: 2,
-    },
+   
 ];
-
 const ShoppingCartPage: React.FC = () => {
     const [cartItems, setCartItems] = useState(mockCartItems);
     const [voucherCode, setVoucherCode] = useState("");
@@ -57,7 +37,7 @@ const ShoppingCartPage: React.FC = () => {
 
     return (
         <div className="min-h-screen flex flex-col bg-background">
-            <Navbar cartItemCount={cartItems.length} />
+            <Navbar />
             <main className="flex-grow max-w-7xl mx-auto w-full px-4 md:px-8 py-12">
                 <div className="flex flex-col gap-4 mb-12">
                     <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-primary">

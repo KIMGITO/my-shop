@@ -1,20 +1,25 @@
 import React, { useState } from "react";
 import { cn } from "@/Utils/helpers";
-import { useDeliverySubscriptionStore } from "@/Stores/useDeliverySubscriptionStore";
+import {
+    DaySchedule,
+    Frequency,
+    Interval,
+    useDeliverySubscriptionStore,
+} from "@/Stores/useDeliverySubscriptionStore";
 import Button from "@/Components/UI/Button";
 import { HiOutlineCheck, HiOutlineMinus, HiOutlinePlus } from "react-icons/hi";
 import { Modal } from "./UI/Modal";
 
-interface Frequency {
-    id: string;
-    label: string;
-    icon: string;
-    description?: string;
-    customDays?: number[];
-    dayQuantities?: { [key: string]: number };
-    interval?: "daily" | "weekly" | "biweekly" | "monthly" | "custom";
-    intervalValue?: number;
-}
+// interface Frequency {
+//     id: string;
+//     label: string;
+//     icon: string;
+//     description?: string;
+//     customDays?: number[];
+//     dayQuantities?: { [key: string]: number };
+//     interval?: "daily" | "weekly" | "biweekly" | "monthly" | "custom";
+//     intervalValue?: number;
+// }
 
 interface FrequencySelectorProps {
     className?: string;
@@ -98,7 +103,7 @@ const DecimalQuantitySelector: React.FC<{
                 disabled={quantity <= min}
                 className={cn(
                     sizeClasses[size],
-                    "flex items-center justify-center hover:bg-surface-container rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    "flex items-center justify-center hover:bg-surface-container rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed",
                 )}
             >
                 <HiOutlineMinus size={size === "sm" ? 12 : 14} />
@@ -131,7 +136,7 @@ const DecimalQuantitySelector: React.FC<{
                 disabled={quantity >= max}
                 className={cn(
                     sizeClasses[size],
-                    "flex items-center justify-center hover:bg-surface-container rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    "flex items-center justify-center hover:bg-surface-container rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed",
                 )}
             >
                 <HiOutlinePlus size={size === "sm" ? 12 : 14} />
@@ -189,7 +194,7 @@ const IntervalSelector: React.FC<{
                             "flex flex-col items-center p-2 rounded-xl transition-all",
                             interval === opt.id
                                 ? "bg-primary text-on-primary shadow-md"
-                                : "bg-surface-container-low text-on-surface-variant hover:bg-surface-container"
+                                : "bg-surface-container-low text-on-surface-variant hover:bg-surface-container",
                         )}
                     >
                         <span className="material-symbols-outlined text-lg">
@@ -217,7 +222,7 @@ const CustomFrequencyModal: React.FC<{
         [key: string]: number;
     }>({});
     const [customName, setCustomName] = useState("");
-    const [interval, setInterval] = useState("weekly");
+    const [interval, setInterval] = useState<Interval>("weekly");
     const [intervalValue, setIntervalValue] = useState(1);
     const [deliveryCount, setDeliveryCount] = useState(1); // Number of deliveries per interval
 
@@ -245,7 +250,7 @@ const CustomFrequencyModal: React.FC<{
         }));
     };
 
-    const handleIntervalChange = (newInterval: string, value: number) => {
+    const handleIntervalChange = (newInterval: Interval, value: number) => {
         setInterval(newInterval);
         setIntervalValue(value);
     };
@@ -253,7 +258,7 @@ const CustomFrequencyModal: React.FC<{
     const calculatePerDeliveryPrice = () => {
         const totalQuantity = Object.values(dayQuantities).reduce(
             (sum, qty) => sum + qty,
-            0
+            0,
         );
         const rawPrice = basePrice * totalQuantity;
         return roundToNearestFive(rawPrice);
@@ -266,14 +271,18 @@ const CustomFrequencyModal: React.FC<{
 
     const handleSave = () => {
         if (selectedDays.length === 0) return;
+        const getDayName = (id: number): string => {
+            const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+            return days[id] ?? "Unknown";
+        };
 
         const dayLabels = selectedDays.map(
             (dayId) =>
-                DAYS_OF_WEEK.find((d) => d.id === dayId)?.fullName || dayId
+                DAYS_OF_WEEK.find((d) => d.id === dayId)?.fullName || dayId,
         );
 
         const dayIndices = selectedDays.map((dayId) =>
-            DAYS_OF_WEEK.findIndex((d) => d.id === dayId)
+            DAYS_OF_WEEK.findIndex((d) => d.id === dayId),
         );
 
         const frequency: Frequency = {
@@ -281,10 +290,17 @@ const CustomFrequencyModal: React.FC<{
             label: customName || `${selectedDays.length} day(s)`,
             icon: "schedule",
             description: `${selectedDays.length} day(s) • ${interval} • ${deliveryCount} delivery(s)`,
-            customDays: dayIndices,
-            dayQuantities: dayQuantities,
-            interval: interval as any,
-            intervalValue: intervalValue,
+
+            customDays: dayIndices.map((dayId) => ({
+                id: String(dayId),
+                dayName: getDayName(dayId),
+                enabled: true,
+                interval,
+                volume: "1",
+            })),
+            interval,
+            dayQuantities,
+            intervalValue,
         };
 
         onSave(frequency);
@@ -297,7 +313,6 @@ const CustomFrequencyModal: React.FC<{
     return (
         <Modal
             isOpen={isOpen}
-            b
             onClose={onClose}
             title="Custom Schedule"
             size="md"
@@ -348,10 +363,10 @@ const CustomFrequencyModal: React.FC<{
                             {interval === "daily"
                                 ? "per day"
                                 : interval === "weekly"
-                                ? "per week"
-                                : interval === "biweekly"
-                                ? "per 2 weeks"
-                                : "per month"}
+                                  ? "per week"
+                                  : interval === "biweekly"
+                                    ? "per 2 weeks"
+                                    : "per month"}
                         </span>
                     </div>
                 </div>
@@ -372,7 +387,7 @@ const CustomFrequencyModal: React.FC<{
                                         "py-2 rounded-lg text-sm font-medium transition-all",
                                         isSelected
                                             ? "bg-primary text-on-primary shadow-md"
-                                            : "bg-surface-container-low text-on-surface-variant hover:bg-surface-container"
+                                            : "bg-surface-container-low text-on-surface-variant hover:bg-surface-container",
                                     )}
                                 >
                                     {day.label}
@@ -391,11 +406,11 @@ const CustomFrequencyModal: React.FC<{
                         <div className="space-y-2">
                             {selectedDays.map((dayId) => {
                                 const day = DAYS_OF_WEEK.find(
-                                    (d) => d.id === dayId
+                                    (d) => d.id === dayId,
                                 );
                                 const quantity = dayQuantities[dayId] || 1;
                                 const price = roundToNearestFive(
-                                    basePrice * quantity
+                                    basePrice * quantity,
                                 );
 
                                 return (
@@ -416,7 +431,7 @@ const CustomFrequencyModal: React.FC<{
                                             onIncrease={() =>
                                                 handleQuantityChange(
                                                     dayId,
-                                                    quantity + 0.1
+                                                    quantity + 0.1,
                                                 )
                                             }
                                             onDecrease={() =>
@@ -424,8 +439,8 @@ const CustomFrequencyModal: React.FC<{
                                                     dayId,
                                                     Math.max(
                                                         0.1,
-                                                        quantity - 0.1
-                                                    )
+                                                        quantity - 0.1,
+                                                    ),
                                                 )
                                             }
                                             onChange={(val) =>
@@ -505,10 +520,10 @@ const CustomFrequencyModal: React.FC<{
 
 // Day Schedule Display
 const DayScheduleDisplay: React.FC<{
-    customDays?: number[];
-    dayQuantities?: { [key: string]: number };
+    customDays?: DaySchedule[];
+    dayQuantities?: Record<string, number>;
     basePrice?: number;
-    interval?: string;
+    interval?: Interval;
     deliveryCount?: number;
 }> = ({
     customDays,
@@ -527,8 +542,13 @@ const DayScheduleDisplay: React.FC<{
     };
 
     const daysToShow = customDays
-        ? customDays.map((index) => DAYS_OF_WEEK[index])
-        : DAYS_OF_WEEK;
+        ? customDays
+        : DAYS_OF_WEEK.map((name, index) => ({
+              id: String(index),
+              label: name,
+              fullName: name,
+              index,
+          }));
 
     const perDeliveryTotal = daysToShow.reduce((total, day) => {
         return total + calculateDayPrice(day.id);
@@ -614,7 +634,7 @@ export const FrequencySelector: React.FC<FrequencySelectorProps> = ({
         if (onPriceUpdate && frequency.dayQuantities) {
             const perDelivery = Object.values(frequency.dayQuantities).reduce(
                 (sum, qty) => sum + roundToNearestFive(basePrice * qty),
-                0
+                0,
             );
             const total = perDelivery * (frequency.intervalValue || 1);
             onPriceUpdate(total);
@@ -657,7 +677,7 @@ export const FrequencySelector: React.FC<FrequencySelectorProps> = ({
                                         "flex flex-col items-center justify-center p-3 rounded-xl transition-all border min-w-50 sm:min-w-25 sm:w-full aspect-square sm:aspect-auto",
                                         isSelected
                                             ? "border-primary bg-surface-container-lowest shadow-sm ring-1 ring-primary/20"
-                                            : "border-outline-variant/30 bg-surface-container-low hover:bg-surface-container"
+                                            : "border-outline-variant/30 bg-surface-container-low hover:bg-surface-container",
                                     )}
                                 >
                                     <span
@@ -665,7 +685,7 @@ export const FrequencySelector: React.FC<FrequencySelectorProps> = ({
                                             "material-symbols-outlined text-2xl mb-2 transition-transform duration-300",
                                             isSelected
                                                 ? "text-primary scale-110"
-                                                : "text-on-surface-variant"
+                                                : "text-on-surface-variant",
                                         )}
                                     >
                                         {option.icon}
@@ -678,7 +698,7 @@ export const FrequencySelector: React.FC<FrequencySelectorProps> = ({
                                             "font-bold text-[10px]  tracking-wider text-center w-full truncate px-1",
                                             isSelected
                                                 ? "text-on-surface"
-                                                : "text-on-surface-variant/80"
+                                                : "text-on-surface-variant/80",
                                         )}
                                     >
                                         {option.label}
@@ -703,12 +723,12 @@ export const FrequencySelector: React.FC<FrequencySelectorProps> = ({
                                     (selectedFrequency === "daily"
                                         ? "Every day delivery"
                                         : selectedFrequency === "weekly"
-                                        ? "Once a week"
-                                        : selectedFrequency === "biweekly"
-                                        ? "Every 2 weeks"
-                                        : selectedFrequency === "monthly"
-                                        ? "Once a month"
-                                        : "")}
+                                          ? "Once a week"
+                                          : selectedFrequency === "biweekly"
+                                            ? "Every 2 weeks"
+                                            : selectedFrequency === "monthly"
+                                              ? "Once a month"
+                                              : "")}
                             </p>
                         </div>
 

@@ -66,7 +66,7 @@ export default function Dashboard() {
                     <div className="space-y-6">
                         <StatCard
                             Icon={GiTakeMyMoney}
-                            variant=""
+                            variant="default"
                             className="bg-white text-on-primary font-semibold"
                             title="Store Credit"
                             value="$45.00"
@@ -137,7 +137,6 @@ export default function Dashboard() {
                         </div>
                     </div>
                 </div>
-                <FloatingActionButton icon={<FaPlus />} />
             </Container>
         </AuthenticatedLayout>
     );

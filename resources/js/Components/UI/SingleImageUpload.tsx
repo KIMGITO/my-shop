@@ -9,12 +9,16 @@ interface SingleImageUploadProps {
     onFileChange: (file: File | null) => void;
     onRemoveExisting: (shouldRemove: boolean) => void;
     error?: string;
+    label?: string;
+    disabled?: boolean;
 }
 
 export const SingleImageUpload: React.FC<SingleImageUploadProps> = ({
     value,
     onFileChange,
     onRemoveExisting,
+    label,
+    disabled,
     error,
 }) => {
     const [preview, setPreview] = React.useState<string | null>(value);
@@ -29,7 +33,7 @@ export const SingleImageUpload: React.FC<SingleImageUploadProps> = ({
         setPreview(url);
         setIsRemoved(false);
         onFileChange(file);
-        onRemoveExisting(true); 
+        onRemoveExisting(true);
     };
 
     const handleRemove = () => {
@@ -45,7 +49,7 @@ export const SingleImageUpload: React.FC<SingleImageUploadProps> = ({
             <div
                 className={cn(
                     "relative w-32 h-32 rounded-xl border-2 border-dashed overflow-hidden flex items-center justify-center bg-surface-container-low",
-                    isRemoved ? "border-error/50" : "border-outline-variant/30"
+                    isRemoved ? "border-error/50" : "border-outline-variant/30",
                 )}
             >
                 {preview ? (
@@ -66,11 +70,18 @@ export const SingleImageUpload: React.FC<SingleImageUploadProps> = ({
                 ) : (
                     <button
                         type="button"
-                        onClick={() => fileInputRef.current?.click()}
-                        className="flex flex-col items-center text-on-surface-variant hover:text-primary transition-colors"
+                        onClick={() =>
+                            !disabled && fileInputRef.current?.click()
+                        }
+                        className={cn(
+                            disabled && "brightness-40",
+                            "flex flex-col items-center text-on-surface-variant hover:text-primary transition-colors",
+                        )}
                     >
                         <RiUpload2Line className="text-xl mb-1" />
-                        <span className="text-[10px] font-bold">UPLOAD</span>
+                        <span className="text-[10px] font-bold">
+                            {label || "UPLOAD"}
+                        </span>
                     </button>
                 )}
             </div>
@@ -80,7 +91,7 @@ export const SingleImageUpload: React.FC<SingleImageUploadProps> = ({
                 type="file"
                 className="hidden"
                 accept="image/*"
-                onChange={handleFileSelect}
+                onChange={!disabled && handleFileSelect}
             />
             {error && <p className="text-error text-xs italic">{error}</p>}
         </div>

@@ -52,7 +52,7 @@ export const PerDayScheduleSelector: React.FC<PerDayScheduleSelectorProps> = ({
     const totalMonthlyPrice = totalWeeklyPrice * 4;
 
     const handleEditDay = (dayId: string) => {
-        const schedule = perDaySchedules.find((d) => d.dayId === dayId);
+        const schedule = perDaySchedules.find((d) => d.id === dayId);
         setTempSchedule({ ...schedule });
         setEditingDay(dayId);
     };
@@ -89,7 +89,7 @@ export const PerDayScheduleSelector: React.FC<PerDayScheduleSelectorProps> = ({
                 <div className="grid grid-cols-7 gap-1">
                     {DAYS.map((day) => {
                         const schedule = perDaySchedules.find(
-                            (d) => d.dayId === day.id
+                            (d) => d.id === day.id
                         );
                         const isEnabled = schedule?.enabled;
                         const volume = schedule?.volume || "1l";
@@ -150,7 +150,7 @@ export const PerDayScheduleSelector: React.FC<PerDayScheduleSelectorProps> = ({
                 <div className="space-y-6 max-h-[60vh] overflow-y-auto">
                     {DAYS.map((day) => {
                         const schedule = perDaySchedules.find(
-                            (d) => d.dayId === day.id
+                            (d) => d.id === day.id
                         );
                         const isEditing = editingDay === day.id;
 

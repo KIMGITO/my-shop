@@ -7,7 +7,6 @@ import FloatingActionButton from "@/Components/Common/FloatingActionButton";
 import ProductFilters from "@/Components/Shop/ProductFilters";
 import ProductGrid from "@/Components/Shop/ProductGrid";
 import Container from "@/Components/UI/Container";
-import { categories, products } from "@/Data/ProductData";
 
 // Mock products data
 

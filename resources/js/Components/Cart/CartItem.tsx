@@ -57,12 +57,10 @@ const CartItem: React.FC<CartItemProps> = ({
                 <div className="flex flex-wrap justify-between items-center gap-4 mt-4">
                     <QuantitySelector
                         quantity={item.quantity}
-                        onIncrease={() =>
-                            onUpdateQuantity(item.id, item.quantity + 1)
+                        onUpdate={(quantity) =>
+                            {onUpdateQuantity(item.id, Number(quantity))}
                         }
-                        onDecrease={() =>
-                            onUpdateQuantity(item.id, item.quantity - 1)
-                        }
+                        max={99}
                         size="sm"
                     />
                     <button

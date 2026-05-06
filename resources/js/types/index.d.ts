@@ -1,3 +1,4 @@
+import { Status, StatusBadgeProps } from "@/Components/UI/StatusBadge";
 import { Config } from "ziggy-js";
 
 export type PageProps<
@@ -17,7 +18,7 @@ export interface BaseProduct {
     image: string;
     mainProductImage: string;
     description?: string;
-    category?: string;
+    categoryId?: string;
     sku?: string;
 }
 
@@ -49,7 +50,7 @@ export interface ProductImage {
 
 // ========== SUBSCRIPTION PRODUCT ==========
 export interface SubscriptionProduct extends BaseProduct {
-    volumeOptions: string[];
+    volumeOptions: VolumeSelectorOption[];
     defaultVolume: string;
     frequencyOptions: Frequency[];
 }
@@ -69,9 +70,11 @@ export interface CashierCartItem {
 
 // ========== BATCH ==========
 export interface Batch {
+    id:number;
     batchNumber: string;
     expiryDate: string;
     receiveDate: string;
+    status:Status,
     intakeQuantity: string;
     balance: string;
     isActive: boolean;

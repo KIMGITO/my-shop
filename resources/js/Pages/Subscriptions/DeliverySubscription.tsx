@@ -6,7 +6,6 @@ import Button from "@/Components/UI/Button";
 import Badge from "@/Components/UI/Badge";
 import { cn } from "@/Utils/helpers";
 import { SubscriptionProduct } from "@/types";
-import { subscriptionProduct } from "@/Data/DeliveryData";
 import CalendarWidget from "@/Widgets/CalendarWidget";
 import { FrequencySelector } from "@/Components/FrequencySelector";
 import { VolumeSelector } from "@/Components/VolumeSelector";
@@ -48,7 +47,7 @@ const SubscriptionProductCard: React.FC<{ product: SubscriptionProduct }> = ({
 }) => {
     const [selectedVolume, setSelectedVolume] = useState(product.defaultVolume);
     const [selectedFrequency, setSelectedFrequency] = useState(
-        product.frequencyOptions[0].id
+        product.frequencyOptions[0].id,
     );
 
     const handleUpdate = () => {
@@ -67,16 +66,6 @@ const SubscriptionProductCard: React.FC<{ product: SubscriptionProduct }> = ({
                     alt={product.name}
                     className="w-full h-full object-cover"
                 />
-                {product.isPopular && (
-                    <div className="absolute top-4 left-4">
-                        <Badge
-                            variant="primary"
-                            className="font-headline font-bold text-xs px-3 py-1.5 uppercase tracking-widest"
-                        >
-                            Most Popular
-                        </Badge>
-                    </div>
-                )}
             </div>
 
             <div className="p-8 md:w-1/2 flex flex-col justify-center">
@@ -88,17 +77,9 @@ const SubscriptionProductCard: React.FC<{ product: SubscriptionProduct }> = ({
                 </p>
 
                 <div className="space-y-6">
-                    <VolumeSelector
-                        options={product.volumeOptions}
-                        selected={selectedVolume}
-                        onChange={setSelectedVolume}
-                    />
+                    <VolumeSelector />
 
-                    <FrequencySelector
-                        options={product.frequencyOptions}
-                        selected={selectedFrequency}
-                        onChange={setSelectedFrequency}
-                    />
+                    <FrequencySelector />
                 </div>
             </div>
         </div>
@@ -232,9 +213,7 @@ export default function DeliverySubscription() {
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                     {/* Left Column - Subscription Management */}
                     <div className="lg:col-span-7 space-y-8">
-                        <SubscriptionProductCard
-                            product={subscriptionProduct}
-                        />
+                        <SubscriptionProductCard product={null} />
                         <ActionBar />
                     </div>
 

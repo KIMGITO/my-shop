@@ -12,8 +12,9 @@ import Badge from "@/Components/UI/Badge";
 import Rating from "@/Components/UI/Rating";
 import QuantitySelector from "@/Components/UI/QuantitySelector";
 import ProductImageGallery from "@/Components/Product/ProductImageGallery";
-import RelatedProducts from "@/Components/Product/RelatedProducts";
 import { cn } from "@/lib/utils";
+import RelatedProducts from "@/Components/Product/RelatedProducts";
+import { ShopProduct } from "@/Components/Shop/type";
 
 const  features =  [
                 {
@@ -96,42 +97,42 @@ const  features =  [
 // };
 
 // Related products
-const relatedProducts = [
-    {
-        id: 2,
-        name: "Double Heavy Cream",
-        price: 4.25,
-        description: "250ml Jar",
-        image: "https://lh3.googleusercontent.com/aida-public/AB6AXuD65NFYZaERCfQ7K4Wx5Z6qSbW2wr4AbRmbwOSDqGuOnmbJcWjr5PrAVY975PfRiLNDdMQuO6j2X4og6SQjBGjFXJEUkTafxxitb2RRqX2qWZ6JFXKhK-XdruYxWStSJdlfdJosjjYBj9XIARdRFugP9LBv4mAX5yu9lR_h4jYtIK3Y_lZpPoIkpYa-Kb6qYjwqfLtabh53RcUS0PqO4xoKIy8l5EgPdpOCzZW_yznO_5xa6Cq-uf0rnQmWyNON5KBVtYtxqb_-vAkp",
-        rating: 4.9,
-        isPopular: true,
-    },
-    {
-        id: 3,
-        name: "Cultured Sea Salt Butter",
-        price: 8.0,
-        description: "200g Block",
-        image: "https://lh3.googleusercontent.com/aida-public/AB6AXuCNDltFlCG_ygFgi7F3P20H3ePDHhsIaUQTmH3Uty4Bo2KZYwUZ5QuvufNS1wIa-jQbuvJL2WL95aLonu92eEZ2SrFhB4Dkko9uCXTRPuIrQ8wh1vnbs0JWrEZbYyblNaREKfk2SSGAW1FL_VixCic-Pd5EhaLU-sRTo89glbICIPId6cTkwKQM7mOGasGqDJiqnBiePD751CGip-7U5o8_I_bWkd7QXyGsDZcU1ZXTx1zrnPvDjFvGGv9LblBtGeuBdnh_EAZP8l0t",
-        rating: 5.0,
-    },
-    {
-        id: 4,
-        name: "Signature Greek Yogurt",
-        price: 5.5,
-        description: "500g Tub",
-        image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBOSm1ywTQfUwsUx4svUZr1GHZo2jnbTx_XgCEEUzakqWDfGR04kwZSlA9-UMZm7CbxLE7sLLt99U5EaHxkowpYlJj82-Tmrx9Om0XvaZbtTzYqmBDlI-EQlj369AabsHnnJ_qkJF2zwDHPUSIXCUwhmZ0ZXz1ICvBtISj-pTjIoTY0zKI-QoPrknfBbcq1d9LD7hAf04Qtgr9AH8DUFKAwCC15XNTas-xZlZ9A3u6CZEQtenOKzrcU2-Ho6TDSR2gEVOcVR6tm63O-",
-        rating: 4.8,
-        inStock: false,
-    },
-    {
-        id: 5,
-        name: "Small Batch Oat Milk",
-        price: 7.25,
-        description: "1L Bottle",
-        image: "https://lh3.googleusercontent.com/aida-public/AB6AXuCdFCOHdh1n_HSpGXmqZmzC9mwU6JFwWDZcWewQf0_1dEq5nCsorJCp4v5vUbj313a1rpuNTlrvkd7YE1pZ-g84jQ0tV9z3SdBqBdXogcNauabFkFKydKmaVFnfQUhY1fg08elG2QEnupJjVhw-c1JOBL_EjfUCevSmlu0RD7b83YQ3uVef0o2HmPP8SWWV4XifiLO_GxVLUkIfD-IX0KjpSk1CMd0BYU-QPl15GwFJQBTzQ0yeFQR8Q0uLB44U7bXBNnzobN1tK4_Q",
-        rating: 4.7,
-    },
-];
+// const relatedProducts: ShopProduct = [
+//     {
+//         id: 2,
+//         name: "Double Heavy Cream",
+//         price: 4.25,
+//         description: "250ml Jar",
+//         image: "https://lh3.googleusercontent.com/aida-public/AB6AXuD65NFYZaERCfQ7K4Wx5Z6qSbW2wr4AbRmbwOSDqGuOnmbJcWjr5PrAVY975PfRiLNDdMQuO6j2X4og6SQjBGjFXJEUkTafxxitb2RRqX2qWZ6JFXKhK-XdruYxWStSJdlfdJosjjYBj9XIARdRFugP9LBv4mAX5yu9lR_h4jYtIK3Y_lZpPoIkpYa-Kb6qYjwqfLtabh53RcUS0PqO4xoKIy8l5EgPdpOCzZW_yznO_5xa6Cq-uf0rnQmWyNON5KBVtYtxqb_-vAkp",
+//         rating: 4.9,
+//         isPopular: true,
+//     },
+//     {
+//         id: 3,
+//         name: "Cultured Sea Salt Butter",
+//         price: 8.0,
+//         description: "200g Block",
+//         image: "https://lh3.googleusercontent.com/aida-public/AB6AXuCNDltFlCG_ygFgi7F3P20H3ePDHhsIaUQTmH3Uty4Bo2KZYwUZ5QuvufNS1wIa-jQbuvJL2WL95aLonu92eEZ2SrFhB4Dkko9uCXTRPuIrQ8wh1vnbs0JWrEZbYyblNaREKfk2SSGAW1FL_VixCic-Pd5EhaLU-sRTo89glbICIPId6cTkwKQM7mOGasGqDJiqnBiePD751CGip-7U5o8_I_bWkd7QXyGsDZcU1ZXTx1zrnPvDjFvGGv9LblBtGeuBdnh_EAZP8l0t",
+//         rating: 5.0,
+//     },
+//     {
+//         id: 4,
+//         name: "Signature Greek Yogurt",
+//         price: 5.5,
+//         description: "500g Tub",
+//         image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBOSm1ywTQfUwsUx4svUZr1GHZo2jnbTx_XgCEEUzakqWDfGR04kwZSlA9-UMZm7CbxLE7sLLt99U5EaHxkowpYlJj82-Tmrx9Om0XvaZbtTzYqmBDlI-EQlj369AabsHnnJ_qkJF2zwDHPUSIXCUwhmZ0ZXz1ICvBtISj-pTjIoTY0zKI-QoPrknfBbcq1d9LD7hAf04Qtgr9AH8DUFKAwCC15XNTas-xZlZ9A3u6CZEQtenOKzrcU2-Ho6TDSR2gEVOcVR6tm63O-",
+//         rating: 4.8,
+//         inStock: false,
+//     },
+//     {
+//         id: 5,
+//         name: "Small Batch Oat Milk",
+//         price: 7.25,
+//         description: "1L Bottle",
+//         image: "https://lh3.googleusercontent.com/aida-public/AB6AXuCdFCOHdh1n_HSpGXmqZmzC9mwU6JFwWDZcWewQf0_1dEq5nCsorJCp4v5vUbj313a1rpuNTlrvkd7YE1pZ-g84jQ0tV9z3SdBqBdXogcNauabFkFKydKmaVFnfQUhY1fg08elG2QEnupJjVhw-c1JOBL_EjfUCevSmlu0RD7b83YQ3uVef0o2HmPP8SWWV4XifiLO_GxVLUkIfD-IX0KjpSk1CMd0BYU-QPl15GwFJQBTzQ0yeFQR8Q0uLB44U7bXBNnzobN1tK4_Q",
+//         rating: 4.7,
+//     },
+// ];
 
 // Product Features Component
 const ProductFeatures: React.FC<{
@@ -163,7 +164,6 @@ const ProductFeatures: React.FC<{
 export default function ProductShow({product}) {
 
     console.log(product.category);
-    const { id } = usePage().props as { id: string };
     
     const [quantity, setQuantity] = useState(1);
     const [isWishlisted, setIsWishlisted] = useState(false);
@@ -249,6 +249,7 @@ export default function ProductShow({product}) {
                                     <QuantitySelector
                                         quantity={quantity}
                                         onUpdate={()=>{}}
+                                        max={99}
                                       
                                     />
                                 </div>
@@ -298,7 +299,7 @@ export default function ProductShow({product}) {
                         </div>
 
                         {/* Related Products */}
-                        <RelatedProducts products={relatedProducts} />
+                        <RelatedProducts products={[]} />
                     </Container>
                 </main>
                 <Footer />

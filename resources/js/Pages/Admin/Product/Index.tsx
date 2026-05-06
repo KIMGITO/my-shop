@@ -6,7 +6,7 @@ import { FilterChip } from "@/Components/UI/FilterChip";
 import { SearchBar } from "@/Components/UI/SearchBar";
 import AuthenticatedLayout from "@/Components/Layout/AuthenticatedLayout";
 import { HiOutlinePlus, HiPlus } from "react-icons/hi";
-import { Product } from "@/types";
+import { InventoryProduct, Product } from "@/types";
 import ProductFormModal from "./ProductFormModal";
 import FloatingActionButton from "@/Components/Common/FloatingActionButton";
 import Button from "@/Components/UI/Button";
@@ -26,7 +26,7 @@ export default function ProductsPage({
     modalOpen = false,
 }: {
     modalOpen: boolean;
-    products: Product[];
+    products: InventoryProduct[];
     categories: Category[];
 }) {
     const [searchQuery, setSearchQuery] = useState("");

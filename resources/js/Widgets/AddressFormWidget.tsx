@@ -11,7 +11,7 @@ import {
 
 // ... (Props interface stays the same)
 
-export const AddressFormWidget: React.FC<AddressFormWidgetProps> = ({
+export const AddressFormWidget = ({
     data,
     setData,
     errors,

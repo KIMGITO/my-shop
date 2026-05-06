@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Head } from "@inertiajs/react";
 import { StatCard } from "@/Components/Admin/StatCard";
-import { StatusBadge } from "@/Components/UI/StatusBadge";
+import { Status, StatusBadge } from "@/Components/UI/StatusBadge";
 import { Pagination } from "@/Components/UI/Pagination";
 import { ActionButton } from "@/Components/UI/ActionButton";
 import {
@@ -121,12 +121,24 @@ export default function BatchesPage({batches,isModalOpen = false} : {batches: Ba
     const itemsPerPage = 5;
 
 
-    const statusStyles = {
-        fresh: "text-green-600",
-        expiring_soon: "text-yellow-200 font-bold",
-        expiring_today: "text-orange-600 font-bold",
-        expired: "text-error font-bold",
-    };
+    const statusStyles: Record<Status  , string> = {
+    fresh: "text-green-600",
+    expiring_soon: "text-yellow-200 font-bold",
+    expiring_today: "text-orange-600 font-bold",
+    expired: "text-error font-bold",
+    active: "",
+    depleted: "",
+    sent: "",
+    draft: "",
+    fulfilled: "",
+    partial: "",
+    in_progress: "",
+    completed: "",
+    pending: "",
+    cancelled: "",
+};
+
+    
     const filteredBatches = batches.filter(
         (batch) =>
             batch.batchNumber
