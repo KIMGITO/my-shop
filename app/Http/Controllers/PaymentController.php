@@ -29,9 +29,7 @@ class PaymentController extends Controller
 
     public function  store(PaymentRequest  $request, Order $order){
         $data = $request->validated();
-
         if( $order->balance == 0){ 
-            
             return redirect()->route('pos.index')->with('error', 'This order is already fully paid.');
         }
 
