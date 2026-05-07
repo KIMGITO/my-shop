@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AddressController;
+use App\Http\Controllers\CreditController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\POSController;
@@ -191,8 +192,11 @@ Route::middleware(['auth'])->group(function () {
 
     Route::prefix('payments')->name('payments.')->group(function () {
         Route::get('/{customer}',[ PaymentController::class, 'index'])->name('index');
+        Route::post('/{customer}',[CreditController::class,'pay'])->name('credits');
         Route::post('/process/{order}', [PaymentController::class, 'store'])->name('process');
     });
+
+   
 
     // ============================================================================
     // Dispatch Routes (Logistics & Delivery)

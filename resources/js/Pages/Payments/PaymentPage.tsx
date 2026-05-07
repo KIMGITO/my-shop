@@ -41,13 +41,13 @@ export default function CreditPaymentPage({ customerId }: { customerId: number})
     }, [customerId]);
 
     const handlePaymentComplete = (paymentData: any) => {
-        console.log("Processing Debt Payment:", {
+        
+
+        router.post(route('payments.credits', customer.id),{
             customerId: customer?.id,
             ...paymentData
-        });
-        // Here you would call your API to reduce the customer's balance
-        // api.post('/credit/pay', { customerId, ...paymentData });
-        alert("Payment Processed Successfully!");
+        } );
+
     };
 
     if (loading) return <div className="p-10 text-center">Loading Account Details...</div>;
