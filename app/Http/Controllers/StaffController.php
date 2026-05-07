@@ -103,4 +103,14 @@ class StaffController extends Controller
         }
     }
 
+    public function destroy(User $user){
+        try {
+            $user->update(['is_active', false]);
+
+            return redirect()->back()->with(['success' => 'Staff trashed']);
+        }catch(Throwable $th){
+            throw new  StaffException("Error Processing Request");
+        }
+    }
+
 }
