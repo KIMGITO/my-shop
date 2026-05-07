@@ -34,7 +34,7 @@ class OrderRequest extends FormRequest
             'expireTime' => 'nullable|date',
             'items' => 'required|array',
             'items.*.batch_id' => 'required|integer|exists:batches,id',
-            'items.*.quantity' => 'required|integer|min:1',
+            'items.*.quantity' => 'required|numeric|min:0.1',
             'items.*.price' => 'required|numeric|min:0',
         ];
     }
