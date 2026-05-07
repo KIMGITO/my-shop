@@ -105,7 +105,8 @@ class StaffController extends Controller
 
     public function destroy(User $user){
         try {
-            $user->update(['is_active', false]);
+            $user->is_active = false;
+            $user->save();
 
             return redirect()->back()->with(['success' => 'Staff trashed']);
         }catch(Throwable $th){

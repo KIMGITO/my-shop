@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import { Head, useForm } from "@inertiajs/react";
+import { Head, router, useForm } from "@inertiajs/react";
 import { SearchBar } from "@/Components/UI/SearchBar";
 import { FilterChip } from "@/Components/UI/FilterChip";
 import StaffCard from "@/Components/Admin/StaffCard";
@@ -45,7 +45,7 @@ export default function StaffManagement({
         useForm({
             name: "",
             email: "",
-            phone:"",
+            phone: "",
             roleType: "cashier" as Lowercase<RoleType>,
         });
 
@@ -96,6 +96,10 @@ export default function StaffManagement({
                 },
             });
         }
+    };
+
+    const handleDelete = (id: string) => {
+        router.delete(route("admin.staff.destroy", id));
     };
 
     return (
@@ -178,8 +182,11 @@ export default function StaffManagement({
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {filteredStaff.map((staff) => (
                             <div key={staff.id} className="group relative">
-                                <StaffCard staff={staff} editMode={() => handleOpenEditModal(staff)} />
-                                
+                                <StaffCard
+                                    onDelete={(id) => handleDelete(id)}
+                                    staff={staff}
+                                    editMode={() => handleOpenEditModal(staff)}
+                                />
                             </div>
                         ))}
 

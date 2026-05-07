@@ -58,7 +58,7 @@ use Inertia\Inertia;
                 Route::get('/', [StaffController::class, 'index'])->name('staff');
                 Route::post('/',[StaffController::class, 'store'])->name('store');
                 Route::put('/{user}', [StaffController::class, 'update'])->name('update');
-                Route::delete('/', [StaffController::class, 'destroy'])->name('destroy');
+                Route::delete('/{user}', [StaffController::class, 'destroy'])->name('destroy');
             });
 
 
