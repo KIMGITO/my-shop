@@ -57,7 +57,7 @@ use Inertia\Inertia;
             Route::prefix('staff')->name('staff.')->group(function () {
                 Route::get('/', [StaffController::class, 'index'])->name('staff');
                 Route::post('/',[StaffController::class, 'store'])->name('store');
-                Route::put('/', [StaffController::class, 'update'])->name('update');
+                Route::put('/{user}', [StaffController::class, 'update'])->name('update');
                 Route::delete('/', [StaffController::class, 'destroy'])->name('destroy');
             });
 

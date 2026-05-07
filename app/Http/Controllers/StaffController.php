@@ -2,13 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\StaffException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StaffRequest;
 use App\Models\User;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+use Throwable;
 
 class StaffController extends Controller
 {
@@ -77,6 +80,26 @@ class StaffController extends Controller
     }
 
     public function store(StaffRequest $request){
-        dd($request->validated());
+        try{
+            $payload =  $request->validated();
+            $user = User::create(Arr::except($payload, ['roleType']));
+            $user->assignRole($payload['roleType']);
+            
+            return redirect()->back()->with(['success' => 'Staff added successfully']);
+        }catch(Throwable $th){
+            throw new StaffException('Failed to add staff');
+        }
     }
+
+    public function update(StaffRequest  $request,  User $user) {
+       try{ $payload = $request->validated();
+
+            $user->update(Arr::except($payload, ['roleType']));
+            $user->syncRoles($payload['roleType']);
+            return redirect()->back()->with(['success' => 'Staff updated successfully.']);
+        }catch(Throwable $th){
+            throw new StaffException('Failed to update staff,  please try again.');
+        }
+    }
+
 }
