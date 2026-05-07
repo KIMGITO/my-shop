@@ -28,8 +28,6 @@ export const Button: React.FC<ButtonProps> = ({
         ghost: "text-on-surface-variant hover:text-primary",
         danger: " hover:text-red-200 border border-red-200 text-red-500/40  hover:bg-red-500/20",
         link: " text-primary font-bold text-sm flex items-center gap-1 hover:underline",
-
-
     };
 
     const sizes = {
@@ -41,7 +39,7 @@ export const Button: React.FC<ButtonProps> = ({
     return (
         <button
             className={cn(
-                "rounded-full font-semibold  transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center",
+                "rounded-full font-semibold hover:cursor-pointer transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center",
                 variants[variant],
                 sizes[size],
                 fullWidth && "w-full",

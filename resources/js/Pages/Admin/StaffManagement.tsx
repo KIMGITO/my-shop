@@ -202,11 +202,10 @@ export default function StaffManagement({
                             </div>
                             <div>
                                 <p className="font-bold text-lg">
-                                    Onboard Talent
+                                    Onboard Staff
                                 </p>
                                 <p className="text-sm text-on-surface-variant">
-                                    Send an invitation link to a new staff
-                                    member.
+                                    Add a new member to your team.
                                 </p>
                             </div>
                         </div>
@@ -260,7 +259,10 @@ export default function StaffManagement({
                     </div>
                 </Modal>
 
-                <FloatingActionButton action={handleOpenAddModal} />
+                <FloatingActionButton
+                    disabled={isModalOpen}
+                    action={handleOpenAddModal}
+                />
             </AuthenticatedLayout>
         </>
     );

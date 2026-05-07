@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StaffRequest;
 use App\Models\User;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 use Spatie\Permission\Models\Permission;
@@ -104,6 +105,14 @@ class StaffController extends Controller
     }
 
     public function destroy(User $user){
+
+        if(!Auth::user()->hasRole('admin')){
+            throw new StaffException("You have no right permissions to delete a staff.");
+        }
+
+        if(Auth::id() == $user->id){
+            throw new StaffException("You can't delete your staff account.");
+        }
         try {
             $user->is_active = false;
             $user->save();

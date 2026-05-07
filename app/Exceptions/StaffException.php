@@ -10,6 +10,6 @@ class StaffException extends Exception
 {
     use HandlesExceptionResponse;
     public function render(Request $request){
-        $this->errorResponse($request, $this->getMessage());
+        return $this->errorResponse($request, $this->getMessage());
     }
 }

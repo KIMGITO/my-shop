@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import Button from "../UI/Button";
-import { MdMoreVert, MdEdit, MdDelete, MdInfo } from "react-icons/md";
+import { MdMoreVert, MdEdit, MdDelete, MdInfo, MdOutlineAdminPanelSettings } from "react-icons/md";
 
 export interface StaffCardProps {
     editMode: (staff: any) => void;
@@ -55,7 +55,7 @@ export const StaffCard: React.FC<StaffCardProps> = ({
     };
 
     return (
-        <div className="bg-surface-container-lowest p-6 rounded-3xl shadow-2xl hover:shadow-xl transition-all border border-transparent hover:border-outline-variant/20 group relative">
+        <div className="bg-surface-container-lowest p-4 rounded-3xl shadow-2xl hover:shadow-xl transition-all border border-transparent hover:border-outline-variant/20 group relative">
             <div className="flex justify-between items-start mb-6">
                 <div className="relative">
                     <img
@@ -81,7 +81,7 @@ export const StaffCard: React.FC<StaffCardProps> = ({
                     <Button 
                         onClick={() => setMenuOpen(!menuOpen)} 
                         variant="ghost" 
-                        className="p-2 opacity-0 group-hover:opacity-100"
+                        className="p-0 opacity-0 group-hover:opacity-100"
                     >
                         <MdMoreVert className="text-2xl"/>
                     </Button>
@@ -119,13 +119,15 @@ export const StaffCard: React.FC<StaffCardProps> = ({
                 <p className="text-on-surface-variant text-sm">{staff.role}</p>
             </div>
            
-            <Button
-                variant="ghost"
-                className="p-1 border"
-                onClick={() => onManagePermissions?.(staff.id)}
-            >
-                Manage Permissions
-            </Button>
+            <div className=" flex justify-end">
+                <Button
+                    variant="ghost"
+                    className="p-0"
+                    onClick={() => onManagePermissions?.(staff.id)}
+                >
+                    <MdOutlineAdminPanelSettings className="text-2xl "/>
+                </Button>
+            </div>
         </div>
     );
 };
