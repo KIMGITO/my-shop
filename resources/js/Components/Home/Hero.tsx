@@ -20,7 +20,7 @@ export const Hero: React.FC = () => {
                     </div>
 
                     <h1 className="font-headline text-5xl md:text-8xl text-on-surface font-extrabold tracking-tight leading-[0.95] mb-8">
-                        Pure Dairy.
+                        Pure KayKays.
                         <br />
                         <span className="relative inline-block mt-2">
                             Pure Joy.
