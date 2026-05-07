@@ -37,17 +37,17 @@ class CustomerController extends Controller
         }
 
         $data = [
-            'customerId' =>$customer->id,
+            'id' =>$customer->id,
             'name' => $customer->name,
             'phone' => $customer->phone,
-            'outstandingBalance' => $customer->balance,
+            'outstandingBalance' => (int) $customer->balance,
         ];
-        $latestPayments = $this->customerService->transactions();
+        $history = $this->customerService->transactions();
 
         // last 5 transactions.
         // get order or credit where  payment is not credit and get the payment with order id or credit id of the first 5 
 
-        return  response()->json(['customerDebt' => $data]);
+        return  response()->json(['data' => $data, 'history' => $history]);
     }
     
 }

@@ -2,6 +2,9 @@
 
 namespace App\Services;
 
+use App\Enums\CreditStatus;
+use App\Enums\OrderPaymentStatus;
+use App\Exceptions\CustomerExceptions;
 use App\Models\Credit;
 use App\Repositories\CreditRepository;
 use App\Repositories\CustomerRepository;
@@ -67,4 +70,72 @@ class CreditService
         });
         
     }
+
+    public function payCredits(int $customerId, float $amount, float $change)
+    {
+        return DB::transaction(function () use ($customerId, $amount) {
+
+            $customer = $this->customerRepository->find($customerId);
+
+            if (!$customer) {
+                throw new CustomerExceptions('Customer Not Found!');
+            }
+
+            $credits = $customer->credits()
+                ->with('order')
+                ->where('status', '!=', CreditStatus::PAID->value)
+                ->orderBy('created_at', 'asc')
+                ->get();
+
+            $remainingAmount = $amount;
+
+            foreach ($credits as $credit) {
+
+                if ($remainingAmount <= 0) break;
+
+                $balance = $credit->balance;
+
+                if ($remainingAmount >= $balance) {
+                    $applied = $balance;
+
+                    $credit->amount_paid = $credit->total_amount;
+                    $credit->status = CreditStatus::PAID;
+
+                    $remainingAmount -= $balance;
+
+                } else {
+                    $applied = $remainingAmount;
+
+                    $credit->amount_paid += $remainingAmount;
+                    $credit->status = CreditStatus::PARTIAL;
+
+                    $remainingAmount = 0;
+                }
+
+                $order = $credit->order;
+
+                $order->paid_amount += $applied;
+
+                
+                if ($order->paid_amount <= 0) {
+                    $order->payment_status = OrderPaymentStatus::UNPAID;
+                } elseif ($order->paid_amount < $order->total_amount) {
+                    $order->payment_status = OrderPaymentStatus::PARTIALLY_PAID;
+                } else {
+                    $order->payment_status = OrderPaymentStatus::PAID;
+                }
+
+                $order->save();
+                $credit->save();
+            }
+            return [
+                'paid_amount' => $amount - $remainingAmount,
+                'remaining_amount' => $remainingAmount,
+            ];
+        });
+
+
+    }
+
+    
 }

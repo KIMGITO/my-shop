@@ -18,4 +18,7 @@ class CustomerRepository extends BaseRepository
     public function latestPayments(?int $limit = 5){
         return $this->model->getLatestPayments($limit);
     }
+
+    
+
 }
