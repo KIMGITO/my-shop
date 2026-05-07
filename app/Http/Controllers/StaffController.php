@@ -41,6 +41,7 @@ class StaffController extends Controller
 
     //    map
         $staff = User::isStaff()
+            ->active()
             ->with('roles:id,name')
             ->get()
             ->map(function ($user) use ($priority) {

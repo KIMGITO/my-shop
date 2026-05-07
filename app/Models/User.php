@@ -12,7 +12,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Cache;
 use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Traits\HasRoles;
-#[Fillable(['name', 'email', 'password', 'phone', 'address', 'avatar', 'phone_verified_at','email_verified_at'])]
+#[Fillable(['name', 'email', 'password', 'phone', 'address', 'is_active', 'avatar', 'phone_verified_at','email_verified_at'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -49,6 +49,11 @@ class User extends Authenticatable
     public function scopeIsCustomer($query)
     {
         return $query->role('customer');
+    }
+
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
     }
 
     public function customer()
