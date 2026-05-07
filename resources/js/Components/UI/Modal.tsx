@@ -28,11 +28,11 @@ export const Modal: React.FC<ModalProps> = ({
     const modalRef = useRef<HTMLDivElement>(null);
 
     const sizeClasses = {
-        sm: "max-w-sm",
-        md: "max-w-md",
-        lg: "max-w-lg",
-        xl: "max-w-xl",
-        full: "max-w-4xl",
+        sm: "max-w-md",        
+        md: "max-w-xl",       
+        lg: "max-w-3xl",      
+        xl: "max-w-5xl",       
+        full: "max-w-[95vw]",  
     };
 
     useEffect(() => {

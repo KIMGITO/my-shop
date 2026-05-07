@@ -166,6 +166,7 @@ class RolePermissionSeeder extends Seeder
         $this->createUser('Admin User', 'admin@kaykays.com', 'admin');
         $this->createUser('Manager User', 'manager@kaykays.com', 'manager');
         $this->createUser('Cashier User', 'cashier@kaykays.com', 'cashier');
+        $this->createUser('Rider User', 'rider@kaykays.com', 'rider');
     }
 
     private function createUser($name, $email, $role)

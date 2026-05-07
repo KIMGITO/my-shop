@@ -83,11 +83,11 @@ export const cashierNav: NavItem[] = [
 
 export const adminNav: NavItem[] = [
     { label: "Dashboard", path: "/admin/dashboard", icon: MdDashboard },
-    {
-        label: "Inventory Analytics",
-        path: "/admin/inventory/analytics",
-        icon: HiOutlineChartBar,
-    },
+    // {
+    //     label: "Inventory Analytics",
+    //     path: "/admin/inventory/analytics",
+    //     icon: HiOutlineChartBar,
+    // },
 
     {
         label: "Products",
@@ -97,31 +97,31 @@ export const adminNav: NavItem[] = [
     { label: "POS", path: "/pos", icon: MdPointOfSale },
     { label: "Customers", path: "/admin/customers", icon: HiUsers },
 
-    {
-        label: "Stock Adjustment",
-        path: "/admin/inventory/adjustment",
-        icon: HiAdjustmentsHorizontal,
-    },
-    {
-        label: "Stock History",
-        path: "/admin/inventory/history",
-        icon: HiMiniClock,
-    },
-    { label: "Sales Reports", path: "/admin/sales", icon: BiSolidReport },
+    // {
+    //     label: "Stock Adjustment",
+    //     path: "/admin/inventory/adjustment",
+    //     icon: HiAdjustmentsHorizontal,
+    // },
+    // {
+    //     label: "Stock History",
+    //     path: "/admin/inventory/history",
+    //     icon: HiMiniClock,
+    // },
+    // { label: "Sales Reports", path: "/admin/sales", icon: BiSolidReport },
     { label: "Staff", path: "/admin/staff", icon: HiOutlineUsers },
     { label: "Batches", path: "/admin/inventory/batches", icon: FaSitemap },
     { label: "Suppliers", path: "/admin/suppliers", icon: HiOutlineTruck },
-    {
-        label: "Supplier Orders",
-        path: "/admin/suppliers/orders",
-        icon: MdShoppingCartCheckout,
-    },
-    { label: "Settings", path: "/admin/settings", icon: HiOutlineCog },
-    {
-        label: "Audit Logs",
-        path: "/admin/audit-logs",
-        icon: HiOutlineClipboardDocumentList,
-    },
+    // {
+    //     label: "Supplier Orders",
+    //     path: "/admin/suppliers/orders",
+    //     icon: MdShoppingCartCheckout,
+    // },
+    // { label: "Settings", path: "/admin/settings", icon: HiOutlineCog },
+    // {
+    //     label: "Audit Logs",
+    //     path: "/admin/audit-logs",
+    //     icon: HiOutlineClipboardDocumentList,
+    // },
 ];
 
 // ============================================================================

@@ -1,8 +1,12 @@
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import Button from "../UI/Button";
+import { MdMoreVert, MdEdit, MdDelete, MdInfo } from "react-icons/md";
 
 export interface StaffCardProps {
+    editMode: (staff: any) => void;
+    onDelete?: (id: string) => void;
+    onInfo?: (staff: any) => void;
     staff: {
         id: string;
         name: string;
@@ -18,19 +22,29 @@ export interface StaffCardProps {
 export const StaffCard: React.FC<StaffCardProps> = ({
     staff,
     onManagePermissions,
+    editMode,
+    onDelete,
+    onInfo,
 }) => {
+    const [menuOpen, setMenuOpen] = useState(false);
+    const menuRef = useRef<HTMLDivElement>(null);
+
+    // Close menu when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+                setMenuOpen(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
     const roleColors = {
-        admin: "bg-warning",
+        admin: "bg-red-500",
         manager: "bg-primary-dark",
         cashier: "bg-success",
-        rider: "bg-secondary",
-    };
-
-    const roleBadgeColors = {
-        admin: "bg-warning/30 text-primary",
-        manager: "bg-primary/30 text-primary",
-        cashier: "bg-success/10 text-success",
-        rider: "bg-secondary/30 text-white",
+        rider: "bg-blue-500",
     };
 
     const roleDisplayNames = {
@@ -41,7 +55,7 @@ export const StaffCard: React.FC<StaffCardProps> = ({
     };
 
     return (
-        <div className="bg-surface-container-lowest p-6 rounded-3xl shadow-2xl hover:shadow-xl transition-all border border-transparent hover:border-outline-variant/20 group">
+        <div className="bg-surface-container-lowest p-6 rounded-3xl shadow-2xl hover:shadow-xl transition-all border border-transparent hover:border-outline-variant/20 group relative">
             <div className="flex justify-between items-start mb-6">
                 <div className="relative">
                     <img
@@ -61,37 +75,53 @@ export const StaffCard: React.FC<StaffCardProps> = ({
                         {roleDisplayNames[staff.roleType]}
                     </span>
                 </div>
-                <button className="text-on-surface-variant opacity-0 group-hover:opacity-100 transition-opacity">
-                    <span className="material-symbols-outlined">more_vert</span>
-                </button>
+                
+                {/* More Vert Button and Menu */}
+                <div className="relative" ref={menuRef}>
+                    <Button 
+                        onClick={() => setMenuOpen(!menuOpen)} 
+                        variant="ghost" 
+                        className="p-2 opacity-0 group-hover:opacity-100"
+                    >
+                        <MdMoreVert className="text-2xl"/>
+                    </Button>
+
+                    {menuOpen && (
+                        <div className="absolute right-0 mt-2 w-40 bg-surface-container-high border border-outline-variant/20 rounded-2xl shadow-2xl z-50 py-2">
+                            <button
+                                onClick={() => { editMode(staff); setMenuOpen(false); }}
+                                className="w-full flex items-center gap-3 px-4 py-2 text-sm hover:bg-surface-container-highest transition-colors"
+                            >
+                                <MdEdit className="text-primary" /> Edit
+                            </button>
+                            <button
+                                onClick={() => { onInfo?.(staff); setMenuOpen(false); }}
+                                className="w-full flex items-center gap-3 px-4 py-2 text-sm hover:bg-surface-container-highest transition-colors"
+                            >
+                                <MdInfo className="text-info" /> Info
+                            </button>
+                            <hr className="my-1 border-outline-variant/10" />
+                            <button
+                                onClick={() => { onDelete?.(staff.id); setMenuOpen(false); }}
+                                className="w-full flex items-center gap-3 px-4 py-2 text-sm text-error hover:bg-error/10 transition-colors"
+                            >
+                                <MdDelete /> Delete
+                            </button>
+                        </div>
+                    )}
+                </div>
             </div>
+            
             <div className="space-y-1 mb-4">
                 <h4 className="text-xl font-bold font-headline">
                     {staff.name}
                 </h4>
                 <p className="text-on-surface-variant text-sm">{staff.role}</p>
             </div>
-            {/* <div className="flex flex-wrap gap-2 text-xs font-semibold mb-6">
-                {staff.permissions.map((perm, idx) => (
-                    <span
-                        key={idx}
-                        className={cn(
-                            "px-2 py-1 rounded",
-                            roleBadgeColors[staff.roleType]
-                        )}
-                    >
-                        {perm}
-                    </span>
-                ))}
-                {staff.twoFactor && (
-                    <span className="bg-primary/10 text-primary px-2 py-1 rounded">
-                        2FA Active
-                    </span>
-                )}
-            </div> */}
+           
             <Button
                 variant="ghost"
-                className="p-1 border "
+                className="p-1 border"
                 onClick={() => onManagePermissions?.(staff.id)}
             >
                 Manage Permissions

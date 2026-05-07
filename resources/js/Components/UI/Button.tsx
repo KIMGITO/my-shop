@@ -5,7 +5,7 @@ import { BiLoaderCircle } from "react-icons/bi";
 import { TbLoader3 } from "react-icons/tb";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-    variant?: "primary" | "secondary" | "outline" | "ghost" | "danger";
+    variant?: "primary" | "secondary" | "outline" | "ghost" | "danger" | "link";
     size?: "sm" | "md" | "lg";
     fullWidth?: boolean;
     loading?: boolean;
@@ -27,6 +27,9 @@ export const Button: React.FC<ButtonProps> = ({
         outline: "border border-primary text-primary hover:bg-primary/10",
         ghost: "text-on-surface-variant hover:text-primary",
         danger: " hover:text-red-200 border border-red-200 text-red-500/40  hover:bg-red-500/20",
+        link: " text-primary font-bold text-sm flex items-center gap-1 hover:underline",
+
+
     };
 
     const sizes = {

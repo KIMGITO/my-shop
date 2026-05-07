@@ -22,11 +22,7 @@ class UserController extends Controller
 
         $roles = ['admin', 'manager', 'cashier', 'rider'];
 
-        /**
-         * FIX: We convert the collection to an array BEFORE caching.
-         * This prevents the __PHP_Incomplete_Class error caused by 
-         * unserializing Spatie models before they are fully booted.
-         */
+        
         $rolePermissions = Cache::rememberForever('staff_roles_permissions', function () use ($roles) {
             return Role::whereIn('name', $roles)
                 ->with('permissions:id,name')
