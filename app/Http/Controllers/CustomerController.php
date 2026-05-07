@@ -42,7 +42,7 @@ class CustomerController extends Controller
             'phone' => $customer->phone,
             'outstandingBalance' => (int) $customer->balance,
         ];
-        $history = $this->customerService->transactions();
+        $history = $this->customerService->transactions($customer);
 
         // last 5 transactions.
         // get order or credit where  payment is not credit and get the payment with order id or credit id of the first 5 

@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Customer;
 use App\Repositories\CustomerRepository;
 
 class CustomerService
@@ -17,17 +18,18 @@ class CustomerService
         // fetchCustomerData 
     }
 
-    public function transactions(int $limit = 5){
-        $payments = $this->customerRepository->latestPayments($limit);
+    // Pass the $customer into the function
+    public function transactions(Customer $customer, int $limit = 5)
+    {
+        // Pass the customer ID to the repository
+        $payments = $this->customerRepository->latestPayments($customer->id, $limit);
 
-        return  collect($payments)->map(function ($payment){
+        return collect($payments)->map(function ($payment) {
             return [
                 'method' => $payment->method,
-                'date' => $payment->created_at->format('F j Y'),
+                'date'   => $payment->created_at->format('F j Y'),
                 'amount' => $payment->amount_paid
             ];
         })->toArray();
-
-
     }
 }

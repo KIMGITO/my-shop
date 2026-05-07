@@ -38,7 +38,7 @@ export default function CreditPaymentPage({ customerId }: { customerId: number})
             setLoading(false);
         };
         fetchCustomerDebt();
-    }, [customerId]);
+    }, []);
 
     const handlePaymentComplete = (paymentData: any) => {
         
