@@ -69,7 +69,7 @@ export default function CustomerShowPage({ customer }: { customer: any }) {
                                 </div>
                             </div>
                            {
-                            !isIndebted &&  <div  className="mt-8 grid grid-cols-1 gap-4">
+                            isIndebted &&  <div  className="mt-8 grid grid-cols-1 gap-4">
                                 <Button variant="danger" className="p-2 brightness-120  truncate" onClick={()=>{router.get(`/payments/${customer.id}`)}}>
                                     <p className="text-lg font-black">Register Payment</p>
                                 </Button>

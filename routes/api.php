@@ -16,7 +16,7 @@ Route::get('/products/search', [SearchController::class,  'products']);
 Route::get('/suppliers/search', [SearchController::class,  'suppliers']);
 Route::get('/categories/search', [SearchController::class,  'categories']);
 Route::get('/customers/search', [SearchController::class,  'customers']);
-Route::get('/customers/{customer}/debt', [CustomerController::class,  'debt']);
+Route::get('/customers/{customer}/debt', [CustomerController::class,  'debt'])->middleware('auth:sanctum');
 
 
 
