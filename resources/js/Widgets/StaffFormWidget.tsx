@@ -3,7 +3,7 @@ import { Input } from "@/Components/UI/Input";
 import { Select } from "@/Components/UI/Select";
 import ToggleSwitch from "@/Components/UI/ToggleSwitch";
 import { MdBadge, MdEmail, MdManageAccounts, MdSecurity } from "react-icons/md";
-import { HiOutlineUser } from "react-icons/hi";
+import { HiDeviceMobile, HiOutlineUser, HiPhone } from "react-icons/hi";
 
 interface StaffFormWidgetProps {
     data: any;
@@ -55,11 +55,18 @@ export const StaffFormWidget: React.FC<StaffFormWidgetProps> = ({
             </div>
 
             <div className="space-y-4">
-                <h4 className="text-sm font-semibold uppercase tracking-wider text-primary">
-                    Role & Permissions
-                </h4>
+               
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                   <Input
+                        label="Phone"
+                        value={data.phone}
+                        onChange={(e) => setData("phone", e.target.value)}
+                        placeholder="e.g., 07xxxxxxxx"
+                        Icon={HiPhone}
+                        error={errors.phone}
+                        disabled={processing}
+                    />
                     <Select
                         size="sm"
                         label="System Role"
@@ -71,15 +78,7 @@ export const StaffFormWidget: React.FC<StaffFormWidgetProps> = ({
                         error={errors.roleType}
                         disabled={processing}
                     />
-                    <Input
-                        label="Job Title"
-                        value={data.role}
-                        onChange={(e) => setData("role", e.target.value)}
-                        placeholder="e.g., Senior Barista"
-                        Icon={MdBadge}
-                        error={errors.role}
-                        disabled={processing}
-                    />
+                   
                 </div>
             </div>
 
@@ -88,9 +87,9 @@ export const StaffFormWidget: React.FC<StaffFormWidgetProps> = ({
                     Security
                 </h4>
                 <ToggleSwitch
-                    label="Require Two-Factor Authentication"
+                    label="Two-Factor Authentication"
                     onChange={(val) => setData("twoFactor", val)}
-                    value={data.twoFactor}
+                    value={true}
                     size="sm"
                     icon={MdSecurity}
                     disabled={processing}

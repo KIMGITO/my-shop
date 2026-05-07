@@ -12,6 +12,7 @@ use App\Http\Controllers\BatchController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\StaffController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -53,7 +54,12 @@ use Inertia\Inertia;
 
 
          //staff
-         Route::get('/staff', [UserController::class, 'staffIndex'])->name('staff');
+            Route::prefix('staff')->name('staff.')->group(function () {
+                Route::get('/', [StaffController::class, 'index'])->name('staff');
+                Route::post('/',[StaffController::class, 'store'])->name('store');
+                Route::put('/', [StaffController::class, 'update'])->name('update');
+                Route::delete('/', [StaffController::class, 'destroy'])->name('destroy');
+            });
 
 
         // Sales Reports

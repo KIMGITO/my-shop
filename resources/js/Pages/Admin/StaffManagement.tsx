@@ -16,7 +16,8 @@ type RoleType = "Admin" | "Cashier" | "Rider" | "Manager";
 export interface Staff {
     id: string;
     name: string;
-    email?: string; // Added for onboarding
+    email?: string;
+    phone?: string;
     role: string;
     avatar: string;
     roleType: Lowercase<RoleType>;
@@ -44,6 +45,7 @@ export default function StaffManagement({
         useForm({
             name: "",
             email: "",
+            phone:"",
             roleType: "cashier" as Lowercase<RoleType>,
         });
 
@@ -73,6 +75,7 @@ export default function StaffManagement({
         setData({
             name: staff.name,
             email: staff.email || "",
+            phone: staff.phone || "",
             roleType: staff.roleType,
         });
         setIsModalOpen(true);
@@ -80,12 +83,13 @@ export default function StaffManagement({
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        console.log(editingStaff);
         if (editingStaff) {
-            put(route("staff.update", editingStaff.id), {
+            put(route("admin.staff.update", editingStaff.id), {
                 onSuccess: () => setIsModalOpen(false),
             });
         } else {
-            post(route("staff.store"), {
+            post(route("admin.staff.store"), {
                 onSuccess: () => {
                     setIsModalOpen(false);
                     reset();
