@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Order;
+use App\Traits\HasDatesScopes;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 
@@ -10,7 +11,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Payment extends Model
 {
-    
+    use HasDatesScopes;//for sorting daily,weekly,monthly,yearly
+
     public function order(){
         return $this->belongsTo(Order::class);
     }
@@ -32,42 +34,5 @@ class Payment extends Model
         );
     }
 
-    public function scopeToday($query)
-    {
-        return $query->whereDate(
-            'created_at',
-            today()
-        );
-    }
-
-    public function scopeThisWeek($query)
-    {
-        return $query->whereBetween(
-            'created_at',
-            [
-                now()->startOfWeek(),
-                now()->endOfWeek(),
-            ]
-        );
-    }
-
-    public function scopeThisMonth($query)
-    {
-        return $query->whereMonth(
-            'created_at',
-            now()->month
-        )->whereYear(
-            'created_at',
-            now()->year
-        );
-    }
-
-    public function scopeThisYear($query)
-    {
-        return $query->whereYear(
-            'created_at',
-            now()->year
-        );
-    }
 
 }

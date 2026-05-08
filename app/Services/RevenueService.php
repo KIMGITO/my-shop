@@ -15,6 +15,6 @@ class RevenueService
     }
 
     public function totalRevenue(): float {
-        return  Payment::paid()->sum();
+        return  Payment::thisMont()->income();
     }
 }
