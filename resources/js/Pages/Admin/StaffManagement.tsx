@@ -118,17 +118,7 @@ export default function StaffManagement({
                                 Kaykay's Milk Bar.
                             </p>
                         </div>
-                        <div className="flex gap-3">
-                            <Button
-                                variant="secondary"
-                                onClick={handleOpenAddModal}
-                            >
-                                <span className="material-symbols-outlined mr-2">
-                                    person_add
-                                </span>
-                                Add Staff
-                            </Button>
-                        </div>
+                       
                     </div>
 
                     {/* Stats */}
