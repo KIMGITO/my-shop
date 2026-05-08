@@ -15,6 +15,7 @@ import Breadcrumb, { BreadcrumbItem } from "../Common/Breadcrumb";
 import { UserAvatar } from "../UI/UserAvatar";
 import { FlashNotifications } from "../UI/FlasNotificatons";
 import { Toaster } from "@/components/ui/sonner";
+import { BiError } from "react-icons/bi";
 
 export default function Authenticated({
     children,
@@ -216,7 +217,7 @@ export default function Authenticated({
                         className="flex-1 bg-surface-container-low/40  overflow-y-auto scroll-smooth scrollbar-hidden"
                     >
                         <FlashNotifications/>
-                        <Toaster richColors closeButton position='top-center'/>
+                        <Toaster swipeDirections={['right']} theme={'light'} richColors closeButton position='top-center'/>
                         <div className=" mx-auto py-15 md:py-12">{children}</div>
                     </div>
                 </main>

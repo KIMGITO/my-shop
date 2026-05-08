@@ -1,44 +1,101 @@
-import React from "react";
+import React, { useState } from "react";
+import axios from "axios"; // Ensure axios is installed
 import { cn } from "@/Utils/helpers";
+import { toast } from "sonner";
+import { PiUserCircleCheckDuotone, PiUserCircleCheckFill } from "react-icons/pi";
+import { TbUserCancel } from "react-icons/tb";
+import { Button } from "@/Components/UI/Button";
 
+// ... existing interfaces ...
 interface PermissionRow {
     feature: string;
+
     [key: string]: any;
 }
 
 interface RolePermissionTableProps {
     roleMatrix: PermissionRow[];
+
     roles: string[];
+
     className?: string;
+
     maxHeight?: string; // Added prop for custom scroll height
 }
 
 export const RolePermissionTable: React.FC<RolePermissionTableProps> = ({
-    roleMatrix,
+    roleMatrix: initialData,
     roles,
     className,
-    maxHeight = "max-h-[600px]", // Default scroll height
+    maxHeight = "max-h-[600px]",
 }) => {
+    // Keep local state so the UI updates immediately when you click
+    const [matrix, setMatrix] = useState(initialData);
+    const [loading, setLoading] = useState<string | null>(null);
+
+    const handleToggle = async (
+        roleName: string,
+        permissionName: string,
+        currentValue: boolean,
+    ) => {
+        const id = `${roleName}-${permissionName}`;
+
+        // update icon status instantly 
+        setMatrix((prev) =>
+            prev.map((row) => {
+                if (row.feature === permissionName) {
+                    return { ...row, [roleName.toLowerCase()]: !currentValue };
+                }
+                return row;
+            }),
+        );
+
+        try {
+            // Your Laravel endpoint
+            await axios.post("/api/v1/permissions/toggle", {
+                role: roleName.toLowerCase(),
+                permission: permissionName,
+                status: !currentValue,
+            });
+        } catch (error) {
+            // revert the local status if failed
+            setMatrix((prev) =>
+                prev.map((row) => {
+                    if (row.feature === permissionName) {
+                        return {
+                            ...row,
+                            [roleName.toLowerCase()]: currentValue,
+                        };
+                    }
+                    return row;
+                }),
+            );
+            toast.error(
+                error.response.data.message || "Unable to update status",
+            );
+        } finally {
+            setLoading(null);
+        }
+    };
+
     return (
         <div
             className={cn(
                 "bg-surface-container-lowest/50 rounded-3xl border border-outline-variant/10 shadow-sm overflow-hidden",
-                className
+                className,
             )}
         >
-            {/* The wrapper handles both horizontal and vertical scrolling */}
-            <div className={cn("overflow-auto scrollbar-hidden", maxHeight)}>
+            <div className={cn("overflow-auto", maxHeight)}>
                 <table className="w-full text-left border-separate border-spacing-0">
                     <thead className="sticky top-0 z-10">
-                        <tr className="bg-on-primary border-b border-outline-variant/10">
-                            <th></th>
-                            <th className="p-5 text-[10px] font-black uppercase tracking-widest  sticky left-0 bg-on-primary ">
+                        <tr className="bg-on-primary">
+                            <th className="p-5 sticky left-0 bg-on-primary">
                                 Features & Permissions
                             </th>
                             {roles.map((role) => (
                                 <th
                                     key={role}
-                                    className="p-5 text-center text-[10px] font-black uppercase tracking-widest "
+                                    className="p-5 text-center text-[10px] font-black uppercase"
                                 >
                                     {role}
                                 </th>
@@ -46,40 +103,49 @@ export const RolePermissionTable: React.FC<RolePermissionTableProps> = ({
                         </tr>
                     </thead>
                     <tbody className="text-sm">
-                        {roleMatrix.map((row, idx) => (
-                            <tr
-                                key={idx}
-                                className={cn(
-                                    "transition-colors hover:bg-on-primary",
-                                    idx % 2 === 0
-                                        ? "bg-surface-container-low/30"
-                                        : "bg-transparent"
-                                )}
-                            >
-                                <td className="max-w-10 bg-on-primary text-center font-bold">{idx + 1}</td>
-                                <td className="p-5 font-bold text-on-surface border-b capitalize border-outline-variant/5 sticky left-0 bg-on-primary">
+                        {matrix.map((row, idx) => (
+                            <tr key={idx} className="hover:bg-on-primary">
+                                <td className="p-5 font-bold sticky left-0 bg-on-primary border-b capitalize">
                                     {row.feature}
                                 </td>
-                                {roles.map((role) => (
-                                    <td
-                                        key={role}
-                                        className="p-5 text-center border-b border-outline-variant/5"
-                                    >
-                                        {row[role.toLowerCase()] ? (
-                                            <div className="flex justify-center">
-                                                <span className="material-symbols-outlined text-[#eeb200] text-xl">
-                                                    check_circle
-                                                </span>
-                                            </div>
-                                        ) : (
-                                            <div className="flex justify-center">
-                                                <span className="material-symbols-outlined text-on-surface/10 text-xl">
-                                                    cancel
-                                                </span>
-                                            </div>
-                                        )}
-                                    </td>
-                                ))}
+                                {roles.map((role) => {
+                                    const isAssigned = row[role.toLowerCase()];
+                                    const isLoading =
+                                        loading === `${role}-${row.feature}`;
+
+                                    return (
+                                        <td
+                                            key={role}
+                                            className="p-5 text-center border-b"
+                                        >
+                                            <Button
+                                                variant="ghost"
+                                                onClick={() =>
+                                                    handleToggle(
+                                                        role,
+                                                        row.feature,
+                                                        !!isAssigned,
+                                                    )
+                                                }
+                                                disabled={isLoading || role.toLowerCase() == 'admin'}
+                                                className={cn(
+                                                    "transition-transform active:scale-90",
+                                                    isLoading
+                                                        ? "opacity-50 cursor-not-allowed"
+                                                        : "cursor-pointer",
+                                                )}
+                                            >
+                                                {isAssigned ? (
+                                                   <PiUserCircleCheckDuotone className="text-2xl text-primary" />
+                                                    
+                                                ) : (
+                                                    
+                                                    <TbUserCancel  className="material-symbols-outlined text-on-surface/10 text-2xl" />
+                                                )}
+                                            </Button>
+                                        </td>
+                                    );
+                                })}
                             </tr>
                         ))}
                     </tbody>
@@ -88,5 +154,3 @@ export const RolePermissionTable: React.FC<RolePermissionTableProps> = ({
         </div>
     );
 };
-
-export default RolePermissionTable;

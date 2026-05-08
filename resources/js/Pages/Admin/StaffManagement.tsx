@@ -215,12 +215,9 @@ export default function StaffManagement({
                     <div className="space-y-6 pt-10">
                         <div className="flex items-center justify-between">
                             <h3 className="text-2xl font-bold font-headline">
-                                Role Permission Matrix
+                                Role Permission Table
                             </h3>
-                            <Button variant="link">
-                                Edit Default Roles
-                                <MdManageAccounts className="ml-2 text-xl" />
-                            </Button>
+                         
                         </div>
                         <RolePermissionTable
                             roles={roles}

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SearchController;
 use Illuminate\Http\Request;
@@ -25,4 +26,10 @@ Route::prefix('pos') -> middleware('auth:sanctum')->group(function () {
     Route::get('/orders/order-number', [OrderController::class, 'getOrderNumber']);
     Route::post('/orders', [OrderController::class, 'store']);
     Route::patch('/orders/{order}/status', [OrderController::class, 'updateStatus']);
+});
+
+// roles and permissions
+
+Route::prefix('/permissions')->name('permissions.')->group(function (){
+    Route::post('/toggle', [PermissionController::class, 'toggle'])->name('toggle');
 });

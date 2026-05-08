@@ -158,7 +158,7 @@ class RolePermissionSeeder extends Seeder
             'create orders',
             'cancel orders',
             'view order history',
-            'view deliveries', // To track their own milk/bread
+            'view deliveries', 
         ]);
 
         // --- 3. Create Default Users ---

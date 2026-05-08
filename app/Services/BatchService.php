@@ -92,7 +92,7 @@ class BatchService
             $expireDays = (int) Carbon::today()->diffInDays($expiryDate);
 
             if($expireDays >= floor($shelfLife/2)){
-                return 'expiring_soon';
+                return 'fresh';
             }else if($expireDays < floor($shelfLife/2) && $expireDays > 0){
                 return 'expiring_soon';
             }else if($expireDays == 0){
