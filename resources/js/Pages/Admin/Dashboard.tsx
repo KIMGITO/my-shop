@@ -9,6 +9,8 @@ import {
 } from "react-icons/hi2";
 import AuthenticatedLayout from "@/Components/Layout/AuthenticatedLayout";
 import { HiOutlineCash } from "react-icons/hi";
+import { FaUsersLine } from "react-icons/fa6";
+import FinancialChart from "./FinantialChart";
 
 const alerts = [
     {
@@ -34,7 +36,7 @@ const alerts = [
     },
 ];
 
-export default function AdminDashboard() {
+export default function AdminDashboard({ revenue, orders, products, customers }) {
     return (
         <>
             <Head title="Admin Dashboard" />
@@ -63,82 +65,36 @@ export default function AdminDashboard() {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         <KPICard
                             title="Total Revenue"
-                            value="KSh 1,240,500"
+                            value={revenue['income']}
                             icon={HiOutlineCash}
-                            trend={{ value: 12.5, direction: "up" }}
+                            trend={{ value: revenue['percentage'], direction: "up" }}
                         />
                         <KPICard
-                            title="Orders Today"
-                            value="156"
+                            title="Orders This Month"
+                            value={orders['count']}
                             icon={HiOutlineShoppingBag}
-                            subtitle="Peak hour: 8:00 AM"
+                            subtitle={`Peak hour: ${orders['peakHour']}`}
                         />
                         <KPICard
                             title="Stock Alerts"
-                            value="4 Items"
+                            value={products['count']}
                             icon={HiOutlineExclamationTriangle}
                             color="error"
-                            subtitle="Immediate restock required"
+                            subtitle={products['message']}
                         />
                         <KPICard
-                            title="On-Time Delivery"
-                            value="98.2%"
-                            icon={HiOutlineTruck}
-                            trend={{ value: 2, direction: "up" }}
+                            title="Customers"
+                            value={customers['count']}
+                            icon={FaUsersLine}
+                            trend={{ value: customers['percentage'], direction: "up" }}
                         />
                     </div>
 
                     {/* Main Insights */}
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                         {/* Sales Chart */}
-                        <div className="lg:col-span-2 bg-surface-container-lowest p-8 rounded-2xl shadow-sm">
-                            <div className="flex items-center justify-between mb-6">
-                                <div>
-                                    <h3 className="text-xl font-bold font-headline">
-                                        Revenue Velocity
-                                    </h3>
-                                    <p className="text-sm text-stone-500">
-                                        Weekly intake performance across all
-                                        branches
-                                    </p>
-                                </div>
-                                <div className="flex bg-surface-container-low p-1 rounded-lg gap-1">
-                                    <button className="px-4 py-1.5 text-xs font-bold bg-white rounded shadow-sm text-primary">
-                                        7 Days
-                                    </button>
-                                    <button className="px-4 py-1.5 text-xs font-bold text-stone-500">
-                                        30 Days
-                                    </button>
-                                </div>
-                            </div>
-                            <div className="flex-1 min-h-[300px] flex items-end justify-between px-2 gap-4">
-                                {[40, 60, 50, 85, 70, 95, 45].map(
-                                    (height, i) => (
-                                        <div
-                                            key={i}
-                                            className="w-full bg-surface-container-low rounded-t-lg relative group h-[40%]"
-                                        >
-                                            <div
-                                                className="absolute inset-x-0 bottom-0 editorial-gradient rounded-t-lg"
-                                                style={{ height: `${height}%` }}
-                                            ></div>
-                                            <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-[10px] font-bold text-stone-400">
-                                                {
-                                                    [
-                                                        "MON",
-                                                        "TUE",
-                                                        "WED",
-                                                        "THU",
-                                                        "FRI",
-                                                        "SAT",
-                                                        "SUN",
-                                                    ][i]
-                                                }
-                                            </span>
-                                        </div>
-                                    )
-                                )}
-                            </div>
+                        <div className="lg:col-span-2 bg-surface-container-lowest p-8 rounded-2xl shadow-lg">
+                           <FinancialChart/>
                         </div>
 
                         {/* Alerts Column */}

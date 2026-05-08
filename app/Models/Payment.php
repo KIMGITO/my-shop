@@ -28,9 +28,9 @@ class Payment extends Model
         );
     }
 
-    public function scopeExpense($query){
+    public function scopeExpenses($query){
         return $query->selectRaw(
-            'SUM(CASE WHEN amount_paid < 0 THEN amount_paid ELSE 0 END) as expense'
+            'SUM(CASE WHEN amount_paid < 0 THEN amount_paid ELSE 0 END) as expenses'
         );
     }
 

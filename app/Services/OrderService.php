@@ -207,4 +207,12 @@ class OrderService
         });
         
     }
+
+    public function totalOrders(){
+        return Order::thisMonth()->count();
+    }
+
+    public function peakHours (){
+        return Order::thisMonth()->peakHours();
+    }
 }

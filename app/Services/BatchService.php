@@ -87,7 +87,7 @@ class BatchService
 
             $receiveDate = Carbon::parse($batch->created_at);
             $shelfLife = $batch->product->shelf_life;
-            $expiryDate = $receiveDate->addDays($shelfLife);
+            $expiryDate = $batch->expiryDate();
 
             $expireDays = (int) Carbon::today()->diffInDays($expiryDate);
 
@@ -103,6 +103,14 @@ class BatchService
         } catch (\Throwable $th) {
             throw $th;
         }
+    }
+
+    public function countExpired(): float {
+        return Batch::expired()->count();
+    }
+    public function countExpiringSoon(): float
+    {
+        return Batch::expiringSoon()->count();
     }
     
 

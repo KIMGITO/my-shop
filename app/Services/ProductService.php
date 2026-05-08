@@ -48,4 +48,8 @@ class ProductService
 
         return $formattedProducts->toArray();
     }
+
+    public function  totalProducts():int {
+        return Product::count();
+    }
 }

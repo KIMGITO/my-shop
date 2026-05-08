@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PermissionController;
@@ -32,4 +33,8 @@ Route::prefix('pos') -> middleware('auth:sanctum')->group(function () {
 
 Route::prefix('/permissions')->name('permissions.')->group(function (){
     Route::post('/toggle', [PermissionController::class, 'toggle'])->name('toggle');
+});
+
+Route::prefix('/admin')->name('admin.')->group(function(){
+    Route::get('/chart/{type}', [AdminController::class, 'chartData']);
 });

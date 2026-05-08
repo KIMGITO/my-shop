@@ -8,6 +8,7 @@
     // Admin Routes (Backend Management)
     // ============================================================================
 
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\BatchController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomerController;
@@ -21,7 +22,7 @@ use Inertia\Inertia;
     Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
 
         // Admin Dashboard
-        Route::get('/dashboard', fn() => Inertia::render('Admin/Dashboard'))->name('dashboard');
+        Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
 
         // Inventory Management
         Route::prefix('inventory')->name('inventory.')->group(function () {

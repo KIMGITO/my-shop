@@ -32,4 +32,22 @@ class CustomerService
             ];
         })->toArray();
     }
+
+    public function customerStats (){
+        $thisMonthCustomers =  Customer::thisMonth()->count();
+        $lastMonthsCustomers = Customer::thisMonth(1) ->count();
+        $totalCustomers  = Customer::count();
+
+        $percentageIncrease = number_format(
+            ( $lastMonthsCustomers > 0 ? $thisMonthCustomers / $lastMonthsCustomers : 0) * 100,
+            1
+        );
+
+        return [
+            'count' => $totalCustomers,
+            'percentage'  => $percentageIncrease
+        ];
+
+
+    }
 }

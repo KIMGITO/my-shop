@@ -7,12 +7,15 @@ use App\Models\Customer;
 use App\Models\OrderItem;
 use App\Models\Payment;
 use App\Models\User;
+use App\Traits\HasDatesScopes;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 #[Fillable(['order_number','type','source','status','customer_id','user_id','total_amount','paid_amount','payment_status','balance','discount','tax','notes','expires_at'])]
 class Order extends Model
 {
+    use HasDatesScopes;
+    
     protected $casts = [
         'expires_at' => 'datetime',
     ];
@@ -41,14 +44,13 @@ class Order extends Model
         return $this->hasOne(Credit::class);
     }
 
-    public function scopeToday(Builder $query){
-        return $query->whereDate('created_at', today());
+
+    public function scopePeakHours(Builder $query)
+    {
+        return $query->selectRaw('HOUR(created_at) as hour, COUNT(*) as total_orders')
+            ->groupBy('hour')
+            ->orderBy('total_orders', 'desc')
+            ->first();
     }
 
-    public function scopeThisWeek($query){
-        return $query->whereBetween('created_at', [
-            now()->startOfWeek(),
-            now()->endOfWeek()
-        ]);
-    }
 }

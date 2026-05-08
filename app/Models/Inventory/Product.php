@@ -8,6 +8,7 @@ use App\Models\ProductImage;
 use App\Models\Traits\HasSkuByCategoryName;
 use App\Services\CloudinaryService;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 #[Fillable(
@@ -54,4 +55,8 @@ class Product extends Model
     {
         return $this->images->where('is_main', true)->first()?->url ?? $this->images->first()->url ?? 'https://res.cloudinary.com/dhekeyvop/image/upload/e_background_removal/suppliers/yxmcydmani7hhsapzo5z.png';
     }
+
+    
+
+
 }

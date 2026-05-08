@@ -15,6 +15,16 @@ class RevenueService
     }
 
     public function totalRevenue(): float {
-        return  Payment::thisMont()->income();
+        return Payment::thisMonth()->income()->value('income');
+    }
+
+    public function revenuePercentage(){
+        $revenue = Payment::thisMonth()->income()->value('income');
+        $lastMonth = Payment::thisMonth(1)->income()->value('income');
+        return (number_format($lastMonth > 0 ? $revenue * 100 / $lastMonth : 0,1));
+    }
+
+    public function totalExpenses():float{
+        return Payment::thisMonth()->expenses()->value('expenses');
     }
 }

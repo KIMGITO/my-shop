@@ -7,6 +7,7 @@ use App\Models\Order;
 use App\Models\Payment;
 use App\Models\Traits\HasCustomerNumber;
 use App\Models\User;
+use App\Traits\HasDatesScopes;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
@@ -15,7 +16,7 @@ use Illuminate\Support\Facades\DB;
 class Customer extends Model
 {
 
-use HasCustomerNumber;
+use HasCustomerNumber,  HasDatesScopes;
     protected $with = ['user:id,name,email,phone','user.addresses'];
 
     public function user(){
